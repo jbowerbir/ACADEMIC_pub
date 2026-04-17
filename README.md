@@ -1,4 +1,4 @@
-# ACADEMIC_PUBLIC
+# ACADEMIC_pub
 
 Replication materials for published academic research by Jacob S. Bower-Bir.
 
