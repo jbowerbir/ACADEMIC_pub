@@ -11,8 +11,8 @@ Americans simultaneously believe income differences are too large, perceive conf
 - **Data:** `../data/economic_justice_v7_nonstandardized.csv` (N=992, see `../data/README.md`)
 - **Codebook:** `../data/Survey_v7_codebook_2014-04-08.xlsx`
 - **Analysis scripts:** `analysis/`
-  - `Public opinion puzzle_180817.R` — Main analysis
-  - `Data_aesthetic v justice mismatch_180604.R` — Justice mismatch analysis
+  - `public-opinion-puzzle_180817.R` — Main analysis
+  - `data-aesthetic-v-justice-mismatch_180604.R` — Justice mismatch analysis
 - **Figures:** `figures/`
 
 ## Key Finding

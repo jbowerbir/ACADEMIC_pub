@@ -11,10 +11,10 @@ What do Americans think determines whether someone deserves to be rich or poor? 
 - **Data:** `../data/economic_justice_v7_nonstandardized.csv` (N=992, see `../data/README.md`)
 - **Codebook:** `../data/Survey_v7_codebook_2014-04-08.xlsx`
 - **Analysis scripts:** `analysis/`
-  - `Data_imortance v control_180801.R` — Main importance vs. control analysis
-  - `Data_imortance v control_densities_180801.R` — Density plots
-  - `Data_imortance v control_dot plots_180801.R` — Dot plots
-  - `Data_imortance v control_heatmaps_180801.R` — Heatmap visualizations
+  - `data-importance-v-control_180801.R` — Main importance vs. control analysis
+  - `data-importance-v-control-densities_180801.R` — Density plots
+  - `data-importance-v-control-dot-plots_180801.R` — Dot plots
+  - `data-importance-v-control-heatmaps_180801.R` — Heatmap visualizations
 - **Figures:** `figures/`
 
 ## Key Finding
