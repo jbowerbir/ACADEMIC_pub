@@ -6,12 +6,12 @@ Replication materials for published academic research by Jacob S. Bower-Bir.
 
 | Paper | Journal | Year | Data | Code |
 |---|---|---|---|---|
-| [Desert and Redistribution](desert-redistribution-psj-2021/) | *Policy Studies Journal* | 2021 | Shared | R |
-| [Earning Our Place, More or Less](earning-our-place-ecopol-2020/) | *Economia Politica* | 2020 | Shared | R |
+| [Desert and Redistribution](desert-redistribution-psj-2021/) | *Policy Studies Journal* 50(4) | 2022 | Shared | Stata, R, Python |
+| [Earning Our Place, More or Less](earning-our-place-ecopol-2020/) | *Economia Politica* 38(1) | 2021 | Shared | R |
 
 ## Shared Data
 
-The [Economic Justice Survey (v7)](data/) supports both papers above. N=992 nationally representative respondents. De-identified CSV with codebook.
+The [Economic Justice Survey (v7)](data/) supports both papers above. N=992 nationally representative respondents (published models use N=963 after listwise deletion). De-identified CSVs with codebook — use `economic_justice_v7_analysis-weighted.csv` to reproduce published tables.
 
 ## Other Published Work (Replication Materials Forthcoming)
 
