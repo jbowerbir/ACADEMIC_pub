@@ -14,7 +14,7 @@ Survey data from the Economic Justice survey (v7), fielded by **SocialSci** in N
 
 ## De-identification
 
-The following columns were removed from the public release: `participant_id` (Qualtrics panel ID), `startdate`, `enddate`, `starttime`, `endtime` (survey timestamps), `pagesequence`, `visitedpages`, `pageprogression` (survey navigation metadata). The anonymous `id` column and `timetaken` (for data quality checks) are retained.
+The following columns were removed from the public release: `participant_id` (SocialSci panel ID), `startdate`, `enddate`, `starttime`, `endtime` (survey timestamps), `pagesequence`, `visitedpages`, `pageprogression` (survey navigation metadata). The anonymous `id` column and `timetaken` (for data quality checks) are retained.
 
 ## Citation
 
