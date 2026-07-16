@@ -1,6 +1,6 @@
 # Economic Justice Survey (v7)
 
-Survey data from the Economic Justice survey fielded via Qualtrics in November 2013. N=992 respondents, nationally representative sample (weighted). This dataset supports multiple published papers:
+Survey data from the Economic Justice survey (v7), fielded by **SocialSci** in November 2013. N=992 respondents, nationally representative sample (weighted). This dataset supports multiple published papers:
 
 - Bower-Bir (2021) "Earning Our Place, More or Less" *Economia Politica* 38(1)
 - Bower-Bir (2022) "Desert and Redistribution" *Policy Studies Journal* 50(4)
