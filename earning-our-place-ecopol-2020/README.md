@@ -10,7 +10,7 @@ A nationally representative survey (N = 992) asks whether and which Americans as
 
 ## Replication
 
-**Data:** `../data/economic_justice_v7_analysis-weighted.csv` — this is the layer every regression runs. It carries `post_weight`, which all published models use. `../data/economic_justice_v7_nonstandardized.csv` is the right layer for Table 2 and the figure statistics (those are unweighted, and need the un-rescaled response scales). See `../data/PROVENANCE.md` and `../data/CODEBOOK.md`.
+**Data:** The replication dataset (Economic Justice Survey v7) is being finalized for public deposit at IU ScholarWorks and is not in this repository yet; it will be posted with the complete replication package (in preparation, 2026). See `../data/README.md` for the schema. The scripts below run against `economic_justice_v7_analysis-weighted.csv` (the weighted layer every regression uses) and `economic_justice_v7_nonstandardized.csv` (Table 2 and the figure statistics) once the data is in place.
 
 **Codebook:** `../data/Survey_v7_codebook_2014-04-08.xlsx`
 

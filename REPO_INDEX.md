@@ -34,26 +34,4 @@ Published academic work (static archive). Replication data and analysis scripts 
 
 ## Data
 
-Economic Justice Survey (v7), fielded by SocialSci, November 2013. Shared dataset supports both published papers. Prepared for IU ScholarWorks deposit 2026-07-16.
-
-### Standing References
-
-- `data/PROVENANCE.md` --- DOC-EJS-PROVENANCE. Vendor delivery to analysis file: the exclusion rule (`drop if time_check <= 10`, 1,390 → 992), the three-script cleaning chain, raking method and targets, every layer's shape, and four verified data-quality defects. Read before using the data.
-- `data/CODEBOOK.md` --- DOC-EJS-CODEBOOK. Variable-level documentation: question wording, coding, scaling, derivation keyed to script and line. Covers the 45 variables absent from the original codebook spreadsheet.
-
-### Data files (all de-identified)
-
-- `data/economic_justice_v7_raw.csv` --- Layer A. 1,390 x 181. Includes the 398 later-excluded responses.
-- `data/economic_justice_v7_nonstandardized.csv` --- Layer B, cleaned. 992 x 229.
-- `data/economic_justice_v7_standardized.csv` --- Layer C. 992 x 229. Defective on six econ variables; see PROVENANCE.md.
-- `data/economic_justice_v7_nonstandardized-weighted.csv` --- Layer D. 992 x 240.
-- `data/economic_justice_v7_standardized-weighted.csv` --- Layer E. 992 x 240.
-- `data/economic_justice_v7_analysis-weighted.csv` --- Layer E_WORKING. 992 x 241. **The analysis file; replicates the published tables.**
-
-### Scripts and source material
-
-- `data/build_deposit_csvs.py` --- Builds all six CSVs from the source Stata files; verifies shapes, scans for PII.
-- `data/build_analysis_csv.py` --- Builds the analysis layer alone. Superseded; kept for continuity.
-- `data/cleaning-scripts/` --- The original 2014 Stata scripts: `Data Cleaning I_Generate` -> `II_Standardize` -> `III_Weight` (the chain), plus the superseded `Survey_recoding_v3.do`.
-- `data/instrument/` --- Instrument as fielded (PDF), Qualtrics-authored version with numeric response codes (docx), quota design, and vendor quota reconciliation.
-- `data/Survey_v7_codebook_2014-04-08.xlsx` --- The original codebook: 212 variables, with values and labels.
+Economic Justice Survey (v7), fielded by SocialSci, November 2013. The shared dataset behind both published papers. **The data is being finalized for public deposit at IU ScholarWorks and is not in this repository yet** (de-identification under review; deposit planned for 2026). The staging work (raw through analysis layers, the instrument, the cleaning chain, and the provenance and codebook documentation) is held in a private repository until the deposit is reviewed and cleared; cleared files will be posted here with the complete replication package. `data/README.md` retains the dataset's schema for reference.

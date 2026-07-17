@@ -10,7 +10,7 @@ Americans simultaneously believe income differences are too large, perceive conf
 
 ## Replication
 
-**Data:** `../data/economic_justice_v7_analysis-weighted.csv` — use this one. The other release (`economic_justice_v7_nonstandardized.csv`) lacks the survey weights every published model needs. See `../data/README.md`.
+**Data:** The replication dataset (Economic Justice Survey v7) is being finalized for public deposit at IU ScholarWorks and is not in this repository yet; it will be posted with the complete replication package (in preparation, 2026). See `../data/README.md` for the schema. The scripts below reproduce every published table from `economic_justice_v7_analysis-weighted.csv` once the data is in place.
 
 **Codebook:** `../data/Survey_v7_codebook_2014-04-08.xlsx`
 

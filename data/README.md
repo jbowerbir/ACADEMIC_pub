@@ -5,6 +5,8 @@ Survey data from the Economic Justice survey (v7), fielded by **SocialSci** in N
 - Bower-Bir (2021) "Earning Our Place, More or Less" *Economia Politica* 38(1)
 - Bower-Bir (2022) "Desert and Redistribution" *Policy Studies Journal* 50(4)
 
+> **Note (2026):** The data files themselves are being finalized for public deposit at IU ScholarWorks and are not in this repository yet. This document describes the dataset and its schema; the CSVs and supporting materials will be posted with the complete, reviewed replication package. De-identification is under review before release.
+
 ## Files
 
 - `economic_justice_v7_nonstandardized.csv` — De-identified survey responses. 992 rows, 229 columns. Original (non-standardized) scale values. Good for descriptive work; **cannot reproduce the published regression tables** (no survey weights, unstandardized scales).
