@@ -3,3 +3,7 @@ __pycache__/
 .env
 .venv/
 .DS_Store
+.Rhistory
+tables_py.md
+tables_deduplicated_py.md
+figure-*-py.png
