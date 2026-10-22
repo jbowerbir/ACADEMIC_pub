@@ -150,8 +150,35 @@ def tables_md(data):
             n = int(mask.sum()); md.append(f'| {g}: {lab} | {n} | {n / len(data):.2f} |')
     return res, md
 
+# The survey weight was raked on all 992 rows in 2014 (iterative proportional fitting to population
+# totals on gender, party, income, race and education). Raking the same way on the 991 distinct rows
+# gives the weight those tables should carry. Strata and targets are the 2014 script's; the targets
+# are scaled from 992 to the rows present.
+def rake(x):
+    inc = (x['income_household'] * 18).round(); edu = (x['education'] * 6).round()
+    strata = {'gender': x['gender'].values,
+              'party': np.select([x.party >= 2, x.party == 1, x.party == 0, x.party == -1, x.party <= -2], [1, 2, 3, 4, 5]),
+              'income': np.select([inc < 8, inc < 11, inc < 13, inc < 15, inc >= 15], [1, 2, 3, 4, 5]),
+              'race': np.select([x.race == 0, x.race == 1, x.race == 2, x.race >= 3], [1, 2, 3, 4]),
+              'educ': np.select([edu <= 1, edu == 2, edu.isin([3, 4]), edu == 5, edu == 6], [1, 2, 3, 4, 5])}
+    targets = {'gender': {1: 486, 0: 506}, 'party': {1: 317, 2: 159, 3: 119, 4: 159, 5: 238},
+               'income': {1: 245, 2: 249, 3: 182, 4: 120, 5: 196}, 'race': {1: 632, 2: 121, 3: 162, 4: 77},
+               'educ': {1: 122, 2: 301, 3: 292, 4: 166, 5: 111}}
+    w = np.ones(len(x))
+    for _ in range(500):
+        w0 = w.copy()
+        for g, t in targets.items():
+            for lvl, tot in t.items():
+                m = strata[g] == lvl; w[m] *= (tot * len(x) / 992) / w[m].sum()
+        if np.abs(w - w0).max() < 1e-12: break
+    return w
+# check: raked on all 992 rows, the method reproduces the shipped weight
+assert np.abs(rake(d) - d['post_weight'].values).max() < 1e-4
+
 res, md = tables_md(d)
-res_dedup, md_dedup = tables_md(d[~dup_mask].reset_index(drop=True))
+d991 = d[~dup_mask].reset_index(drop=True)
+d991['post_weight'] = rake(d991)
+res_dedup, md_dedup = tables_md(d991)
 
 
 # ---- Figures --------------------------------------------------------------------------------------
@@ -292,3 +319,7 @@ if os.path.exists(PUB):
             if probs: mism.append(f"{tag}: " + '; '.join(probs))
     print(f"\nCompared {ncell} cells with {PUB} (the constant's SE and stars are not compared).")
     print('Every cell matches.' if not mism else f'{len(mism)} cells differ between the printed tables and the re-run:\n' + '\n'.join('  ' + m for m in mism))
+    # the same list, as a file: the cell-by-cell record of the transcription errors
+    open('cells_corrected_py.md', 'w', encoding='utf-8').write('\n'.join(
+        ['# Cells where the printed tables differ from the re-run', '(992 observations)', '',
+         'Each line: table | column | row: what was printed, what the', 're-run gives.', ''] + ['- ' + m for m in mism]) + '\n')

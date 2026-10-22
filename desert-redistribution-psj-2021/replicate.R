@@ -269,8 +269,50 @@ tables_md <- function(data) {
   list(res = res, md = md)
 }
 
+# The survey weight was raked on all 992 rows in 2014 (iterative proportional
+# fitting to population totals on gender, party, income, race and education).
+# Raking the same way on the 991 distinct rows gives the weight those tables
+# should carry. Strata and targets are the 2014 script's; the targets are
+# scaled from 992 to the rows present.
+rake <- function(x) {
+  inc <- round(x$income_household * 18)
+  edu <- round(x$education * 6)
+  strata <- list(
+    gender = x$gender,
+    party  = ifelse(x$party >= 2, 1, ifelse(x$party == 1, 2,
+             ifelse(x$party == 0, 3, ifelse(x$party == -1, 4, 5)))),
+    income = ifelse(inc < 8, 1, ifelse(inc < 11, 2, ifelse(inc < 13, 3,
+             ifelse(inc < 15, 4, 5)))),
+    race   = ifelse(x$race == 0, 1, ifelse(x$race == 1, 2,
+             ifelse(x$race == 2, 3, 4))),
+    educ   = ifelse(edu <= 1, 1, ifelse(edu == 2, 2, ifelse(edu %in% c(3, 4), 3,
+             ifelse(edu == 5, 4, 5)))))
+  targets <- list(
+    gender = c(`1` = 486, `0` = 506),
+    party  = c(`1` = 317, `2` = 159, `3` = 119, `4` = 159, `5` = 238),
+    income = c(`1` = 245, `2` = 249, `3` = 182, `4` = 120, `5` = 196),
+    race   = c(`1` = 632, `2` = 121, `3` = 162, `4` = 77),
+    educ   = c(`1` = 122, `2` = 301, `3` = 292, `4` = 166, `5` = 111))
+  w <- rep(1, nrow(x))
+  for (it in 1:500) {
+    w0 <- w
+    for (g in names(targets)) {
+      for (lvl in names(targets[[g]])) {
+        m <- strata[[g]] == as.numeric(lvl)
+        w[m] <- w[m] * (targets[[g]][[lvl]] * nrow(x) / 992) / sum(w[m])
+      }
+    }
+    if (max(abs(w - w0)) < 1e-12) break
+  }
+  w
+}
+# check: raked on all 992 rows, the method reproduces the shipped weight
+stopifnot(max(abs(rake(d) - d$post_weight)) < 1e-4)
+
 full  <- tables_md(d)
-dedup <- tables_md(d[-dup_row, ])
+d991  <- d[-dup_row, ]
+d991$post_weight <- rake(d991)
+dedup <- tables_md(d991)
 res   <- full$res
 md    <- full$md
 
@@ -584,4 +626,9 @@ if (file.exists(PUB)) {
                 length(mism)), "\n")
     cat(paste0("  ", mism, "\n"), sep = "")
   }
+  # the same list as a file: the cell-by-cell record of the errors
+  writeLines(c("# Cells where the printed tables differ from the re-run",
+               "(992 observations)", "",
+               "Each line: table | column | row: what was printed, what the",
+               "re-run gives.", "", paste0("- ", mism)), "cells_corrected.md")
 }
