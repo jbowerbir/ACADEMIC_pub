@@ -6,15 +6,15 @@ Bower-Bir, J. S. (2022). Desert and redistribution: Justice as a remedy for, and
 
 This package allows users to replicate every table and figure in the article using the provided survey data. In addition to the original Stata script used to analyze the data---included in this package---I translated the analysis into R and Python, and expanded the analysis to compare the tables it produces with the published tables. The R, Python, and Stata scripts produce identical output. I found, however, a few typos in the published tables, none of which alter the paper’s conclusions. Below is a summary of discrepancies between the verified output and the published tables:
 
-- Twenty-one published cells differ from the output, all copying errors I made when typing the tables into the manuscript: mostly digits mistyped or transposed, decimals slipped, and significance stars one level off, plus three dropped minus signs. One of those is in Table 1, on the paper's central variable, where the text already states the correct, negative result. None contradicts the published prose.
-- One sentence of the published text misreads a coefficient sign. The coefficient on `age^2` is so small that it prints as 0.000. The offending sentence in the article calls it positive when it is negative, such that support for government action to reduce the income gap (`Y_gov_fix_gap`) rises with age to the late thirties and then falls rather than accelerating.
+- Twenty-one published cells differ from the output, all copying errors I made when typing the tables into the manuscript: mostly digits mistyped or transposed, a decimal point in the wrong place, and significance stars one level off, plus three dropped minus signs. One of those is in Table 1, on the paper's central variable, where the text already states the correct, negative coefficient. None contradicts the published prose.
+- One sentence of the published text misreads a coefficient sign. The coefficient on Age^2 is so small that it prints as 0.000. The offending sentence in the article calls it positive when it is negative, such that support for government action to reduce the income gap (Y_gov_fix_gap) rises with age into the late thirties and then falls rather than accelerating.
 
-In the course of re-engaging with the data, I also found a duplicate row that my 2014 data cleaning did not catch. One respondent's submission appears twice in the survey file as the vendor delivered it, under two different survey ids. My cleaning screened submissions by completion time, which removed every other duplicated row in the delivery, all of them fast finishers; this pair, completed in sixteen minutes, passed, and the published tables count that respondent twice. Every table has therefore been re-estimated on the 991 distinct observations, rather than the original 992. (The figures are descriptive and are reproduced as published; Figure 4 already excluded the duplicate.) As before, nothing changes in the results or the prose. A summary of the changes:
+In the course of re-engaging with the data, I also found a duplicate row that my 2014 data cleaning did not catch. One respondent’s submission appears twice in the dataset provided by the online survey panel vendor, under two different survey ids. My initial cleaning removed every other duplicated row in the delivered dataset, save the remaining offender. Every table has been re-estimated on the 991 distinct observations, rather than the original 992. The figures can also be re-rendered, though the changes are imperceptible. As before, nothing contradicts the published conclusions or the prose. A summary of the changes:
 
-- Coefficients move by one or two units in the third decimal place, at most 0.014 in the large interaction terms of Table D1.
-- Four significance stars that sit on a p-value threshold move, each by one level. Definition in Table 1, Model 1, goes from p = 0.0099 to p = 0.0100, so it is now marked significant at 5% rather than 1%. Two 10% stars on control variables (Female in Table C1 Model B, Good life in Table C2 Model A) slip just over the line into non-significance, and one (Income in Table 1, Y_prog_tax Model 1) slips just under it and gains a 10% star.
+- Coefficients move by one or two units in the third decimal place, at most 0.014.
+- Four coefficients whose p-values sit on a significance threshold cross it, so their stars move by one level. Definition, the paper's central variable, drops from the 1% level to the 5% level in one of the three Y_gov models of Table 1 and stays at 1% in the other two. The other three are control variables: two drop out of significance altogether, and one achieves significance at the 10% level.
 
-The data provided are the 27 survey variables these tables and figures use, for all 992 rows as delivered, with a codebook. The scripts produce both the 992-row tables (the published analysis with the typos corrected) and the 991-row tables (the replacements). Additional details below.
+The dataset here provided includes the 27 survey variables used to generate the paper’s tables and figures, for all 992 observations as delivered by the panel vendor, with a codebook. The scripts produce both the 992-observation tables (the published analysis with the typos corrected) and the 991-observation tables (the replacement tables). Additional details below.
 
 A correction (journal DOI 10.1111/psj.70145) is included. Again, none of the errors alters the article’s substantive findings or interpretations.
 
@@ -45,31 +45,33 @@ Put the files in one folder. R needs base R only. Python needs pandas, numpy, sc
 ## What is reproduced, and how closely: the published sample (992 observations)
 
 - **Tables 1, C1, C2, D1.** Every coefficient, standard error, N, R² and adjusted R² matches the printed value to the printed decimals, except the 21 corrected cells. The constant's standard error is an approximation of Stata's and is not compared.
-- **Table A1.** Every count matches.
-- **Figures 2, 3, 4.**
-  - Figure 2 matches the printed figure: the same curves, the same heights.
-  - Figure 3 is drawn here with R's and Python's default smoothing. The printed figure is smoother: Stata drew it in 2014 with a wider smoothing bandwidth, and that setting was not recorded.
-  - Figure 4 drops the duplicated respondent record, as the 2014 plot did. I found the duplicate while drawing that figure, in 2018, and dropped it there, but the regressions dated from 2014 and were not rerun.
-- **Figures D1, D2.** The marginal-effect lines and bands come from the eight regressions the 2014 plot code specifies (ordinary weighted regression without state effects, errors clustered by state). Their coefficients are not printed in the article; they are written to `tables_corrected.md`. The panels match the printed ones.
-- **Figure 1** charts three percentages from the 2010 General Social Survey, not from this survey; the numbers are in the scripts.
-- **Figure B1**, the heat maps of control against ideal importance, belongs to the companion article in *Economia Politica* and is reproduced in that article's package.
+- **Table A1**, the sample's composition by gender, race, education and so on: every group count and share matches.
+- **Figure 2** matches the printed figure: the same curves, the same heights.
+- **Figure 3** is drawn here with R's and Python's default smoothing. The printed figure is smoother because Stata drew it in 2014 with a wider smoothing bandwidth, and that setting was not recorded.
+- **Figure 4** drops the duplicated respondent record, as the 2014 plot did. I found the duplicate while drawing that figure, in 2018, and dropped it there, but the regressions dated from 2014 and I failed to rerun them at the time.
+- **Figure 1** charts three percentages from the 2010 General Social Survey, not from this survey. The numbers are in the scripts.
+- **Figures D1, D2** match the printed panels. The marginal-effect lines and bands come from the eight regressions the 2014 plot code specifies (ordinary weighted regression without state effects, errors clustered by state). The article does not print those regressions, but the scripts nonetheless write them to `tables_corrected.md`.
+- **Figure B1**, the heat maps of control against ideal importance, is not in this article. It appears in the companion article in *Economia Politica* and is reproduced in that article's package.
 
 ## What changes without the duplicate (991 observations)
 
-`tables_deduplicated.md` re-estimates Tables 1, C1, C2 and D1 on the 991 distinct observations, with the survey weight raked again on those 991 rows (the 2014 weights were raked with the duplicate present; the scripts repeat the 2014 raking, whose method they first confirm by reproducing the shipped weight on all 992 rows). The file ends with a list of every cell that changes at the printed precision. Across the 422 coefficient and standard-error cells:
+`tables_deduplicated.md` re-estimates Tables 1, C1, C2 and D1 on the 991 distinct observations, with the survey weight raked again on those 991 rows (the 2014 weights were raked with the duplicate present; the replication analysis scripts repeat the 2014 raking, whose method they first confirm by reproducing the shipped weight on all 992 rows). The file ends with a list of every cell whose printed value changes. Across the 422 coefficient and standard-error cells in those tables:
 
 - No coefficient changes sign. Every negative stays negative and every positive stays positive.
-- Coefficients move by one or two units in the third decimal place. The largest move is 0.014, in the large interaction terms of Table D1.
+- Coefficients move by one or two units in the third decimal place. The largest moves are in Table D1, Y_gov_fix_gap Model 1, where Agency rises from 2.194 to 2.208, and Def. x Agency falls from −2.654 to −2.667. Those two coefficients are the largest in the tables so the moves are small in proportion.
 - R² values move by at most 0.0007.
-- At the 5% level nothing changes: every coefficient significant at 5% or better stays so, and none becomes so. Four markers that sit on a threshold move by one level: Definition in Table 1, Model 1 (p = 0.0099 to 0.0100, from 1% to 5%); Female in Table C1 Model B and Good life in Table C2 Model A (p = 0.096 to 0.101 and 0.098 to 0.108, from 10% to unmarked); and Income in Table 1, Y_prog_tax Model 1 (p = 0.102 to 0.100, from unmarked to 10%).
-- N falls by one: from 992 to 991 in regressions without Definition, and from 963 to 962 in regressions with it.
-- Every claim in the text holds.
+- At the 5% level of statistical significance, nothing changes. Every coefficient with two or three stars keeps at least two, and no coefficient with fewer than two gains a second.
+- Four coefficients whose p-values sit on a significance threshold cross it, so their stars change.
+  - Definition, the paper's central variable, in Table 1, Y_gov Model 1 drops from three stars to two: significant at the 1% level before (p = 0.0099), at the 5% level now (p = 0.0100).
+  - Two controls, Female in Table C1 Model B and Good life in Table C2 Model A, lose their one star: significant at the 10% level before (p = 0.096 and 0.098), not significant at any conventional level now (p = 0.101 and 0.108).
+  - One control, Income in Table 1, Y_prog_tax Model 1, gains one star: not significant before (p = 0.102), significant at the 10% level now (p = 0.100).
+- Every written claim in the text holds.
 
-The figures are not redrawn, because on 991 observations they are indistinguishable from the ones shipped: the density curves of Figures 2 and 3 move by less than 0.01 and 0.03 on peaks of 1.5 to 6, the marginal-effect lines of Figures D1 and D2 by less than 0.005 on axes spanning 4 to 9 units, and Figure 4 already excludes the duplicate.
+The figures are not redrawn because, with one fewer observation, they are indistinguishable from the published figures. The density curves of Figures 2 and 3 move by less than 0.01 and 0.03 on the density axis, where the peaks stand at 1.5 to 6. The marginal-effect lines of Figures D1 and D2 move by less than 0.005 on axes spanning 4 to 9 units, and Figure 4 already excludes the duplicate.
 
 ## The data
 
-SocialSci, an online survey panel company, fielded the Economic Justice Survey (version 7) in November 2013. My 2014 cleaning kept 992 respondents, and this file holds all of them; the one further cleaning step in this package, removing the duplicated record, is done by the scripts, not in the file. Of the survey dataset's 241 columns, the dataset provided here keeps the 27 columns the tables and figures use. The R and Python scripts build the variables the regressions need from them (age squared, the married and unemployed indicators, the four-level tax outcome, the interaction terms), as the 2014 Stata code did.
+SocialSci, an online survey panel company, fielded my Economic Justice Survey (version 7) in November 2013. My 2014 cleaning kept 992 respondents, and this file holds all of them. To remove the single duplicate row, please run the corresponding lines of code in provided analysis scripts. Of the survey dataset's 241 columns, the dataset provided here keeps the 27 columns the tables and figures use. The R and Python scripts build the variables the regressions need from them (age squared, the married and unemployed indicators, the four-level tax outcome, the interaction terms), as the 2014 Stata code did.
 
 The 2014 cleaning itself built some of the columns in the file from the raw answers: the four attitude measures that combine a direction with a strength (`gov_reducegap_str`, `agency_str`, `justice_str`, `gov_help_str`), the three deserve scores (`desert_rich_tot`, `desert_americans_tot`, `desert_poor_tot`) and the Definition correlation (`corr_ideal_agency`). I recomputed each from the raw survey items, and each matches on every row. I also re-derived the survey weight (`post_weight`) by raking from the 2014 script's strata and population targets; it matches the shipped weight for every respondent to five decimal places.
 

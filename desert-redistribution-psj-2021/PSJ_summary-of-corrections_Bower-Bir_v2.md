@@ -4,20 +4,11 @@ Bower-Bir, J. S. (2022). Desert and redistribution: Justice as a remedy for, and
 
 ## Summary
 
-While preparing the survey data and analysis for public deposit, I found transcription errors in the printed tables, one misread coefficient sign in the text, and a duplicated survey record. None of these changes any finding, interpretation, or claim in the paper. To build the replication package, I translated the original 2014 Stata code into R and Python, verified the data cleaning, and checked every table in the paper against the output. The check found two kinds of problem: reporting errors, where the analysis itself was correct, and a problem in the data that required re-estimating the tables.
+While preparing the replication package for this article, I found transcription errors in the printed tables, one misread sign in the text, and a duplicated survey record. The tables below replace Tables 1, C1, C2 and D1. They correct twenty-one cells I mistyped when entering the results into the manuscript, and they are estimated on 991 respondents rather than 992, one respondent's submission having been delivered twice by the survey vendor under two ids. The re-estimation moves coefficients in the third decimal place and four significance markers by one level. Nothing in the prose changes; where a printed cell and the text disagreed, the text was right.
 
-**Reporting errors: the printed tables and one sentence of text.** Twenty-one cells in the tables differ from the output: mostly digits mistyped or transposed, decimals slipped, and significance stars one level off, plus three dropped minus signs. One of those is in Table 1: the coefficient on Definition in Model 3 for Y_gov is printed as 0.518 and is −0.518, as Section 6.3 states and as the other two models in the row show. These errors are mine, made when I typed the results into the manuscript. Apart from the sentence corrected next, the text already states the correct results throughout. Each cell is listed in the replication package.
+One sentence does change. Section 6.1 says the coefficient on Age² is positive and that support for government action to reduce the income gap grows "with an increasing marginal effect." The coefficient is negative; it prints as 0.000 because age is measured in years. Support rises with age to the late thirties and then falls. "Concave," in the same sentence, was already right. Age is a control, and no finding rests on it.
 
-Section 6.1 says the coefficient on Age² is positive and that support for government action to reduce the income gap grows "with an increasing marginal effect." The coefficient is negative but tiny, because age is measured in years, so the table rounds it to 0.000 and its sign never appears there. Support for government action rises with age to the late thirties and then falls. "Concave," in the same sentence, was already right. Age is a control, and no finding rests on it.
-
-**A duplicated record.** In correcting the tables I also found that one respondent's submission appears twice in the survey file as the vendor delivered it, under two different survey ids. My cleaning screened submissions by completion time, which removed every other duplicated row in the delivery; this pair passed, and the published tables count that respondent twice. I have therefore re-estimated every table on the 991 distinct observations, with the survey weight raked again on those rows. Tables that include Definition have N = 962, because 29 respondents have no value for that variable; that gap predates the duplicate. The updated tables follow.
-
-- No coefficient changes sign.
-- Most coefficients move by 0.001 to 0.002; the largest move is 0.014, in Table D1.
-- At the 5% level nothing changes: every coefficient significant at 5% or better stays so, and none becomes so. Four markers that sit on a threshold move by one level: Definition in Table 1, Model 1 (p = 0.0099 to 0.0100, from 1% to 5%); Female in Table C1, Model B, and Good life in Table C2, Model A (from 10% to unmarked); and Income in Table 1, Y_prog_tax Model 1 (p = 0.102 to 0.100, from unmarked to 10%).
-- Every claim in the text holds.
-
-The replication package (survey data, the original Stata code, and R and Python versions of the analysis that reproduce every table and figure, with the cell-by-cell record of the errors above) is being deposited in Indiana University's ScholarWorks repository; its DOI is forthcoming.
+The replication package (the survey data, the original Stata code, R and Python versions of the analysis that reproduce every table and figure, and the cell-by-cell record of the errors) is deposited in Indiana University's ScholarWorks repository; its DOI is forthcoming.
 
 ## Updated tables (991 observations)
 
