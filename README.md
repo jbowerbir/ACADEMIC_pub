@@ -11,7 +11,7 @@ Replication materials for published academic research by Jacob S. Bower-Bir.
 
 ## Shared Data
 
-The [Economic Justice Survey (v7)](data/) supports both papers above: 992 respondents, nationally representative by weighting. The full survey is being prepared for deposit at IU ScholarWorks and is not in this repository yet. The 27 columns the PSJ paper uses are in that paper's folder, with a codebook.
+The [Economic Justice Survey (v7)](data/) supports both papers above: 992 respondents, nationally representative by weighting. The full survey is being prepared for deposit at IU DataCORE and is not in this repository yet. The 27 columns the PSJ paper uses are in that paper's folder, with a codebook.
 
 ## Other Published Work (Replication Materials Forthcoming)
 

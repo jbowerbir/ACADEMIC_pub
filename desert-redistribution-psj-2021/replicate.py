@@ -144,11 +144,12 @@ def tables_md(data):
           ('Education', [('High school or less', edu <= 2), ("Associate's or some college", edu.isin([3, 4])), ("Bachelor's degree", edu == 5), ('Graduate degree', edu == 6)]),
           ('Household income', [('< $25k', inc <= 6), ('$25k-$49k', inc.between(7, 10)), ('$50k-$74k', inc.between(11, 12)), ('$75k-$99k', inc.between(13, 14)), ('$100k-$149k', inc.between(15, 16)), ('$150k+', inc >= 17)]),
           ('Political party', [('Republican', data['party'] <= -2), ('Lean Republican', data['party'] == -1), ('Independent', data['party'] == 0), ('Lean Democrat', data['party'] == 1), ('Democrat', data['party'] >= 2)])]
-    md += ['', '## Table A1', '| Group | Sample N | Sample share |', '|---|---|---|']
+    a1 = ['', '## Table A1', '| Group | Sample N | Sample share |', '|---|---|---|']
     for g, rows in A1:
         for lab, mask in rows:
-            n = int(mask.sum()); md.append(f'| {g}: {lab} | {n} | {n / len(data):.2f} |')
-    return res, md
+            n = int(mask.sum()); a1.append(f'| {g}: {lab} | {n} | {n / len(data):.2f} |')
+    i = md.index('## Table C1: Y_gov_fix_gap') - 1      # the article's order: Table 1, then A1, then C1
+    return res, md[:i] + a1 + md[i:]
 
 # The survey weight was raked on all 992 rows in 2014 (iterative proportional fitting to population
 # totals on gender, party, income, race and education). Raking the same way on the 991 distinct rows
@@ -225,8 +226,6 @@ ax.imshow(tab.values, origin='lower', cmap='Greys', aspect='auto', extent=(-6.5,
 ax.set_xticks([-6, 0, 6]); ax.set_xticklabels(['VC, VU', 'NC, ND/U', 'VC, VD']); ax.set_yticks([-3, 0, 3]); ax.set_yticklabels(['SD', 'N', 'SA'])
 ax.set_xlabel('Do the rich deserve their wealth?'); ax.set_ylabel('Are income differences too large?')
 fig.tight_layout(); fig.savefig('figure-4-py.png', dpi=200); plt.close(fig)
-md += ['', '## Figure 4 cell shares (rows: income differences too large, SA down to SD; columns: rich deserve, VC,VU to VC,VD)']
-for i in range(3, -4, -1): md.append('| ' + ' | '.join(f'{v:.3f}' for v in tab.loc[i]) + ' |')
 
 # Figures D1 and D2: marginal-effect plots. Each panel: an ordinary weighted regression with the interaction,
 # errors clustered by state (Stata: reg ... [pw=post_weight], cluster(state)); the marginal effect of X at each
@@ -270,15 +269,28 @@ open(OUT, 'w', encoding='utf-8').write('\n'.join(md) + '\n')
 # Same layout, 991 rows, followed by every regression cell whose printed coefficient, standard
 # error or stars differ from the 992-row tables.
 fmt = lambda c: (f'{c[0]:.3f}{stars(c[2])}', f'({c[1]:.3f})')
+# a regression's place in the article, named as printed: ('Table C1: Y_gov_fix_gap', 'gov Model A')
+# -> 'Table C1 | Y_gov_fix_gap | Model A'
+def where(t, c):
+    pre, model = c.split(' ', 1)
+    return f"{t.split(':')[0]} | {dict(gov='Y_gov_fix_gap', tax='Y_prog_tax')[pre.replace('Y_', '')]} | {model}"
 changes = []
 for (t, c, e), (_, _, e2) in zip(res, res_dedup):
     for r in e['cells']:
         fa, fb = fmt(e['cells'][r]), fmt(e2['cells'][r])
-        if fa != fb: changes.append(f'| {t} | {c} | {r} | {fa[0]} {fa[1]} | {fb[0]} {fb[1]} |')
+        if fa != fb: changes.append(f'| {where(t, c)} | {r} | {fa[0]} {fa[1]} | {fb[0]} {fb[1]} |')
+# Table A1 too: the duplicated respondent is counted once fewer in each of their groups
+def a1_rows(lines):
+    i = lines.index('## Table A1')
+    return [cells for cells in (l.strip('|').split('|') for l in lines[i + 3:]) if len(cells) == 3] if i >= 0 else []
+for (g, n1, s1), (_, n2, s2) in zip(a1_rows(md[:md.index('## Table C1: Y_gov_fix_gap')]), a1_rows(md_dedup[:md_dedup.index('## Table C1: Y_gov_fix_gap')])):
+    if (n1, s1) != (n2, s2):
+        k = sum(ch.startswith('| Table 1 |') for ch in changes)     # table order: after Table 1
+        changes.insert(k + sum(ch.startswith('| Table A1 |') for ch in changes), f'| Table A1 | | | {g.strip()} | {n1.strip()} ({s1.strip()}) | {n2.strip()} ({s2.strip()}) |')
 dd = md_dedup + ['', '## Cells that change when the duplicated record is dropped',
-                 '| Table | Column | Row | With (992 rows) | Without (991 rows) |', '|---|---|---|---|---|'] + changes
+                 '| Table | Outcome | Model | Row | With (992 rows) | Without (991 rows) |', '|---|---|---|---|---|---|'] + changes
 open('tables_deduplicated_py.md', 'w', encoding='utf-8').write('\n'.join(dd) + '\n')
-print(f"wrote tables_deduplicated_py.md: {len(changes)} of {sum(len(e['cells']) for _, _, e in res)} regression cells change at the printed precision")
+print(f"wrote tables_deduplicated_py.md: {sum(not ch.startswith('| Table A1') for ch in changes)} of {sum(len(e['cells']) for _, _, e in res)} regression cells change at the printed precision")
 print(f'wrote {OUT} and figure-1-py.png ... figure-D2-py.png')
 
 # ---- compare Tables 1, C1, C2, D1 with the printed page ------------------------------------------
@@ -302,24 +314,31 @@ if os.path.exists(PUB):
                     if v: tables[cur][c][last]['se'] = v
         return tables
     num = lambda s: float(s.replace('−', '-').replace('*', '').strip('()'))
-    pub = parse_md(PUB); mism = []; ncell = 0
+    pub = parse_md(PUB); mism = []; side = []; ncell = 0
     for t, c, e in res:
         for row, cell in pub.get(t, {}).get(c, {}).items():
-            ncell += 1; tag = f'{t} | {c} | {row}'
+            ncell += 1; tag = f'{where(t, c)} | {row}'
             if row in ('N', 'R2', 'Adj-R2'):
                 got = {'N': e['N'], 'R2': e['R2'], 'Adj-R2': e['AdjR2']}[row]; tol = {'N': 0.5, 'R2': 0.00005, 'Adj-R2': 0.0004}[row]
-                if abs(got - num(cell['coef'])) > tol: mism.append(f"{tag}: printed {cell['coef']}, re-estimated {got:g}")
+                if abs(got - num(cell['coef'])) > tol:
+                    mism.append(f"{tag}: printed {cell['coef']}, re-estimated {got:g}"); side.append(f"| {tag} | {cell['coef']} | {got:g} |")
                 continue
             if row not in e['cells']: mism.append(f'{tag}: printed but not in this model'); continue
             b, se, pv = e['cells'][row]; probs = []
             if abs(b - num(cell['coef'])) > 0.0005: probs.append(f"coef printed {cell['coef'].replace('*', '')}, re-estimated {b:.3f}")
             if row != 'Constant' and 'se' in cell and abs(se - num(cell['se'])) > 0.0005: probs.append(f"SE printed {cell['se']}, re-estimated ({se:.3f})")
             ps = re.sub(r'[^*]', '', cell['coef'])
-            if row != 'Constant' and ps != stars(pv): probs.append(f"stars printed '{ps}', earned '{stars(pv)}'")
-            if probs: mism.append(f"{tag}: " + '; '.join(probs))
+            if row != 'Constant' and ps != stars(pv): probs.append(f"stars printed {ps or 'none'}, earned {stars(pv) or 'none'}")
+            if probs:
+                mism.append(f"{tag}: " + '; '.join(probs))
+                side.append(f"| {tag} | {cell['coef']} {cell.get('se', '')} | {' '.join(fmt(e['cells'][row]))} |")
     print(f"\nCompared {ncell} cells with {PUB} (the constant's SE and stars are not compared).")
     print('Every cell matches.' if not mism else f'{len(mism)} cells differ between the printed tables and the re-run:\n' + '\n'.join('  ' + m for m in mism))
-    # the same list, as a file: the cell-by-cell record of the transcription errors
+    # the same list, as a file: the cell-by-cell record of the transcription errors (stars escaped so markdown shows them)
     open('cells_corrected_py.md', 'w', encoding='utf-8').write('\n'.join(
         ['# Cells where the printed tables differ from the re-run', '(992 observations)', '',
-         'Each line: table | column | row: what was printed, what the', 're-run gives.', ''] + ['- ' + m for m in mism]) + '\n')
+         'Each line: table | outcome | model | row: what was printed, what the re-run gives.', ''] + ['- ' + m.replace('*', r'\*') for m in mism]) + '\n')
+    # and side by side at the end of the corrected tables: each printed cell beside its corrected value
+    open(OUT, 'a', encoding='utf-8').write('\n'.join(
+        ['', '## Cells that differ from the published tables', '| Table | Outcome | Model | Row | Published | Corrected |',
+         '|---|---|---|---|---|---|'] + side) + '\n')

@@ -38,6 +38,32 @@
 | R2 | 0.4914 | 0.5462 | 0.5897 | 0.4157 | 0.4406 | 0.4673 |
 | Adj-R2 | 0.4582 | 0.5165 | 0.5619 | 0.3776 | 0.4041 | 0.4312 |
 
+## Table A1
+| Group | Sample N | Sample share |
+|---|---|---|
+| Gender: Female | 586 | 0.59 |
+| Gender: Male | 406 | 0.41 |
+| Race: White | 701 | 0.71 |
+| Race: Black | 93 | 0.09 |
+| Race: Latino | 52 | 0.05 |
+| Race: Asian | 111 | 0.11 |
+| Race: Other | 35 | 0.04 |
+| Education: High school or less | 118 | 0.12 |
+| Education: Associate's or some college | 330 | 0.33 |
+| Education: Bachelor's degree | 351 | 0.35 |
+| Education: Graduate degree | 193 | 0.19 |
+| Household income: < $25k | 192 | 0.19 |
+| Household income: $25k-$49k | 247 | 0.25 |
+| Household income: $50k-$74k | 210 | 0.21 |
+| Household income: $75k-$99k | 141 | 0.14 |
+| Household income: $100k-$149k | 137 | 0.14 |
+| Household income: $150k+ | 65 | 0.07 |
+| Political party: Republican | 68 | 0.07 |
+| Political party: Lean Republican | 79 | 0.08 |
+| Political party: Independent | 264 | 0.27 |
+| Political party: Lean Democrat | 284 | 0.29 |
+| Political party: Democrat | 297 | 0.30 |
+
 ## Table C1: Y_gov_fix_gap
 | Variable | gov Model A | gov Model B | gov Model C | gov Model D | gov Model E |
 |---|---|---|---|---|---|
@@ -304,41 +330,6 @@
 | R2 | 0.4313 | 0.4407 | 0.4700 |
 | Adj-R2 | 0.3935 | 0.4035 | 0.4322 |
 
-## Table A1
-| Group | Sample N | Sample share |
-|---|---|---|
-| Gender: Female | 586 | 0.59 |
-| Gender: Male | 406 | 0.41 |
-| Race: White | 701 | 0.71 |
-| Race: Black | 93 | 0.09 |
-| Race: Latino | 52 | 0.05 |
-| Race: Asian | 111 | 0.11 |
-| Race: Other | 35 | 0.04 |
-| Education: High school or less | 118 | 0.12 |
-| Education: Associate's or some college | 330 | 0.33 |
-| Education: Bachelor's degree | 351 | 0.35 |
-| Education: Graduate degree | 193 | 0.19 |
-| Household income: < $25k | 192 | 0.19 |
-| Household income: $25k-$49k | 247 | 0.25 |
-| Household income: $50k-$74k | 210 | 0.21 |
-| Household income: $75k-$99k | 141 | 0.14 |
-| Household income: $100k-$149k | 137 | 0.14 |
-| Household income: $150k+ | 65 | 0.07 |
-| Political party: Republican | 68 | 0.07 |
-| Political party: Lean Republican | 79 | 0.08 |
-| Political party: Independent | 264 | 0.27 |
-| Political party: Lean Democrat | 284 | 0.29 |
-| Political party: Democrat | 297 | 0.30 |
-
-## Figure 4 cell shares (rows: income differences too large, SA down to SD; columns: rich deserve, VC,VU to VC,VD)
-| 0.033 | 0.042 | 0.069 | 0.072 | 0.081 | 0.019 | 0.013 | 0.010 | 0.037 | 0.019 | 0.014 | 0.012 | 0.009 |
-| 0.001 | 0.010 | 0.024 | 0.039 | 0.038 | 0.016 | 0.006 | 0.011 | 0.042 | 0.037 | 0.027 | 0.003 | 0.005 |
-| 0.000 | 0.001 | 0.007 | 0.013 | 0.015 | 0.008 | 0.007 | 0.012 | 0.036 | 0.024 | 0.035 | 0.007 | 0.003 |
-| 0.001 | 0.000 | 0.006 | 0.004 | 0.007 | 0.002 | 0.007 | 0.001 | 0.017 | 0.008 | 0.009 | 0.004 | 0.003 |
-| 0.000 | 0.000 | 0.002 | 0.000 | 0.001 | 0.000 | 0.002 | 0.001 | 0.004 | 0.006 | 0.016 | 0.002 | 0.001 |
-| 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | 0.001 | 0.004 | 0.010 | 0.002 | 0.001 |
-| 0.000 | 0.000 | 0.001 | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | 0.001 | 0.002 | 0.003 | 0.002 | 0.006 |
-
 ## Figure D1 and D2 regressions
 | Panel | Outcome | Z | b(X) | SE | b(X x Z) | SE | N |
 |---|---|---|---|---|---|---|---|
@@ -350,3 +341,28 @@
 | D2(b) Z_justice given X, on Y_gov_fix_gap | gov_reducegap_str | justice_str | 2.507 | 0.840 | -3.169 | 0.926 | 963 |
 | D2(c) Z_rich_deserve given X, on Y_gov_fix_gap | gov_reducegap_str | desert_rich_tot | 4.128 | 1.673 | -4.913 | 1.825 | 963 |
 | D2(d) Z_agency given X, on Y_prog_tax | progtaxes2_str | agency_str | 1.942 | 0.602 | -2.300 | 0.658 | 963 |
+
+## Cells that differ from the published tables
+| Table | Outcome | Model | Row | Published | Corrected |
+|---|---|---|---|---|---|
+| Table 1 | Y_gov_fix_gap | Model 3 | Definition | 0.518*** (0.131) | -0.518*** (0.131) |
+| Table 1 | Y_gov_fix_gap | Model 3 | Rich deserve | -0.366*** (1.056) | -0.366*** (0.056) |
+| Table 1 | Y_prog_tax | Model 1 | Agency | -0.133*** (0.053) | -0.133** (0.053) |
+| Table 1 | Y_prog_tax | Model 1 | Nonwhite | 0.012 (0.012) | 0.012 (0.031) |
+| Table C1 | Y_gov_fix_gap | Model A | Age^2 | 0.000*** (0.000) | -0.000** (0.000) |
+| Table C1 | Y_gov_fix_gap | Model D | Age | 0.012*** (0.007) | 0.012* (0.007) |
+| Table C1 | Y_gov_fix_gap | Model D | Education | -0.023 (0.56) | -0.023 (0.056) |
+| Table C1 | Y_prog_tax | Model B | Married | 0.320 (0.036) | 0.032 (0.036) |
+| Table C1 | Y_prog_tax | Model D | Education | 0.088 (0.55) | 0.088 (0.055) |
+| Table C2 | Y_gov_fix_gap | Model D | N | 992 | 963 |
+| Table C2 | Y_gov_fix_gap | Model E | Income | 0.136*** (0.049) | -0.136*** (0.049) |
+| Table C2 | Y_prog_tax | Model A | N | 963 | 992 |
+| Table C2 | Y_prog_tax | Model E | Income | 0.039 (0.064) | -0.039 (0.064) |
+| Table D1 | Y_gov_fix_gap | Model 1 | Married | 0.013 (0.036) | 0.013 (0.031) |
+| Table D1 | Y_gov_fix_gap | Model 2 | Income | -0.113*** (0.051) | -0.113** (0.051) |
+| Table D1 | Y_prog_tax | Model 1 | Income | -0.103 (0.062) | -0.103* (0.062) |
+| Table D1 | Y_prog_tax | Model 3 | Rich deserve | 0.833 (0.867) | 0.883 (0.867) |
+| Table D1 | Y_prog_tax | Model 3 | Def. x Rich | -0.653 (0.843) | -1.300 (0.958) |
+| Table D1 | Y_prog_tax | Model 3 | Avg. deserve | -0.922 (0.821) | -0.653 (0.843) |
+| Table D1 | Y_prog_tax | Model 3 | Def. x Avg. | -1.300 (0.958) | 0.662 (0.926) |
+| Table D1 | Y_prog_tax | Model 3 | Poor deserve | 0.662 (0.926) | -0.922 (0.821) |

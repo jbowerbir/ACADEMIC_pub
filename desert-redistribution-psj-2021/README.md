@@ -6,13 +6,13 @@ Bower-Bir, J. S. (2022). Desert and redistribution: Justice as a remedy for, and
 
 This package allows users to replicate every table and figure in the article using the provided survey data. In addition to the original Stata script used to analyze the data---included in this package---I translated the analysis into R and Python, and expanded the analysis to compare the tables it produces with the published tables. The R, Python, and Stata scripts produce identical output. I found, however, a few typos in the published tables, none of which alter the paper’s conclusions. Below is a summary of discrepancies between the verified output and the published tables:
 
-- Twenty-one published cells differ from the output, all copying errors I made when typing the tables into the manuscript: mostly digits mistyped or transposed, a decimal point in the wrong place, and significance stars one level off, plus three dropped minus signs. One of those is in Table 1, on the paper's central variable, where the text already states the correct, negative coefficient. None contradicts the published prose.
+- Twenty-one published cells differ from the output, all copying errors I made when typing the tables into the manuscript: mostly digits mistyped or transposed, a decimal point in the wrong place, significance stars one level off, plus three dropped minus signs. One of those is in Table 1, on the paper's central variable, where the text already states the correct, negative coefficient. Correcting these typos does not contradict the published prose.
 - One sentence of the published text misreads a coefficient sign. The coefficient on Age^2 is so small that it prints as 0.000. The offending sentence in the article calls it positive when it is negative, such that support for government action to reduce the income gap (Y_gov_fix_gap) rises with age into the late thirties and then falls rather than accelerating.
 
 In the course of re-engaging with the data, I also found a duplicate row that my 2014 data cleaning did not catch. One respondent’s submission appears twice in the dataset provided by the online survey panel vendor, under two different survey ids. My initial cleaning removed every other duplicated row in the delivered dataset, save the remaining offender. Every table has been re-estimated on the 991 distinct observations, rather than the original 992. The figures can also be re-rendered, though the changes are imperceptible. As before, nothing contradicts the published conclusions or the prose. A summary of the changes:
 
 - Coefficients move by one or two units in the third decimal place, at most 0.014.
-- Four coefficients whose p-values sit on a significance threshold cross it, so their stars move by one level. Definition, the paper's central variable, drops from the 1% level to the 5% level in one of the three Y_gov models of Table 1 and stays at 1% in the other two. The other three are control variables: two drop out of significance altogether, and one achieves significance at the 10% level.
+- Four coefficients whose p-values sit on a significance threshold cross it, so their stars move by one level. Definition, the paper's central variable, drops from the 1% level to the 5% level in one of the three Y_gov_fix_gap models of Table 1 and stays at 1% in the other two. The other three are control variables: two drop out of significance altogether, and one achieves significance at the 10% level.
 
 The dataset here provided includes the 27 survey variables used to generate the paper’s tables and figures, for all 992 observations as delivered by the panel vendor, with a codebook. The scripts produce both the 992-observation tables (the published analysis with the typos corrected) and the 991-observation tables (the replacement tables). Additional details below.
 
@@ -23,15 +23,15 @@ A correction (journal DOI 10.1111/psj.70145) is included. Again, none of the err
 | File | What it is |
 |---|---|
 | `economic_justice_v7_psj-replication.csv` | The survey data: 992 respondents and the 27 variables the tables and figures use. No value was changed. The full survey is a separate deposit (see "The data"). |
-| `codebook.md` | The 27 columns: question wording, answer options, coding and rescaling, and the name each has in the tables. |
+| `codebook.md` | The 27 columns: question wording, answer options, coding and rescaling, and the label each has in the article. |
 | `replicate.R` | The analysis in R: Tables 1, C1, C2 and D1 (32 regressions), Table A1, and Figures 1, 2, 3, 4, D1 and D2. Writes `tables_corrected.md` and the figures, then prints every cell where the printed tables differ. Base R only. |
 | `replicate.py` | The same program in Python. Writes `tables_py.md` and `figure-*-py.png`, identical to the R output. |
 | `tables_published.md` | The four regression tables as printed in the article, copied cell by cell from the published PDF, stars included. |
 | `cells_corrected.md` | The 21 cells where the printed tables differ from the re-run, one line each: what was printed, what the re-run gives. Written by either program. |
-| `tables_corrected.md`, `.pdf` | The four regression tables as they should read, Table A1, the shares behind Figure 4, and the eight regressions behind Figures D1 and D2. Estimated on all 992 rows, as the article was. The output of either program. |
+| `tables_corrected.md`, `.pdf` | The four regression tables with the typos corrected, on the published 992 rows (duplicate included), plus Table A1 and the eight regressions behind Figures D1 and D2. Ends with the 21 corrected cells beside their published values. The output of either program. |
 | `tables_deduplicated.md`, `.pdf` | The same tables estimated on the 991 distinct records, without the duplicated one, ending with a list of every cell that changes at the printed precision. These are the replacement tables offered to the journal. The output of either program. |
-| `figure-1.png` … `figure-D2.png` | The figures, as drawn by `replicate.R`. |
-| `PSJ_summary-of-corrections_Bower-Bir_v2.md`, `.pdf` | The correction as proposed to the journal: a one-page summary of the transcription errors, the one corrected sentence and the duplicated record, followed by the updated tables on 991 observations. |
+| `figure-1.png` … `figure-D2.png` | The six figures, redrawn by `replicate.R` from the survey data, not copied from the article. Figure 1 charts three General Social Survey percentages written into the scripts. `replicate.py` draws the same figures as `figure-*-py.png`. |
+| `PSJ_summary-of-corrections_Bower-Bir_v2.md`, `.pdf` | The correction as proposed to the journal: the two kinds of error, the one corrected sentence, and corrected Table 1 (991 observations). It points here for every other table. |
 | `policy_taxation_2014_annotated.do` | The original Stata code that produced the article's tables and the D1 and D2 plots, commands untouched, with comment lines (`// [2026]`) saying which command makes which table or figure. A record, not a runnable script: it reads a file not included here. |
 
 ## Running it
@@ -51,7 +51,7 @@ Put the files in one folder. R needs base R only. Python needs pandas, numpy, sc
 - **Figure 4** drops the duplicated respondent record, as the 2014 plot did. I found the duplicate while drawing that figure, in 2018, and dropped it there, but the regressions dated from 2014 and I failed to rerun them at the time.
 - **Figure 1** charts three percentages from the 2010 General Social Survey, not from this survey. The numbers are in the scripts.
 - **Figures D1, D2** match the printed panels. The marginal-effect lines and bands come from the eight regressions the 2014 plot code specifies (ordinary weighted regression without state effects, errors clustered by state). The article does not print those regressions, but the scripts nonetheless write them to `tables_corrected.md`.
-- **Figure B1**, the heat maps of control against ideal importance, is not in this article. It appears in the companion article in *Economia Politica* and is reproduced in that article's package.
+- **Figure B1**, the heat maps of Control against Ideal importance, is not in this article. It appears in the companion article, Bower-Bir (2021), *Economia Politica* 38(1): 131–170, https://doi.org/10.1007/s40888-020-00201-9, and is reproduced in that article's replication package.
 
 ## What changes without the duplicate (991 observations)
 
@@ -60,10 +60,9 @@ Put the files in one folder. R needs base R only. Python needs pandas, numpy, sc
 - No coefficient changes sign. Every negative stays negative and every positive stays positive.
 - Coefficients move by one or two units in the third decimal place. The largest moves are in Table D1, Y_gov_fix_gap Model 1, where Agency rises from 2.194 to 2.208, and Def. x Agency falls from −2.654 to −2.667. Those two coefficients are the largest in the tables so the moves are small in proportion.
 - R² values move by at most 0.0007.
-- At the 5% level of statistical significance, nothing changes. Every coefficient with two or three stars keeps at least two, and no coefficient with fewer than two gains a second.
-- Four coefficients whose p-values sit on a significance threshold cross it, so their stars change.
-  - Definition, the paper's central variable, in Table 1, Y_gov Model 1 drops from three stars to two: significant at the 1% level before (p = 0.0099), at the 5% level now (p = 0.0100).
-  - Two controls, Female in Table C1 Model B and Good life in Table C2 Model A, lose their one star: significant at the 10% level before (p = 0.096 and 0.098), not significant at any conventional level now (p = 0.101 and 0.108).
+- Four coefficients whose p-values sit on a significance threshold cross it, so their stars change. None crosses the 5% line: every coefficient significant at 5% stays significant at 5%, and none becomes significant at 5%.
+  - Definition, the paper's central variable, in Table 1, Y_gov_fix_gap Model 1, drops from three stars to two: significant at the 1% level before (p = 0.0099), at the 5% level now (p = 0.0100).
+  - Two controls, Female in Table C1, Y_gov_fix_gap Model B, and Good life in Table C2, Y_gov_fix_gap Model A, lose their one star: significant at the 10% level before (p = 0.096 and 0.098), not significant at any conventional level now (p = 0.101 and 0.108).
   - One control, Income in Table 1, Y_prog_tax Model 1, gains one star: not significant before (p = 0.102), significant at the 10% level now (p = 0.100).
 - Every written claim in the text holds.
 
@@ -99,7 +98,7 @@ Every regression in the tables is one Stata command, `areg <outcome> <predictors
 
 **Testing decimals for equality.** The 2014 code recodes variables by exact comparison (`if married == .8`, `if progtaxes2_str == 4`). That works in Stata. In R or Python it silently matches no rows, because the stored values are 0.7999… and 3.9999…; the tax outcome is then wrong and every coefficient moves by about 0.03, with no error. Round to the nearest integer first. Both scripts do.
 
-**The interaction terms.** Lines 46–59 of the Stata code build the interaction variables from Definition rescaled to 0 to 1 but store them under the unscaled names. So every interaction term in Table D1 uses the rescaled Definition, and in two of the six D1 regressions (Y_gov Model 1, Y_prog_tax Model 3) the Definition variable itself is also the rescaled one. The fit is identical either way; only the printed coefficients differ, by a factor of two. The scripts reproduce what the article printed. Build the interactions from the unscaled Definition and you will get coefficients half as large and conclude, wrongly, that the table is wrong.
+**The interaction terms.** Lines 46–59 of the Stata code build the interaction variables from Definition rescaled to 0 to 1 but store them under the unscaled names. So every interaction term in Table D1 uses the rescaled Definition, and in two of the six D1 regressions (Y_gov_fix_gap Model 1, Y_prog_tax Model 3) the Definition variable itself is also the rescaled one. The fit is identical either way; only the printed coefficients differ, by a factor of two. The scripts reproduce what the article printed. Build the interactions from the unscaled Definition and you will get coefficients half as large and conclude, wrongly, that the table is wrong.
 
 ## Citation and license
 

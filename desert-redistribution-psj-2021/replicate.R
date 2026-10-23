@@ -258,14 +258,16 @@ tables_md <- function(data) {
                              `Lean Democrat` = data$party == 1,
                              Democrat = data$party >= 2)
   )
-  md <- c(md, "", "## Table A1",
-          "| Group | Sample N | Sample share |", "|---|---|---|")
+  a1 <- c("", "## Table A1", "| Group | Sample N | Sample share |", "|---|---|---|")
   for (g in names(A1)) {
     for (lab in names(A1[[g]])) {
       n  <- sum(A1[[g]][[lab]])
-      md <- c(md, sprintf("| %s: %s | %d | %.2f |", g, lab, n, n / nrow(data)))
+      a1 <- c(a1, sprintf("| %s: %s | %d | %.2f |", g, lab, n, n / nrow(data)))
     }
   }
+  # the article's order: Table 1, then A1, then C1
+  i  <- match("## Table C1: Y_gov_fix_gap", md) - 1
+  md <- append(md, a1, after = i - 1)
   list(res = res, md = md)
 }
 
@@ -386,13 +388,6 @@ axis(1, at = c(-6, 0, 6), labels = c("VC, VU", "NC, ND/U", "VC, VD"),
 axis(2, at = c(-3, 0, 3), labels = c("SD", "N", "SA"), las = 1, cex.axis = 0.8)
 box()
 dev.off()
-md <- c(md, "",
-        paste("## Figure 4 cell shares (rows: income differences too large,",
-              "SA down to SD; columns: rich deserve, VC,VU to VC,VD)"))
-for (i in 7:1) {
-  shares <- paste(sprintf("%.3f", tab[i, ]), collapse = " | ")
-  md <- c(md, paste0("| ", shares, " |"))
-}
 
 # Figures D1 and D2: marginal-effect plots. Each panel: an ordinary weighted
 # regression with the interaction, errors clustered by state (Stata:
@@ -513,26 +508,49 @@ writeLines(md, OUT)
 fmt <- function(c) {
   c(sprintf("%.3f%s", c[1], stars(c[3])), sprintf("(%.3f)", c[2]))
 }
+# a regression's place in the article, named as printed:
+# ("Table C1: Y_gov_fix_gap", "gov Model A") -> "Table C1 | Y_gov_fix_gap | Model A"
+where <- function(t, c) {
+  pre <- sub("^Y_", "", sub(" .*", "", c))
+  sprintf("%s | %s | %s", sub(":.*", "", t),
+          c(gov = "Y_gov_fix_gap", tax = "Y_prog_tax")[[pre]], sub("^[^ ]+ ", "", c))
+}
 changes <- character(0)
 for (k in seq_along(res)) {
   a <- res[[k]]$est$cells; b <- dedup$res[[k]]$est$cells
   for (r in names(a)) {
     fa <- fmt(a[[r]]); fb <- fmt(b[[r]])
     if (!identical(fa, fb)) {
-      changes <- c(changes, sprintf("| %s | %s | %s | %s %s | %s %s |",
-                                    res[[k]]$table, res[[k]]$col, r,
+      changes <- c(changes, sprintf("| %s | %s | %s %s | %s %s |",
+                                    where(res[[k]]$table, res[[k]]$col), r,
                                     fa[1], fa[2], fb[1], fb[2]))
     }
   }
 }
+# Table A1 too: the duplicated respondent is counted once fewer in each of
+# their groups
+a1_rows <- function(m) {
+  m <- m[(match("## Table A1", m) + 3):(match("## Table C1: Y_gov_fix_gap", m) - 1)]
+  m <- m[startsWith(m, "|")]
+  lapply(strsplit(sub("^\\|", "", sub("\\|$", "", m)), "|", fixed = TRUE), trimws)
+}
+for (x in Map(list, a1_rows(full$md), a1_rows(dedup$md))) {
+  if (!identical(x[[1]], x[[2]])) {
+    row <- sprintf("| Table A1 | | | %s | %s (%s) | %s (%s) |",
+                   x[[1]][1], x[[1]][2], x[[1]][3], x[[2]][2], x[[2]][3])
+    # table order: after Table 1 and any A1 rows already placed
+    k <- sum(startsWith(changes, "| Table 1 |")) + sum(startsWith(changes, "| Table A1 |"))
+    changes <- append(changes, row, after = k)
+  }
+}
 dd <- c(dedup$md, "",
         "## Cells that change when the duplicated record is dropped",
-        "| Table | Column | Row | With (992 rows) | Without (991 rows) |",
-        "|---|---|---|---|---|", changes)
+        "| Table | Outcome | Model | Row | With (992 rows) | Without (991 rows) |",
+        "|---|---|---|---|---|---|", changes)
 writeLines(dd, "tables_deduplicated.md")
 ncells <- sum(sapply(res, function(r) length(r$est$cells)))
 cat(sprintf("wrote tables_deduplicated.md: %d of %d regression cells change",
-            length(changes), ncells), "at the printed precision\n")
+            sum(!startsWith(changes, "| Table A1")), ncells), "at the printed precision\n")
 cat(sprintf("wrote %s and figure-1.png, figure-2.png, figure-3.png,", OUT),
     "figure-4.png, figure-D1.png, figure-D2.png\n")
 
@@ -574,13 +592,14 @@ if (file.exists(PUB)) {
 
   pub   <- parse_md(PUB)
   mism  <- character(0)
+  side  <- character(0)
   ncell <- 0
   for (r in res) {
     pc <- pub[[r$table]][[r$col]]
     for (row in names(pc)) {
       ncell <- ncell + 1
       cell  <- pc[[row]]
-      tag   <- sprintf("%s | %s | %s", r$table, r$col, row)
+      tag   <- sprintf("%s | %s", where(r$table, r$col), row)
       if (row %in% c("N", "R2", "Adj-R2")) {
         got <- switch(row, N = r$est$N, R2 = r$est$R2, `Adj-R2` = r$est$AdjR2)
         tol <- switch(row, N = 0.5, R2 = 0.00005, `Adj-R2` = 0.0004)
@@ -588,6 +607,7 @@ if (file.exists(PUB)) {
           shown <- if (row == "N") sprintf("%d", got) else sprintf("%.4f", got)
           mism  <- c(mism, sprintf("%s: printed %s, re-estimated %s",
                                    tag, cell$coef, shown))
+          side  <- c(side, sprintf("| %s | %s | %s |", tag, cell$coef, shown))
         }
         next
       }
@@ -608,11 +628,15 @@ if (file.exists(PUB)) {
       }
       ps <- gsub("[^*]", "", cell$coef)
       if (row != "Constant" && ps != stars(e[3])) {
-        probs <- c(probs, sprintf("stars printed '%s', earned '%s'",
-                                  ps, stars(e[3])))
+        none  <- function(s) if (nzchar(s)) s else "none"
+        probs <- c(probs, sprintf("stars printed %s, earned %s",
+                                  none(ps), none(stars(e[3]))))
       }
       if (length(probs)) {
         mism <- c(mism, paste0(tag, ": ", paste(probs, collapse = "; ")))
+        printed <- trimws(paste(cell$coef, if (is.null(cell$se)) "" else cell$se))
+        side <- c(side, sprintf("| %s | %s | %s |", tag, printed,
+                                paste(fmt(e), collapse = " ")))
       }
     }
   }
@@ -627,8 +651,16 @@ if (file.exists(PUB)) {
     cat(paste0("  ", mism, "\n"), sep = "")
   }
   # the same list as a file: the cell-by-cell record of the errors
+  # (stars escaped so a markdown viewer shows them)
   writeLines(c("# Cells where the printed tables differ from the re-run",
                "(992 observations)", "",
-               "Each line: table | column | row: what was printed, what the",
-               "re-run gives.", "", paste0("- ", mism)), "cells_corrected.md")
+               paste("Each line: table | outcome | model | row: what was printed,",
+                     "what the re-run gives."),
+               "", paste0("- ", gsub("*", "\\*", mism, fixed = TRUE))),
+             "cells_corrected.md")
+  # and side by side at the end of the corrected tables: each printed cell
+  # beside its corrected value
+  cat(c("", "## Cells that differ from the published tables",
+        "| Table | Outcome | Model | Row | Published | Corrected |",
+        "|---|---|---|---|---|---|", side), file = OUT, sep = "\n", append = TRUE)
 }
