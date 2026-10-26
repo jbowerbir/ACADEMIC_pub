@@ -12,9 +12,16 @@ as replicate.R, in Python (pandas, numpy, scipy, statsmodels, matplotlib).
                          errors clustered by state)
   Figure 1               the three General Social Survey percentages the article charts
 
-Usage:  python3 replicate.py                writes tables_py.md and figure-*-py.png, then compares
-                                            Tables 1, C1, C2, D1 with tables_published.md
-        diff tables_corrected.md tables_py.md   checks this program against the R one
+The tables are estimated twice: on the published sample (992 rows, 2014 weight), which reproduces
+the printed tables and is written to tables_py.md with the typos corrected, and on the final data
+(991 distinct respondents, corrected weight), written to tables_final_py.md with every cell that
+changes. The figures are drawn from both.
+
+Usage:  python3 replicate.py                writes tables_py.md, tables_final_py.md, figure-*-py.png and
+                                            figure-*-final-py.png, then compares Tables 1, C1, C2, D1
+                                            with tables_published.md
+        diff tables_corrected.md tables_py.md   checks this program against the R one (likewise
+                                            tables_final.md against tables_final_py.md)
 
 Two things carried over from the 2014 Stata code on purpose. (1) The code recodes by exact
 comparison (`married == .8`); here the values are rounded to the integer grid first, because 0.8
@@ -35,9 +42,11 @@ OUT = 'tables_py.md'
 d = pd.read_csv('economic_justice_v7_psj-replication.csv')
 
 # One respondent's record is in the file twice (rows identical in every answer). The published
-# tables were estimated with it. Every table is therefore estimated twice below: on all 992 rows,
-# which reproduces the published tables, and on the 991 rows without the duplicate, written to a
-# second file with a list of every cell that changes at the printed precision.
+# tables were estimated with it, and with a survey weight whose lowest income stratum was drawn one
+# bracket too high (see rake() below). Every table is therefore estimated twice: on all 992 rows with
+# the 2014 weight, which reproduces the published tables, and on the 991 rows without the duplicate
+# with the weight re-raked on the corrected strata, written to a second file with a list of every
+# cell that changes at the printed precision.
 dup_mask = d.drop(columns=['row', 'id']).duplicated()
 
 # ---- variables the regressions build ----------------------------------------------------------
@@ -155,11 +164,16 @@ def tables_md(data):
 # totals on gender, party, income, race and education). Raking the same way on the 991 distinct rows
 # gives the weight those tables should carry. Strata and targets are the 2014 script's; the targets
 # are scaled from 992 to the rows present.
-def rake(x):
+#
+# One stratum is corrected. The 2014 script's lowest income group took income codes 0-7, that is
+# households under $30,000 (`income_household < 8` on the 19-bracket code), against a population
+# target for households under $25,000; the $25,000 line is code 7. With income_cut=8 the function
+# reproduces the shipped weight; the final tables use income_cut=7.
+def rake(x, income_cut=8):
     inc = (x['income_household'] * 18).round(); edu = (x['education'] * 6).round()
     strata = {'gender': x['gender'].values,
               'party': np.select([x.party >= 2, x.party == 1, x.party == 0, x.party == -1, x.party <= -2], [1, 2, 3, 4, 5]),
-              'income': np.select([inc < 8, inc < 11, inc < 13, inc < 15, inc >= 15], [1, 2, 3, 4, 5]),
+              'income': np.select([inc < income_cut, inc < 11, inc < 13, inc < 15, inc >= 15], [1, 2, 3, 4, 5]),
               'race': np.select([x.race == 0, x.race == 1, x.race == 2, x.race >= 3], [1, 2, 3, 4]),
               'educ': np.select([edu <= 1, edu == 2, edu.isin([3, 4]), edu == 5, edu == 6], [1, 2, 3, 4, 5])}
     targets = {'gender': {1: 486, 0: 506}, 'party': {1: 317, 2: 159, 3: 119, 4: 159, 5: 238},
@@ -177,97 +191,108 @@ def rake(x):
 assert np.abs(rake(d) - d['post_weight'].values).max() < 1e-4
 
 res, md = tables_md(d)
+md = ['# Corrected tables', '', 'The published tables with their typos corrected, estimated on the published sample of 992 observations with the 2014 weight. Written by replicate.R (tables_corrected.md) and replicate.py (tables_py.md); the two files are identical. The last section lists every cell that differs from the published tables.'] + md
 d991 = d[~dup_mask].reset_index(drop=True)
-d991['post_weight'] = rake(d991)
+d991['post_weight'] = rake(d991, income_cut=7)
 res_dedup, md_dedup = tables_md(d991)
+md_dedup = ['# Final tables', '', 'The same tables estimated on the 991 distinct respondents, without the duplicated row and with the survey weight corrected. Written by replicate.R (tables_final.md) and replicate.py (tables_final_py.md); the two files are identical. The last section lists every cell that differs from the corrected tables as published.'] + md_dedup
 
 
 # ---- Figures --------------------------------------------------------------------------------------
+# Drawn twice: from the published sample (992 rows, 2014 weight), which reproduces the printed figures,
+# and from the final data (991 rows, corrected weight) as figure-*-final.png. Returns the rows of the
+# D1 and D2 regressions for the tables file.
 plt.rcParams.update({'font.family': 'serif', 'font.size': 9})
+def draw_figures(d, sfx):
+    rows = []
 
-# Figure 1: the General Social Survey percentages the article charts (not from this survey)
-agree = [0.45, 0.5916, 0.6653]; disagree = [0.52, 0.4084, 0.1647]
-labels = ['the income gap is a\nproblem that needs fixing', 'there are strong conflicts\nbetween the rich and poor', 'differences in income\nare too large']
-fig, ax = plt.subplots(figsize=(6.5, 2.4))
-left = np.zeros(3)
-for vals, col, lab in [(disagree, '0.85', 'disagree'), ([1 - a - b for a, b in zip(agree, disagree)], '0.6', 'unsure'), (agree, '0.3', 'agree')]:
-    ax.barh(labels, vals, left=left, color=col, label=lab); left += np.array(vals)
-ax.axvline(0.5, ls=':', color='k'); ax.set_xlim(0, 1); ax.legend(ncol=3, frameon=False, loc='lower right', bbox_to_anchor=(1, 1))
-for s in ['top', 'right', 'left']: ax.spines[s].set_visible(False)
-fig.tight_layout(); fig.savefig('figure-1-py.png', dpi=200); plt.close(fig)
+    if sfx == "":
+        # Figure 1: the General Social Survey percentages the article charts (not from this survey)
+        agree = [0.45, 0.5916, 0.6653]; disagree = [0.52, 0.4084, 0.1647]
+        labels = ['the income gap is a\nproblem that needs fixing', 'there are strong conflicts\nbetween the rich and poor', 'differences in income\nare too large']
+        fig, ax = plt.subplots(figsize=(6.5, 2.4))
+        left = np.zeros(3)
+        for vals, col, lab in [(disagree, '0.85', 'disagree'), ([1 - a - b for a, b in zip(agree, disagree)], '0.6', 'unsure'), (agree, '0.3', 'agree')]:
+            ax.barh(labels, vals, left=left, color=col, label=lab); left += np.array(vals)
+        ax.axvline(0.5, ls=':', color='k'); ax.set_xlim(0, 1); ax.legend(ncol=3, frameon=False, loc='lower right', bbox_to_anchor=(1, 1))
+        for s in ['top', 'right', 'left']: ax.spines[s].set_visible(False)
+        fig.tight_layout(); fig.savefig(f'figure-1{sfx}-py.png', dpi=200); plt.close(fig)
 
-# Figures 2 and 3: kernel densities (Gaussian kernel, Silverman's default bandwidth). Figure 2 is
-# computed on the 0-1 standardized scores and labeled on their original -1 to 1 scale, as the
-# 2014 plot was. Figure 3 is the raw correlation.
-def silverman(x): x = x[~np.isnan(x)]; iqr = np.subtract(*np.percentile(x, [75, 25])); return 0.9 * min(x.std(ddof=1), iqr / 1.34) * len(x) ** -0.2
-def dens(v, grid):
-    x = v[~np.isnan(v)]; h = silverman(x)
-    return np.array([stats.norm.pdf((g - x) / h).sum() / (len(x) * h) for g in grid])
-grid = np.linspace(-0.15, 1.15, 512)
-fig, ax = plt.subplots(figsize=(6.5, 4))
-for v, ls, lab in [('desert_rich_tot', '-', 'rich'), ('desert_americans_tot', ':', 'average'), ('desert_poor_tot', '--', 'poor')]:
-    ax.plot(2 * grid - 1, dens(d[v].values, grid), ls=ls, color='k', lw=2, label=lab)
-ax.set_xlim(-1, 1); ax.set_ylim(0, 2.8); ax.set_xlabel('Deservingness'); ax.legend(frameon=False)
-for s in ['top', 'right']: ax.spines[s].set_visible(False)
-fig.tight_layout(); fig.savefig('figure-2-py.png', dpi=200); plt.close(fig)
-grid3 = np.linspace(-1.1, 1.1, 512)
-fig, ax = plt.subplots(figsize=(6.5, 4))
-ax.plot(grid3, dens(d['corr_ideal_agency'].values, grid3), color='k', lw=2); ax.set_xlim(-1, 1); ax.set_xlabel('Control-Ideal Importance correlation')
-for s in ['top', 'right']: ax.spines[s].set_visible(False)
-fig.tight_layout(); fig.savefig('figure-3-py.png', dpi=200); plt.close(fig)
+    # Figures 2 and 3: kernel densities (Gaussian kernel, Silverman's default bandwidth). Figure 2 is
+    # computed on the 0-1 standardized scores and labeled on their original -1 to 1 scale, as the
+    # 2014 plot was. Figure 3 is the raw correlation.
+    def silverman(x): x = x[~np.isnan(x)]; iqr = np.subtract(*np.percentile(x, [75, 25])); return 0.9 * min(x.std(ddof=1), iqr / 1.34) * len(x) ** -0.2
+    def dens(v, grid):
+        x = v[~np.isnan(v)]; h = silverman(x)
+        return np.array([stats.norm.pdf((g - x) / h).sum() / (len(x) * h) for g in grid])
+    grid = np.linspace(-0.15, 1.15, 512)
+    fig, ax = plt.subplots(figsize=(6.5, 4))
+    for v, ls, lab in [('desert_rich_tot', '-', 'rich'), ('desert_americans_tot', ':', 'average'), ('desert_poor_tot', '--', 'poor')]:
+        ax.plot(2 * grid - 1, dens(d[v].values, grid), ls=ls, color='k', lw=2, label=lab)
+    ax.set_xlim(-1, 1); ax.set_ylim(0, 2.8); ax.set_xlabel('Deservingness'); ax.legend(frameon=False)
+    for s in ['top', 'right']: ax.spines[s].set_visible(False)
+    fig.tight_layout(); fig.savefig(f'figure-2{sfx}-py.png', dpi=200); plt.close(fig)
+    grid3 = np.linspace(-1.1, 1.1, 512)
+    fig, ax = plt.subplots(figsize=(6.5, 4))
+    ax.plot(grid3, dens(d['corr_ideal_agency'].values, grid3), color='k', lw=2); ax.set_xlim(-1, 1); ax.set_xlabel('Control-Ideal Importance correlation')
+    for s in ['top', 'right']: ax.spines[s].set_visible(False)
+    fig.tight_layout(); fig.savefig(f'figure-3{sfx}-py.png', dpi=200); plt.close(fig)
 
-# Figure 4: share of respondents in each cell of (rich deserve their wealth) x (income differences are too large).
-# The 2014 figure dropped the duplicated respondent record (two rows identical in every answer; the second is dropped).
-d4 = d[~dup_mask]
-ix = (2 * d4['desert_rich_tot'] - 1).mul(6).round().astype(int); iy = (2 * d4['diff_large'] - 1).mul(3).round().astype(int)
-tab = pd.crosstab(iy, ix).reindex(index=range(-3, 4), columns=range(-6, 7), fill_value=0) / len(d4)
-fig, ax = plt.subplots(figsize=(6.5, 4.2))
-ax.imshow(tab.values, origin='lower', cmap='Greys', aspect='auto', extent=(-6.5, 6.5, -3.5, 3.5))
-ax.set_xticks([-6, 0, 6]); ax.set_xticklabels(['VC, VU', 'NC, ND/U', 'VC, VD']); ax.set_yticks([-3, 0, 3]); ax.set_yticklabels(['SD', 'N', 'SA'])
-ax.set_xlabel('Do the rich deserve their wealth?'); ax.set_ylabel('Are income differences too large?')
-fig.tight_layout(); fig.savefig('figure-4-py.png', dpi=200); plt.close(fig)
+    # Figure 4: share of respondents in each cell of (rich deserve their wealth) x (income differences are too large).
+    # The 2014 figure dropped the duplicated respondent record (two rows identical in every answer; the second is dropped).
+    d4 = d[~d.drop(columns=['row', 'id']).duplicated()]
+    ix = (2 * d4['desert_rich_tot'] - 1).mul(6).round().astype(int); iy = (2 * d4['diff_large'] - 1).mul(3).round().astype(int)
+    tab = pd.crosstab(iy, ix).reindex(index=range(-3, 4), columns=range(-6, 7), fill_value=0) / len(d4)
+    fig, ax = plt.subplots(figsize=(6.5, 4.2))
+    ax.imshow(tab.values, origin='lower', cmap='Greys', aspect='auto', extent=(-6.5, 6.5, -3.5, 3.5))
+    ax.set_xticks([-6, 0, 6]); ax.set_xticklabels(['VC, VU', 'NC, ND/U', 'VC, VD']); ax.set_yticks([-3, 0, 3]); ax.set_yticklabels(['SD', 'N', 'SA'])
+    ax.set_xlabel('Do the rich deserve their wealth?'); ax.set_ylabel('Are income differences too large?')
+    fig.tight_layout(); fig.savefig(f'figure-4{sfx}-py.png', dpi=200); plt.close(fig)
 
-# Figures D1 and D2: marginal-effect plots. Each panel: an ordinary weighted regression with the interaction,
-# errors clustered by state (Stata: reg ... [pw=post_weight], cluster(state)); the marginal effect of X at each
-# value of the moderator Z, b1 + b3*Z, with a 95% band, over a histogram of Z.
-def cluster_fit(dv, rhs):
-    sub = d[[dv] + rhs + ['post_weight', 'state']].dropna()
-    X = design(sub, rhs, fe=False); w = sub['post_weight'].astype(float)
-    r = sm.WLS(sub[dv].astype(float), X, weights=w).fit(cov_type='cluster', cov_kwds={'groups': sub['state'].astype(int).values, 'use_correction': True, 'df_correction': True})
-    return r, sub
-def me_panel(ax, dv, xvar, zvar, rhs, xlab, ylab, ylim, zhist, bins, title, rug=False):
-    r, sub = cluster_fit(dv, rhs); ix = 'x_' + zvar; V = r.cov_params()
-    b1, b3 = r.params[xvar], r.params[ix]; v1, v3, c13 = V.loc[xvar, xvar], V.loc[ix, ix], V.loc[xvar, ix]
-    zz = np.linspace(0, 1, 101); me = b1 + b3 * zz; band = 1.96 * np.sqrt(v1 + v3 * zz ** 2 + 2 * c13 * zz)
-    ax2 = ax.twinx(); cnt, edges = np.histogram(sub[zhist], bins=bins); ax2.bar((edges[:-1] + edges[1:]) / 2, 100 * cnt / cnt.sum(), width=(edges[1] - edges[0]) * (0.5 if rug else 0.6), color='0.8', zorder=0)
-    ax2.set_ylabel('Percentage of observations', fontsize=7); ax2.tick_params(labelsize=7)
-    ax.set_zorder(ax2.get_zorder() + 1); ax.patch.set_visible(False)
-    ax.plot(zz, me, 'k', lw=2); ax.plot(zz, me + band, 'k--', lw=1); ax.plot(zz, me - band, 'k--', lw=1); ax.axhline(0, color='k', lw=1)
-    if rug: ax.plot(sub[zhist], np.full(len(sub), ylim[0]), '|', color='0.3', ms=6)
-    ax.set_xlim(0, 1); ax.set_ylim(*ylim); ax.set_xlabel(xlab, fontsize=7); ax.set_ylabel(ylab, fontsize=7); ax.set_title(title, fontsize=8); ax.tick_params(labelsize=7)
-    return f'| {title} | {dv} | {zvar} | {b1:.3f} | {np.sqrt(v1):.3f} | {b3:.3f} | {np.sqrt(v3):.3f} | {int(r.nobs)} |'
-md += ['', '## Figure D1 and D2 regressions', '| Panel | Outcome | Z | b(X) | SE | b(X x Z) | SE | N |', '|---|---|---|---|---|---|---|---|']
-rich_rhs = lambda first: [first, 'desert_rich_tot', 'x_desert_rich_tot', 'desert_americans_tot', 'x_desert_americans_tot', 'desert_poor_tot', 'x_desert_poor_tot'] + CTRL
-bins24 = np.arange(-1 / 48, 1 + 1 / 48 + 1e-9, 1 / 24)
-fig, axes = plt.subplots(2, 2, figsize=(7, 6))
-md.append(me_panel(axes[0, 0], GOV, DEFS, 'agency_str', [DEFS, 'agency_str', 'x_agency_str'] + CTRL, "Belief that peoples' economic standing is within their control", 'Marginal effect of definition', (-3, 1), 'agency_str', bins24, 'D1(a) X given Z_agency, on Y_gov_fix_gap'))
-md.append(me_panel(axes[0, 1], GOV, DEFS, 'justice_str', [DEFS, 'justice_str', 'x_justice_str'] + CTRL, 'Belief that economic desert is rewarded', 'Marginal effect of definition', (-3, 1), 'justice_str', bins24, 'D1(b) X given Z_justice, on Y_gov_fix_gap'))
-md.append(me_panel(axes[1, 0], GOV, DEFS, 'desert_rich_tot', rich_rhs(DEFS), 'Belief that rich Americans deserve their wealth', 'Marginal effect of definition', (-3, 1), 'desert_rich_tot', bins24, 'D1(c) X given Z_rich_deserve, on Y_gov_fix_gap'))
-md.append(me_panel(axes[1, 1], TAX, DEFS, 'agency_str', [DEFS, 'agency_str', 'x_agency_str'] + CTRL, "Belief that peoples' economic standing is within their control", 'Marginal effect of definition', (-3, 1), 'agency_str', bins24, 'D1(d) X given Z_agency, on Y_prog_tax'))
-fig.tight_layout(); fig.savefig('figure-D1-py.png', dpi=200); plt.close(fig)
-bins100 = np.linspace(0, 1, 101)
-fig, axes = plt.subplots(2, 2, figsize=(7, 6))
-md.append(me_panel(axes[0, 0], GOV, 'agency_str', 'agency_str', ['agency_str', DEFS, 'x_agency_str'] + CTRL, 'Importance of agency to definition of desert', 'Marginal effect of belief in economic agency', (-2, 7), DEFS, bins100, 'D2(a) Z_agency given X, on Y_gov_fix_gap', rug=True))
-md.append(me_panel(axes[0, 1], GOV, 'justice_str', 'justice_str', ['justice_str', DEFS, 'x_justice_str'] + CTRL, 'Importance of agency to definition of desert', 'Marginal effect of belief that economic desert is rewarded', (-2, 7), DEFS, bins100, 'D2(b) Z_justice given X, on Y_gov_fix_gap', rug=True))
-md.append(me_panel(axes[1, 0], GOV, 'desert_rich_tot', 'desert_rich_tot', ['desert_rich_tot', DEFS, 'x_desert_rich_tot', 'desert_americans_tot', 'x_desert_americans_tot', 'desert_poor_tot', 'x_desert_poor_tot'] + CTRL, 'Importance of agency to definition of desert', 'Marginal effect of belief that rich Americans deserve their wealth', (-2, 7), DEFS, bins100, 'D2(c) Z_rich_deserve given X, on Y_gov_fix_gap', rug=True))
-md.append(me_panel(axes[1, 1], TAX, 'agency_str', 'agency_str', ['agency_str', DEFS, 'x_agency_str'] + CTRL, 'Importance of agency to definition of desert', 'Marginal effect of belief in economic agency', (-2, 7), DEFS, bins100, 'D2(d) Z_agency given X, on Y_prog_tax', rug=True))
-fig.tight_layout(); fig.savefig('figure-D2-py.png', dpi=200); plt.close(fig)
+    # Figures D1 and D2: marginal-effect plots. Each panel: an ordinary weighted regression with the interaction,
+    # errors clustered by state (Stata: reg ... [pw=post_weight], cluster(state)); the marginal effect of X at each
+    # value of the moderator Z, b1 + b3*Z, with a 95% band, over a histogram of Z.
+    def cluster_fit(dv, rhs):
+        sub = d[[dv] + rhs + ['post_weight', 'state']].dropna()
+        X = design(sub, rhs, fe=False); w = sub['post_weight'].astype(float)
+        r = sm.WLS(sub[dv].astype(float), X, weights=w).fit(cov_type='cluster', cov_kwds={'groups': sub['state'].astype(int).values, 'use_correction': True, 'df_correction': True})
+        return r, sub
+    def me_panel(ax, dv, xvar, zvar, rhs, xlab, ylab, ylim, zhist, bins, title, rug=False):
+        r, sub = cluster_fit(dv, rhs); ix = 'x_' + zvar; V = r.cov_params()
+        b1, b3 = r.params[xvar], r.params[ix]; v1, v3, c13 = V.loc[xvar, xvar], V.loc[ix, ix], V.loc[xvar, ix]
+        zz = np.linspace(0, 1, 101); me = b1 + b3 * zz; band = 1.96 * np.sqrt(v1 + v3 * zz ** 2 + 2 * c13 * zz)
+        ax2 = ax.twinx(); cnt, edges = np.histogram(sub[zhist], bins=bins); ax2.bar((edges[:-1] + edges[1:]) / 2, 100 * cnt / cnt.sum(), width=(edges[1] - edges[0]) * (0.5 if rug else 0.6), color='0.8', zorder=0)
+        ax2.set_ylabel('Percentage of observations', fontsize=7); ax2.tick_params(labelsize=7)
+        ax.set_zorder(ax2.get_zorder() + 1); ax.patch.set_visible(False)
+        ax.plot(zz, me, 'k', lw=2); ax.plot(zz, me + band, 'k--', lw=1); ax.plot(zz, me - band, 'k--', lw=1); ax.axhline(0, color='k', lw=1)
+        if rug: ax.plot(sub[zhist], np.full(len(sub), ylim[0]), '|', color='0.3', ms=6)
+        ax.set_xlim(0, 1); ax.set_ylim(*ylim); ax.set_xlabel(xlab, fontsize=7); ax.set_ylabel(ylab, fontsize=7); ax.set_title(title, fontsize=8); ax.tick_params(labelsize=7)
+        return f'| {title} | {dv} | {zvar} | {b1:.3f} | {np.sqrt(v1):.3f} | {b3:.3f} | {np.sqrt(v3):.3f} | {int(r.nobs)} |'
+    rows += ['', '## Figure D1 and D2 regressions', '| Panel | Outcome | Z | b(X) | SE | b(X x Z) | SE | N |', '|---|---|---|---|---|---|---|---|']
+    rich_rhs = lambda first: [first, 'desert_rich_tot', 'x_desert_rich_tot', 'desert_americans_tot', 'x_desert_americans_tot', 'desert_poor_tot', 'x_desert_poor_tot'] + CTRL
+    bins24 = np.arange(-1 / 48, 1 + 1 / 48 + 1e-9, 1 / 24)
+    fig, axes = plt.subplots(2, 2, figsize=(7, 6))
+    rows.append(me_panel(axes[0, 0], GOV, DEFS, 'agency_str', [DEFS, 'agency_str', 'x_agency_str'] + CTRL, "Belief that peoples' economic standing is within their control", 'Marginal effect of definition', (-3, 1), 'agency_str', bins24, 'D1(a) X given Z_agency, on Y_gov_fix_gap'))
+    rows.append(me_panel(axes[0, 1], GOV, DEFS, 'justice_str', [DEFS, 'justice_str', 'x_justice_str'] + CTRL, 'Belief that economic desert is rewarded', 'Marginal effect of definition', (-3, 1), 'justice_str', bins24, 'D1(b) X given Z_justice, on Y_gov_fix_gap'))
+    rows.append(me_panel(axes[1, 0], GOV, DEFS, 'desert_rich_tot', rich_rhs(DEFS), 'Belief that rich Americans deserve their wealth', 'Marginal effect of definition', (-3, 1), 'desert_rich_tot', bins24, 'D1(c) X given Z_rich_deserve, on Y_gov_fix_gap'))
+    rows.append(me_panel(axes[1, 1], TAX, DEFS, 'agency_str', [DEFS, 'agency_str', 'x_agency_str'] + CTRL, "Belief that peoples' economic standing is within their control", 'Marginal effect of definition', (-3, 1), 'agency_str', bins24, 'D1(d) X given Z_agency, on Y_prog_tax'))
+    fig.tight_layout(); fig.savefig(f'figure-D1{sfx}-py.png', dpi=200); plt.close(fig)
+    bins100 = np.linspace(0, 1, 101)
+    fig, axes = plt.subplots(2, 2, figsize=(7, 6))
+    rows.append(me_panel(axes[0, 0], GOV, 'agency_str', 'agency_str', ['agency_str', DEFS, 'x_agency_str'] + CTRL, 'Importance of agency to definition of desert', 'Marginal effect of belief in economic agency', (-2, 7), DEFS, bins100, 'D2(a) Z_agency given X, on Y_gov_fix_gap', rug=True))
+    rows.append(me_panel(axes[0, 1], GOV, 'justice_str', 'justice_str', ['justice_str', DEFS, 'x_justice_str'] + CTRL, 'Importance of agency to definition of desert', 'Marginal effect of belief that economic desert is rewarded', (-2, 7), DEFS, bins100, 'D2(b) Z_justice given X, on Y_gov_fix_gap', rug=True))
+    rows.append(me_panel(axes[1, 0], GOV, 'desert_rich_tot', 'desert_rich_tot', ['desert_rich_tot', DEFS, 'x_desert_rich_tot', 'desert_americans_tot', 'x_desert_americans_tot', 'desert_poor_tot', 'x_desert_poor_tot'] + CTRL, 'Importance of agency to definition of desert', 'Marginal effect of belief that rich Americans deserve their wealth', (-2, 7), DEFS, bins100, 'D2(c) Z_rich_deserve given X, on Y_gov_fix_gap', rug=True))
+    rows.append(me_panel(axes[1, 1], TAX, 'agency_str', 'agency_str', ['agency_str', DEFS, 'x_agency_str'] + CTRL, 'Importance of agency to definition of desert', 'Marginal effect of belief in economic agency', (-2, 7), DEFS, bins100, 'D2(d) Z_agency given X, on Y_prog_tax', rug=True))
+    fig.tight_layout(); fig.savefig(f'figure-D2{sfx}-py.png', dpi=200); plt.close(fig)
+    return rows
 
+md += draw_figures(d, '')
+md_dedup += draw_figures(d991, '-final')
 open(OUT, 'w', encoding='utf-8').write('\n'.join(md) + '\n')
 
-# ---- the tables without the duplicated record ----------------------------------------------------
-# Same layout, 991 rows, followed by every regression cell whose printed coefficient, standard
-# error or stars differ from the 992-row tables.
+# ---- the final tables: duplicate dropped, weight corrected ---------------------------------------
+# Same layout, 991 rows, followed by every regression cell whose coefficient, standard error or
+# stars differ from the as-published tables above.
 fmt = lambda c: (f'{c[0]:.3f}{stars(c[2])}', f'({c[1]:.3f})')
 # a regression's place in the article, named as printed: ('Table C1: Y_gov_fix_gap', 'gov Model A')
 # -> 'Table C1 | Y_gov_fix_gap | Model A'
@@ -287,10 +312,11 @@ for (g, n1, s1), (_, n2, s2) in zip(a1_rows(md[:md.index('## Table C1: Y_gov_fix
     if (n1, s1) != (n2, s2):
         k = sum(ch.startswith('| Table 1 |') for ch in changes)     # table order: after Table 1
         changes.insert(k + sum(ch.startswith('| Table A1 |') for ch in changes), f'| Table A1 | | | {g.strip()} | {n1.strip()} ({s1.strip()}) | {n2.strip()} ({s2.strip()}) |')
-dd = md_dedup + ['', '## Cells that change when the duplicated record is dropped',
-                 '| Table | Outcome | Model | Row | With (992 rows) | Without (991 rows) |', '|---|---|---|---|---|---|'] + changes
-open('tables_deduplicated_py.md', 'w', encoding='utf-8').write('\n'.join(dd) + '\n')
-print(f"wrote tables_deduplicated_py.md: {sum(not ch.startswith('| Table A1') for ch in changes)} of {sum(len(e['cells']) for _, _, e in res)} regression cells change at the printed precision")
+dd = md_dedup + ['', '## Cells that change with the two data fixes',
+                 'As published: 992 rows, the 2014 weight. Final: 991 rows, the duplicate removed, the weight corrected.', '',
+                 '| Table | Outcome | Model | Row | As published | Final |', '|---|---|---|---|---|---|'] + changes
+open('tables_final_py.md', 'w', encoding='utf-8').write('\n'.join(dd) + '\n')
+print(f"wrote tables_final_py.md: {sum(not ch.startswith('| Table A1') for ch in changes)} of {sum(len(e['cells']) for _, _, e in res)} regression cells change at the printed precision")
 print(f'wrote {OUT} and figure-1-py.png ... figure-D2-py.png')
 
 # ---- compare Tables 1, C1, C2, D1 with the printed page ------------------------------------------

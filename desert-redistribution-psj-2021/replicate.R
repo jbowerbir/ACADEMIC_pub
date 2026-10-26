@@ -18,11 +18,18 @@
 #   Figure 1               the three General Social Survey percentages the
 #                          article charts
 #
+# The tables are estimated twice: on the published sample (992 rows, 2014
+# weight), which reproduces the printed tables and is written to
+# tables_corrected.md with the typos corrected, and on the final data (991
+# distinct respondents, corrected weight), written to tables_final.md with
+# every cell that changes. The figures are drawn from both.
+#
 # Then, if tables_published.md is present, every cell of Tables 1, C1, C2 and
 # D1 is compared with the printed page and the cells that differ are listed.
 #
 # replicate.py is the same program in Python. Both write the same markdown, so
-# `diff tables_corrected.md tables_py.md` checks one against the other.
+# `diff tables_corrected.md tables_py.md` and `diff tables_final.md
+# tables_final_py.md` check one against the other.
 #
 # Two things carried over from the 2014 Stata code on purpose. (1) The code
 # recodes by exact comparison (`married == .8`); here the values are rounded
@@ -33,17 +40,21 @@
 # regressions (Y_gov Model 1, Y_prog_tax Model 3) and the raw one in the
 # other four. That is how the article's tables were estimated.
 #
-# Usage:  Rscript replicate.R      writes tables_corrected.md, figure-*.png
+# Usage:  Rscript replicate.R      writes tables_corrected.md, tables_final.md,
+#                                  figure-*.png and figure-*-final.png
 # =============================================================================
 
 OUT <- "tables_corrected.md"
 d   <- read.csv("economic_justice_v7_psj-replication.csv")
 
 # One respondent's record is in the file twice (rows identical in every
-# answer). The published tables were estimated with it. Every table is
-# therefore estimated twice below: on all 992 rows, which reproduces the
-# published tables, and on the 991 rows without the duplicate, written to a
-# second file with a list of every cell that changes at the printed precision.
+# answer). The published tables were estimated with it, and with a survey
+# weight whose lowest income stratum was drawn one bracket too high (see
+# rake() below). Every table is therefore estimated twice: on all 992 rows
+# with the 2014 weight, which reproduces the published tables, and on the 991
+# rows without the duplicate with the weight re-raked on the corrected strata,
+# written to a second file with a list of every cell that changes at the
+# printed precision.
 dup_row <- which(duplicated(d[, setdiff(names(d), c("row", "id"))]))
 
 
@@ -276,14 +287,20 @@ tables_md <- function(data) {
 # Raking the same way on the 991 distinct rows gives the weight those tables
 # should carry. Strata and targets are the 2014 script's; the targets are
 # scaled from 992 to the rows present.
-rake <- function(x) {
+#
+# One stratum is corrected. The 2014 script's lowest income group took income
+# codes 0-7, that is households under $30,000 (`income_household < 8` on the
+# 19-bracket code), against a population target for households under $25,000;
+# the $25,000 line is code 7. With income_cut = 8 the function reproduces the
+# shipped weight; the final tables use income_cut = 7.
+rake <- function(x, income_cut = 8) {
   inc <- round(x$income_household * 18)
   edu <- round(x$education * 6)
   strata <- list(
     gender = x$gender,
     party  = ifelse(x$party >= 2, 1, ifelse(x$party == 1, 2,
              ifelse(x$party == 0, 3, ifelse(x$party == -1, 4, 5)))),
-    income = ifelse(inc < 8, 1, ifelse(inc < 11, 2, ifelse(inc < 13, 3,
+    income = ifelse(inc < income_cut, 1, ifelse(inc < 11, 2, ifelse(inc < 13, 3,
              ifelse(inc < 15, 4, 5)))),
     race   = ifelse(x$race == 0, 1, ifelse(x$race == 1, 2,
              ifelse(x$race == 2, 3, 4))),
@@ -313,198 +330,212 @@ stopifnot(max(abs(rake(d) - d$post_weight)) < 1e-4)
 
 full  <- tables_md(d)
 d991  <- d[-dup_row, ]
-d991$post_weight <- rake(d991)
+d991$post_weight <- rake(d991, income_cut = 7)
 dedup <- tables_md(d991)
 res   <- full$res
-md    <- full$md
+md    <- c("# Corrected tables", "", "The published tables with their typos corrected, estimated on the published sample of 992 observations with the 2014 weight. Written by replicate.R (tables_corrected.md) and replicate.py (tables_py.md); the two files are identical. The last section lists every cell that differs from the published tables.", full$md)
+dedup$md <- c("# Final tables", "", "The same tables estimated on the 991 distinct respondents, without the duplicated row and with the survey weight corrected. Written by replicate.R (tables_final.md) and replicate.py (tables_final_py.md); the two files are identical. The last section lists every cell that differs from the corrected tables as published.", dedup$md)
 
 
 # ---- Figures -----------------------------------------------------------------
+# Drawn twice: from the published sample (992 rows, 2014 weight), which
+# reproduces the printed figures, and from the final data (991 rows,
+# corrected weight) as figure-*-final.png. Returns the rows of the D1 and D2
+# regressions for the tables file.
+draw_figures <- function(d, sfx) {
+  rows <- character(0)
 
-png_open <- function(f, w = 6.5, h = 4) {
-  png(f, width = w, height = h, units = "in", res = 200)
+  png_open <- function(f, w = 6.5, h = 4) {
+    png(f, width = w, height = h, units = "in", res = 200)
+  }
+  sc <- function(v) 2 * v - 1          # a 0-1 score back to its -1 to 1 scale
+
+  if (sfx == "") {
+    # Figure 1: the General Social Survey percentages the article charts
+    # (not from this survey)
+    png_open(sprintf("figure-1%s.png", sfx), 6.5, 2.4)
+    par(mar = c(3, 12, 2, 1), family = "serif")
+    agree    <- c(0.45, 0.5916, 0.6653)
+    disagree <- c(0.52, 0.4084, 0.1647)
+    greys    <- c("grey85", "grey60", "grey30")
+    barplot(rbind(disagree, 1 - agree - disagree, agree), horiz = TRUE,
+            col = greys, border = NA, las = 1, cex.names = 0.8, cex.axis = 0.8,
+            names.arg = c("the income gap is a\nproblem that needs fixing",
+                          "there are strong conflicts\nbetween the rich and poor",
+                          "differences in income\nare too large"))
+    abline(v = 0.5, lty = 3)
+    legend("topright", c("disagree", "unsure", "agree"), fill = greys, border = NA,
+           bty = "n", cex = 0.8, horiz = TRUE, inset = c(0, -0.22), xpd = TRUE)
+    invisible(dev.off())
+
+  }
+  # Figures 2 and 3: kernel densities (Gaussian kernel, Silverman's default
+  # bandwidth, as Stata's kdensity default). Figure 2 is computed on the 0-1
+  # standardized scores and labeled on their original -1 to 1 scale, which is
+  # how the 2014 plot was drawn; its heights match the printed figure. Figure 3
+  # is the raw correlation; the printed figure is more heavily smoothed than
+  # the default here, and the smoothing it used is not recorded.
+  dens <- function(v) {
+    k <- density(v[!is.na(v)])
+    list(x = sc(k$x), y = k$y)
+  }
+  png_open(sprintf("figure-2%s.png", sfx))
+  par(mar = c(4, 4, 1, 1), family = "serif")
+  plot(dens(d$desert_rich_tot), type = "l", lwd = 2, main = "", ylab = "",
+       xlab = "Deservingness", xlim = c(-1, 1), ylim = c(0, 2.8), bty = "l")
+  lines(dens(d$desert_americans_tot), lwd = 2, lty = 3)
+  lines(dens(d$desert_poor_tot), lwd = 2, lty = 2)
+  legend("topright", c("rich", "average", "poor"), lwd = 2, lty = c(1, 3, 2),
+         bty = "n")
+  invisible(dev.off())
+
+  png_open(sprintf("figure-3%s.png", sfx))
+  par(mar = c(4, 4, 1, 1), family = "serif")
+  plot(density(d$corr_ideal_agency, na.rm = TRUE), lwd = 2, main = "", ylab = "",
+       xlab = "Control-Ideal Importance correlation", xlim = c(-1, 1), bty = "l")
+  invisible(dev.off())
+
+  # Figure 4: share of respondents in each cell of (rich deserve their wealth)
+  # x (income differences are too large). The 2014 figure dropped the
+  # duplicated respondent record (two rows identical in every answer; the
+  # second is dropped).
+  d4  <- d[!duplicated(d[, setdiff(names(d), c("row", "id"))]), ]
+  ix  <- round(sc(d4$desert_rich_tot) * 6)     # 13 columns, -6 to 6
+  iy  <- round(sc(d4$diff_large) * 3)          # 7 rows, -3 to 3
+  tab <- table(factor(iy, levels = -3:3), factor(ix, levels = -6:6)) / nrow(d4)
+  png_open(sprintf("figure-4%s.png", sfx), 6.5, 4.2)
+  par(mar = c(5, 5, 1, 5), family = "serif")
+  image(x = -6:6, y = -3:3, z = t(unclass(tab)),
+        col = grey.colors(20, start = 0.95, end = 0.1), axes = FALSE,
+        xlab = "Do the rich deserve their wealth?",
+        ylab = "Are income differences too large?")
+  axis(1, at = c(-6, 0, 6), labels = c("VC, VU", "NC, ND/U", "VC, VD"),
+       cex.axis = 0.8)
+  axis(2, at = c(-3, 0, 3), labels = c("SD", "N", "SA"), las = 1, cex.axis = 0.8)
+  box()
+  invisible(dev.off())
+
+  # Figures D1 and D2: marginal-effect plots. Each panel: an ordinary weighted
+  # regression with the interaction, errors clustered by state (Stata:
+  # reg ... [pw=post_weight], cluster(state)); the marginal effect of X at each
+  # value of the moderator Z, b1 + b3*Z, with a 95% band, over a histogram of Z.
+  # D2 reverses the roles: the marginal effect of Z at each value of Definition.
+
+  cluster_vcov <- function(fit, g) {
+    X <- model.matrix(fit)
+    w <- weights(fit)
+    e <- residuals(fit)
+    n <- nrow(X)
+    k <- ncol(X)
+    G <- length(unique(g))
+    bread <- solve(crossprod(X * sqrt(w)))
+    U     <- X * (w * e)
+    meat  <- Reduce(`+`, lapply(split(seq_len(n), g), function(i) {
+      s <- matrix(colSums(U[i, , drop = FALSE]), nrow = 1)
+      crossprod(s)
+    }))
+    bread %*% meat %*% bread * (G / (G - 1)) * ((n - 1) / (n - k))
+  }
+
+  # the right-hand side of each plot regression: rescaled Definition, the
+  # justice measure and their product (the three deserve variables and their
+  # products entered together), and the controls
+  plot_rhs <- function(zvar) {
+    block <- if (zvar == "desert_rich_tot") DES_X else c(zvar, paste0("x_", zvar))
+    c(DEFS, block, CTRL)
+  }
+
+  me_panel <- function(dv, xvar, zvar, xlab, ylab, ylim, hist_var, breaks,
+                       main, rug = FALSE) {
+    rhs <- plot_rhs(zvar)
+    sub <- d[complete.cases(d[, c(dv, rhs, "post_weight", "state")]), ]
+    fit <- lm(as.formula(paste(dv, "~", paste(rhs, collapse = " + "))),
+              data = sub, weights = sub$post_weight)
+    V   <- cluster_vcov(fit, sub$state)
+    b   <- coef(fit)
+    ix  <- paste0("x_", zvar)
+    b1  <- b[[xvar]]; b3 <- b[[ix]]
+    v1  <- V[xvar, xvar]; v3 <- V[ix, ix]; c13 <- V[xvar, ix]
+    zz   <- seq(0, 1, by = 0.01)
+    me   <- b1 + b3 * zz
+    band <- 1.96 * sqrt(v1 + v3 * zz^2 + 2 * c13 * zz)
+    h    <- hist(sub[[hist_var]], breaks = breaks, plot = FALSE)
+    par(mar = c(4, 4, 2, 4), family = "serif")
+    plot(h$mids, 100 * h$counts / sum(h$counts), type = "h", lend = 1,
+         lwd = if (rug) 2 else 8, col = "grey80", axes = FALSE,
+         xlab = "", ylab = "", xlim = c(0, 1))
+    axis(4, cex.axis = 0.7)
+    mtext("Percentage of observations", 4, line = 2.2, cex = 0.7)
+    par(new = TRUE)
+    plot(zz, me, type = "l", lwd = 2, ylim = ylim, xlim = c(0, 1), bty = "n",
+         xlab = xlab, ylab = ylab, main = main,
+         cex.lab = 0.75, cex.axis = 0.7, cex.main = 0.8)
+    lines(zz, me + band, lty = 2)
+    lines(zz, me - band, lty = 2)
+    abline(h = 0)
+    if (rug) rug(sub[[hist_var]], col = "grey40")
+    sprintf("| %s | %s | %s | %.3f | %.3f | %.3f | %.3f | %d |",
+            main, dv, zvar, b1, sqrt(v1), b3, sqrt(v3), nobs(fit))
+  }
+
+  rows <- c(rows, "", "## Figure D1 and D2 regressions",
+          "| Panel | Outcome | Z | b(X) | SE | b(X x Z) | SE | N |",
+          "|---|---|---|---|---|---|---|---|")
+
+  X_LAB  <- "Marginal effect of definition"
+  AGENCY <- "Belief that peoples' economic standing is within their control"
+  JUST   <- "Belief that economic desert is rewarded"
+  RICH   <- "Belief that rich Americans deserve their wealth"
+  br24   <- seq(-1 / 48, 1 + 1 / 48, by = 1 / 24)
+
+  png_open(sprintf("figure-D1%s.png", sfx), 7, 6)
+  par(mfrow = c(2, 2))
+  rows <- c(rows,
+    me_panel(GOV, DEFS, "agency_str", AGENCY, X_LAB, c(-3, 1), "agency_str", br24,
+             "D1(a) X given Z_agency, on Y_gov_fix_gap"),
+    me_panel(GOV, DEFS, "justice_str", JUST, X_LAB, c(-3, 1), "justice_str", br24,
+             "D1(b) X given Z_justice, on Y_gov_fix_gap"),
+    me_panel(GOV, DEFS, "desert_rich_tot", RICH, X_LAB, c(-3, 1),
+             "desert_rich_tot", br24,
+             "D1(c) X given Z_rich_deserve, on Y_gov_fix_gap"),
+    me_panel(TAX, DEFS, "agency_str", AGENCY, X_LAB, c(-3, 1), "agency_str", br24,
+             "D1(d) X given Z_agency, on Y_prog_tax"))
+  invisible(dev.off())
+
+  Z_LAB  <- "Importance of agency to definition of desert"
+  br100  <- seq(0, 1, by = 0.01)
+
+  png_open(sprintf("figure-D2%s.png", sfx), 7, 6)
+  par(mfrow = c(2, 2))
+  rows <- c(rows,
+    me_panel(GOV, "agency_str", "agency_str", Z_LAB,
+             "Marginal effect of belief in economic agency",
+             c(-2, 7), DEFS, br100,
+             "D2(a) Z_agency given X, on Y_gov_fix_gap", rug = TRUE),
+    me_panel(GOV, "justice_str", "justice_str", Z_LAB,
+             "Marginal effect of belief that economic desert is rewarded",
+             c(-2, 7), DEFS, br100,
+             "D2(b) Z_justice given X, on Y_gov_fix_gap", rug = TRUE),
+    me_panel(GOV, "desert_rich_tot", "desert_rich_tot", Z_LAB,
+             "Marginal effect of belief that rich Americans deserve their wealth",
+             c(-2, 7), DEFS, br100,
+             "D2(c) Z_rich_deserve given X, on Y_gov_fix_gap", rug = TRUE),
+    me_panel(TAX, "agency_str", "agency_str", Z_LAB,
+             "Marginal effect of belief in economic agency",
+             c(-2, 7), DEFS, br100,
+             "D2(d) Z_agency given X, on Y_prog_tax", rug = TRUE))
+  invisible(dev.off())
+  rows
 }
-sc <- function(v) 2 * v - 1          # a 0-1 score back to its -1 to 1 scale
 
-# Figure 1: the General Social Survey percentages the article charts
-# (not from this survey)
-png_open("figure-1.png", 6.5, 2.4)
-par(mar = c(3, 12, 2, 1), family = "serif")
-agree    <- c(0.45, 0.5916, 0.6653)
-disagree <- c(0.52, 0.4084, 0.1647)
-greys    <- c("grey85", "grey60", "grey30")
-barplot(rbind(disagree, 1 - agree - disagree, agree), horiz = TRUE,
-        col = greys, border = NA, las = 1, cex.names = 0.8, cex.axis = 0.8,
-        names.arg = c("the income gap is a\nproblem that needs fixing",
-                      "there are strong conflicts\nbetween the rich and poor",
-                      "differences in income\nare too large"))
-abline(v = 0.5, lty = 3)
-legend("topright", c("disagree", "unsure", "agree"), fill = greys, border = NA,
-       bty = "n", cex = 0.8, horiz = TRUE, inset = c(0, -0.22), xpd = TRUE)
-dev.off()
-
-# Figures 2 and 3: kernel densities (Gaussian kernel, Silverman's default
-# bandwidth, as Stata's kdensity default). Figure 2 is computed on the 0-1
-# standardized scores and labeled on their original -1 to 1 scale, which is
-# how the 2014 plot was drawn; its heights match the printed figure. Figure 3
-# is the raw correlation; the printed figure is more heavily smoothed than
-# the default here, and the smoothing it used is not recorded.
-dens <- function(v) {
-  k <- density(v[!is.na(v)])
-  list(x = sc(k$x), y = k$y)
-}
-png_open("figure-2.png")
-par(mar = c(4, 4, 1, 1), family = "serif")
-plot(dens(d$desert_rich_tot), type = "l", lwd = 2, main = "", ylab = "",
-     xlab = "Deservingness", xlim = c(-1, 1), ylim = c(0, 2.8), bty = "l")
-lines(dens(d$desert_americans_tot), lwd = 2, lty = 3)
-lines(dens(d$desert_poor_tot), lwd = 2, lty = 2)
-legend("topright", c("rich", "average", "poor"), lwd = 2, lty = c(1, 3, 2),
-       bty = "n")
-dev.off()
-
-png_open("figure-3.png")
-par(mar = c(4, 4, 1, 1), family = "serif")
-plot(density(d$corr_ideal_agency, na.rm = TRUE), lwd = 2, main = "", ylab = "",
-     xlab = "Control-Ideal Importance correlation", xlim = c(-1, 1), bty = "l")
-dev.off()
-
-# Figure 4: share of respondents in each cell of (rich deserve their wealth)
-# x (income differences are too large). The 2014 figure dropped the
-# duplicated respondent record (two rows identical in every answer; the
-# second is dropped).
-d4  <- d[-dup_row, ]
-ix  <- round(sc(d4$desert_rich_tot) * 6)     # 13 columns, -6 to 6
-iy  <- round(sc(d4$diff_large) * 3)          # 7 rows, -3 to 3
-tab <- table(factor(iy, levels = -3:3), factor(ix, levels = -6:6)) / nrow(d4)
-png_open("figure-4.png", 6.5, 4.2)
-par(mar = c(5, 5, 1, 5), family = "serif")
-image(x = -6:6, y = -3:3, z = t(unclass(tab)),
-      col = grey.colors(20, start = 0.95, end = 0.1), axes = FALSE,
-      xlab = "Do the rich deserve their wealth?",
-      ylab = "Are income differences too large?")
-axis(1, at = c(-6, 0, 6), labels = c("VC, VU", "NC, ND/U", "VC, VD"),
-     cex.axis = 0.8)
-axis(2, at = c(-3, 0, 3), labels = c("SD", "N", "SA"), las = 1, cex.axis = 0.8)
-box()
-dev.off()
-
-# Figures D1 and D2: marginal-effect plots. Each panel: an ordinary weighted
-# regression with the interaction, errors clustered by state (Stata:
-# reg ... [pw=post_weight], cluster(state)); the marginal effect of X at each
-# value of the moderator Z, b1 + b3*Z, with a 95% band, over a histogram of Z.
-# D2 reverses the roles: the marginal effect of Z at each value of Definition.
-
-cluster_vcov <- function(fit, g) {
-  X <- model.matrix(fit)
-  w <- weights(fit)
-  e <- residuals(fit)
-  n <- nrow(X)
-  k <- ncol(X)
-  G <- length(unique(g))
-  bread <- solve(crossprod(X * sqrt(w)))
-  U     <- X * (w * e)
-  meat  <- Reduce(`+`, lapply(split(seq_len(n), g), function(i) {
-    s <- matrix(colSums(U[i, , drop = FALSE]), nrow = 1)
-    crossprod(s)
-  }))
-  bread %*% meat %*% bread * (G / (G - 1)) * ((n - 1) / (n - k))
-}
-
-# the right-hand side of each plot regression: rescaled Definition, the
-# justice measure and their product (the three deserve variables and their
-# products entered together), and the controls
-plot_rhs <- function(zvar) {
-  block <- if (zvar == "desert_rich_tot") DES_X else c(zvar, paste0("x_", zvar))
-  c(DEFS, block, CTRL)
-}
-
-me_panel <- function(dv, xvar, zvar, xlab, ylab, ylim, hist_var, breaks,
-                     main, rug = FALSE) {
-  rhs <- plot_rhs(zvar)
-  sub <- d[complete.cases(d[, c(dv, rhs, "post_weight", "state")]), ]
-  fit <- lm(as.formula(paste(dv, "~", paste(rhs, collapse = " + "))),
-            data = sub, weights = sub$post_weight)
-  V   <- cluster_vcov(fit, sub$state)
-  b   <- coef(fit)
-  ix  <- paste0("x_", zvar)
-  b1  <- b[[xvar]]; b3 <- b[[ix]]
-  v1  <- V[xvar, xvar]; v3 <- V[ix, ix]; c13 <- V[xvar, ix]
-  zz   <- seq(0, 1, by = 0.01)
-  me   <- b1 + b3 * zz
-  band <- 1.96 * sqrt(v1 + v3 * zz^2 + 2 * c13 * zz)
-  h    <- hist(sub[[hist_var]], breaks = breaks, plot = FALSE)
-  par(mar = c(4, 4, 2, 4), family = "serif")
-  plot(h$mids, 100 * h$counts / sum(h$counts), type = "h", lend = 1,
-       lwd = if (rug) 2 else 8, col = "grey80", axes = FALSE,
-       xlab = "", ylab = "", xlim = c(0, 1))
-  axis(4, cex.axis = 0.7)
-  mtext("Percentage of observations", 4, line = 2.2, cex = 0.7)
-  par(new = TRUE)
-  plot(zz, me, type = "l", lwd = 2, ylim = ylim, xlim = c(0, 1), bty = "n",
-       xlab = xlab, ylab = ylab, main = main,
-       cex.lab = 0.75, cex.axis = 0.7, cex.main = 0.8)
-  lines(zz, me + band, lty = 2)
-  lines(zz, me - band, lty = 2)
-  abline(h = 0)
-  if (rug) rug(sub[[hist_var]], col = "grey40")
-  sprintf("| %s | %s | %s | %.3f | %.3f | %.3f | %.3f | %d |",
-          main, dv, zvar, b1, sqrt(v1), b3, sqrt(v3), nobs(fit))
-}
-
-md <- c(md, "", "## Figure D1 and D2 regressions",
-        "| Panel | Outcome | Z | b(X) | SE | b(X x Z) | SE | N |",
-        "|---|---|---|---|---|---|---|---|")
-
-X_LAB  <- "Marginal effect of definition"
-AGENCY <- "Belief that peoples' economic standing is within their control"
-JUST   <- "Belief that economic desert is rewarded"
-RICH   <- "Belief that rich Americans deserve their wealth"
-br24   <- seq(-1 / 48, 1 + 1 / 48, by = 1 / 24)
-
-png_open("figure-D1.png", 7, 6)
-par(mfrow = c(2, 2))
-md <- c(md,
-  me_panel(GOV, DEFS, "agency_str", AGENCY, X_LAB, c(-3, 1), "agency_str", br24,
-           "D1(a) X given Z_agency, on Y_gov_fix_gap"),
-  me_panel(GOV, DEFS, "justice_str", JUST, X_LAB, c(-3, 1), "justice_str", br24,
-           "D1(b) X given Z_justice, on Y_gov_fix_gap"),
-  me_panel(GOV, DEFS, "desert_rich_tot", RICH, X_LAB, c(-3, 1),
-           "desert_rich_tot", br24,
-           "D1(c) X given Z_rich_deserve, on Y_gov_fix_gap"),
-  me_panel(TAX, DEFS, "agency_str", AGENCY, X_LAB, c(-3, 1), "agency_str", br24,
-           "D1(d) X given Z_agency, on Y_prog_tax"))
-dev.off()
-
-Z_LAB  <- "Importance of agency to definition of desert"
-br100  <- seq(0, 1, by = 0.01)
-
-png_open("figure-D2.png", 7, 6)
-par(mfrow = c(2, 2))
-md <- c(md,
-  me_panel(GOV, "agency_str", "agency_str", Z_LAB,
-           "Marginal effect of belief in economic agency",
-           c(-2, 7), DEFS, br100,
-           "D2(a) Z_agency given X, on Y_gov_fix_gap", rug = TRUE),
-  me_panel(GOV, "justice_str", "justice_str", Z_LAB,
-           "Marginal effect of belief that economic desert is rewarded",
-           c(-2, 7), DEFS, br100,
-           "D2(b) Z_justice given X, on Y_gov_fix_gap", rug = TRUE),
-  me_panel(GOV, "desert_rich_tot", "desert_rich_tot", Z_LAB,
-           "Marginal effect of belief that rich Americans deserve their wealth",
-           c(-2, 7), DEFS, br100,
-           "D2(c) Z_rich_deserve given X, on Y_gov_fix_gap", rug = TRUE),
-  me_panel(TAX, "agency_str", "agency_str", Z_LAB,
-           "Marginal effect of belief in economic agency",
-           c(-2, 7), DEFS, br100,
-           "D2(d) Z_agency given X, on Y_prog_tax", rug = TRUE))
-dev.off()
+md <- c(md, draw_figures(d, ""))
+dedup$md <- c(dedup$md, draw_figures(d991, "-final"))
 
 writeLines(md, OUT)
 
-# ---- The tables without the duplicated record --------------------------------
-# Same layout, 991 rows, followed by every regression cell whose printed
-# coefficient, standard error or stars differ from the 992-row tables.
+# ---- The final tables: duplicate dropped, weight corrected -------------------
+# Same layout, 991 rows, followed by every regression cell whose coefficient,
+# standard error or stars differ from the as-published tables above.
 fmt <- function(c) {
   c(sprintf("%.3f%s", c[1], stars(c[3])), sprintf("(%.3f)", c[2]))
 }
@@ -544,12 +575,13 @@ for (x in Map(list, a1_rows(full$md), a1_rows(dedup$md))) {
   }
 }
 dd <- c(dedup$md, "",
-        "## Cells that change when the duplicated record is dropped",
-        "| Table | Outcome | Model | Row | With (992 rows) | Without (991 rows) |",
+        "## Cells that change with the two data fixes",
+        "As published: 992 rows, the 2014 weight. Final: 991 rows, the duplicate removed, the weight corrected.", "",
+        "| Table | Outcome | Model | Row | As published | Final |",
         "|---|---|---|---|---|---|", changes)
-writeLines(dd, "tables_deduplicated.md")
+writeLines(dd, "tables_final.md")
 ncells <- sum(sapply(res, function(r) length(r$est$cells)))
-cat(sprintf("wrote tables_deduplicated.md: %d of %d regression cells change",
+cat(sprintf("wrote tables_final.md: %d of %d regression cells change",
             sum(!startsWith(changes, "| Table A1")), ncells), "at the printed precision\n")
 cat(sprintf("wrote %s and figure-1.png, figure-2.png, figure-3.png,", OUT),
     "figure-4.png, figure-D1.png, figure-D2.png\n")

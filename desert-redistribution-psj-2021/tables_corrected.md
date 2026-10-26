@@ -1,3 +1,6 @@
+# Corrected tables
+
+The published tables with their typos corrected, estimated on the published sample of 992 observations with the 2014 weight. Written by replicate.R (tables_corrected.md) and replicate.py (tables_py.md); the two files are identical. The last section lists every cell that differs from the published tables.
 
 ## Table 1
 | Variable | Y_gov Model 1 | Y_gov Model 2 | Y_gov Model 3 | Y_tax Model 1 | Y_tax Model 2 | Y_tax Model 3 |
