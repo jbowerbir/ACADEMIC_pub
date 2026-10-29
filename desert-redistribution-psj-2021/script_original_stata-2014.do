@@ -1,5 +1,5 @@
 // =============================================================================
-// policy_taxation_2014_annotated.do
+// script_original_stata-2014.do (the 2014 file policy_taxation.do, with 2026 annotations)
 //
 // The original Stata analysis for Bower-Bir (2022), "Desert and redistribution:
 // Justice as a remedy for, and cause of, economic inequality", Policy Studies

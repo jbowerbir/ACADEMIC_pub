@@ -4,7 +4,7 @@ __pycache__/
 .venv/
 .DS_Store
 .Rhistory
-tables_py.md
-tables_final_py.md
-figure-*-py.png
-cells_corrected_py.md
+tables_corrected_python.md
+tables_final_python.md
+figure_*_python.png
+tables_corrected-cells_python.md

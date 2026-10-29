@@ -1,6 +1,6 @@
 # Final tables
 
-The same tables estimated on the 991 distinct respondents, without the duplicated row and with the survey weight corrected. Written by replicate.R (tables_final.md) and replicate.py (tables_final_py.md); the two files are identical. The last section lists every cell that differs from the corrected tables as published.
+The same tables estimated on the 991 distinct respondents, without the duplicated row and with the survey weight corrected. Written by script_replication.R (tables_final_R.md) and script_replication.py (tables_final_python.md); the two files are identical. The last section lists every cell that differs from the corrected tables as published.
 
 ## Table 1
 | Variable | Y_gov Model 1 | Y_gov Model 2 | Y_gov Model 3 | Y_tax Model 1 | Y_tax Model 2 | Y_tax Model 3 |

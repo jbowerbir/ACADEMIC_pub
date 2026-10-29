@@ -1,51 +1,58 @@
 #!/usr/bin/env Rscript
 # =============================================================================
 # Reproduces every table and figure in Bower-Bir (2022), "Desert and
-# redistribution", Policy Studies Journal 50(4): 757-795, from
-# economic_justice_v7_psj-replication.csv. Base R only.
+# redistribution: Justice as a remedy for, and cause of, economic inequality",
+# Policy Studies Journal 50(4): 757-795. Base R only. script_replication.py is
+# the same program in Python.
 #
-#   Tables 1, C1, C2, D1   32 weighted regressions with state fixed effects
-#                          and HC1 robust standard errors (Stata: areg ...,
-#                          absorb(state) [pw=post_weight]), written to
-#                          tables_corrected.md
-#   Table A1               sample demographics, written to the same file
-#   Figures 2, 3, 4        densities and the response grid, from the data
-#   Figures D1, D2         marginal-effect plots from the eight interaction
-#                          regressions the 2014 plot code specifies (ordinary
-#                          weighted regression, no state effects, errors
-#                          clustered by state); their coefficients are written
-#                          to the same file
-#   Figure 1               the three General Social Survey percentages the
-#                          article charts
+# Reads, from this folder:
+#   data_survey_psj-subset.csv   992 respondents, the 27 survey variables the
+#                                tables and figures use
+#   tables_as-published.md       the tables as printed, for the comparison at
+#                                the end (skipped if the file is absent)
 #
-# The tables are estimated twice: on the published sample (992 rows, 2014
-# weight), which reproduces the printed tables and is written to
-# tables_corrected.md with the typos corrected, and on the final data (991
-# distinct respondents, corrected weight), written to tables_final.md with
-# every cell that changes. The figures are drawn from both.
+# Writes, to this folder:
+#   tables_corrected_R.md        Tables 1, A1, C1, C2, D1, and the eight
+#                                regressions behind Figures D1 and D2, on the
+#                                published sample (992 rows, 2014 weight), with
+#                                a list of every printed cell that differs
+#                                appended at the end
+#   tables_final_R.md            the same tables on the 991 distinct
+#                                respondents with the survey weight corrected,
+#                                ending with every cell that changes at the
+#                                printed precision
+#   tables_corrected-cells_R.md  the printed cells that differ from the re-run,
+#                                one line each
+#   figure_1_R.png, figure_*_published-sample_R.png, figure_*_final-data_R.png
+#                                the six figures, from each data set
 #
-# Then, if tables_published.md is present, every cell of Tables 1, C1, C2 and
-# D1 is compared with the printed page and the cells that differ are listed.
+# Sections, in order:
+#   1. The data and the two corrections it needs
+#   2. Variables the regressions build
+#   3. The 32 table regressions and Table A1
+#   4. The survey weight, re-raked
+#   5. Figures
+#   6. The final tables and the list of cells that change
+#   7. Comparison with the printed tables
 #
-# replicate.py is the same program in Python. Both write the same markdown, so
-# `diff tables_corrected.md tables_py.md` and `diff tables_final.md
-# tables_final_py.md` check one against the other.
+# Run from this folder:  Rscript script_replication.R
+# Takes under a minute.
 #
-# Two things carried over from the 2014 Stata code on purpose. (1) The code
-# recodes by exact comparison (`married == .8`); here the values are rounded
-# to the integer grid first, because 0.8 is stored as 0.7999... and an exact
-# test matches no rows. (2) The interaction terms are built on Definition
+# Two things carried over from the 2014 Stata code on purpose. (1) The Stata
+# code recodes by exact comparison (`married == .8`); here the values are
+# rounded to the integer grid first, because 0.8 is stored as 0.7999... and an
+# exact test matches no rows. (2) The interaction terms are built on Definition
 # rescaled to 0-1 (the Stata stored them under the unscaled names), and the
 # Definition main effect is the rescaled variable in two of the six Table D1
-# regressions (Y_gov Model 1, Y_prog_tax Model 3) and the raw one in the
-# other four. That is how the article's tables were estimated.
-#
-# Usage:  Rscript replicate.R      writes tables_corrected.md, tables_final.md,
-#                                  figure-*.png and figure-*-final.png
+# regressions (Y_gov Model 1, Y_prog_tax Model 3) and the raw one in the other
+# four. That is how the article's tables were estimated.
 # =============================================================================
 
-OUT <- "tables_corrected.md"
-d   <- read.csv("economic_justice_v7_psj-replication.csv")
+
+# ---- 1. The data and the two corrections it needs ----------------------------
+
+OUT <- "tables_corrected_R.md"
+d   <- read.csv("data_survey_psj-subset.csv")
 
 # One respondent's record is in the file twice (rows identical in every
 # answer). The published tables were estimated with it, and with a survey
@@ -58,15 +65,27 @@ d   <- read.csv("economic_justice_v7_psj-replication.csv")
 dup_row <- which(duplicated(d[, setdiff(names(d), c("row", "id"))]))
 
 
-# ---- Variables the regressions build ----------------------------------------
+# ---- 2. Variables the regressions build ---------------------------------------
+# Every scale in the file is stored on a 0-1 grid. Where a recode needs the
+# original answer codes, the scale is multiplied back and rounded first.
 
 d$age_2 <- d$age * d$age
+
+# employment: 0 is unemployed; the other seven codes are the employed, retired,
+# student, homemaker, and other categories
 d$unemployed_now <- ifelse(d$employment == 0, 1,
                     ifelse(d$employment %in% c(3, 2, 1, -1, -2, -3, -4), 0, NA))
+
+# married: six codes 0-5; 4 (living with partner) and 5 (married) count as married
 m <- round(d$married * 5)
 d$married_bin <- ifelse(m >= 4, 1, 0)
+
+# progressive taxation: seven codes 0-6; the four lowest collapse into one, so
+# the outcome has four levels, 0, 1/3, 2/3, 1
 p <- round(d$progtaxes_str * 6)
 d$progtaxes2_str <- ifelse(p <= 3, 0, p - 3) / 3
+
+# Definition (a correlation, -1 to 1) rescaled to 0-1 for the interaction terms
 d$def_scaled <- (d$corr_ideal_agency + 1) / 2
 
 Z_ALL <- c("agency_str", "justice_str",
@@ -87,6 +106,8 @@ DES_X <- c("desert_rich_tot", "x_desert_rich_tot",
            "desert_americans_tot", "x_desert_americans_tot",
            "desert_poor_tot", "x_desert_poor_tot")
 
+# each variable's row label in the article; raw and rescaled Definition share
+# one row
 ROW <- c(corr_ideal_agency = "Definition",     def_scaled = "Definition",
          agency_str = "Agency",                justice_str = "Justice",
          desert_rich_tot = "Rich deserve",
@@ -103,6 +124,7 @@ ROW <- c(corr_ideal_agency = "Definition",     def_scaled = "Definition",
          married_bin = "Married",              unemployed_now = "Unemployed",
          education = "Education",              income_household = "Income")
 
+# the order the rows take in every table
 ORDER <- c("Definition", "Agency", "Def. x Agency", "Justice", "Def. x Justice",
            "Rich deserve", "Def. x Rich", "Avg. deserve", "Def. x Avg.",
            "Poor deserve", "Def. x Poor", "Good life", "Gov. help", "Charity",
@@ -114,7 +136,7 @@ stars <- function(p) {
 }
 
 
-# ---- The 32 table regressions -----------------------------------------------
+# ---- 3. The 32 table regressions and Table A1 ---------------------------------
 # (table, column, outcome, predictors)
 
 M <- list(
@@ -165,8 +187,10 @@ M <- list(
          "x_desert_poor_tot", CTRL))
 )
 
-# HC1 sandwich on the weighted design:
-# (X'WX)^-1 X'W diag(e^2) W X (X'WX)^-1, times n/(n-k)
+# Standard errors that stay valid when the error variance differs across
+# respondents (heteroskedasticity-robust, Stata's default for areg), computed
+# for a weighted fit: the HC1 sandwich
+# (X'WX)^-1 X'W diag(e^2) W X (X'WX)^-1, times n/(n-k).
 hc1 <- function(fit) {
   X <- model.matrix(fit)
   w <- weights(fit)
@@ -178,6 +202,10 @@ hc1 <- function(fit) {
   bread %*% meat %*% bread * (n / (n - k))
 }
 
+# One table regression: weighted least squares with a separate intercept for
+# each state (the state fixed effects) and HC1 standard errors. Returns each
+# predictor's coefficient, standard error and p-value, with N, R2 and
+# adjusted R2.
 fit_table <- function(dv, rhs, data) {
   sub <- data[complete.cases(data[, c(dv, rhs, "post_weight", "state")]), ]
   f   <- as.formula(paste(dv, "~",
@@ -191,7 +219,8 @@ fit_table <- function(dv, rhs, data) {
   pv  <- 2 * pt(abs(b / se), dfr, lower.tail = FALSE)
   cells <- list()
   for (v in rhs) cells[[ROW[[v]]]] <- c(b[[v]], se[[v]], pv[[v]])
-  # the constant as areg reports it: ybar - xbar'beta; delta-method SE
+  # the constant as areg reports it: ybar - xbar'beta, with a delta-method
+  # standard error
   w    <- sub$post_weight
   xbar <- apply(sub[, rhs, drop = FALSE], 2, weighted.mean, w = w)
   cons <- weighted.mean(sub[[dv]], w) - sum(xbar * b[rhs])
@@ -209,9 +238,7 @@ tables_md <- function(data) {
     list(table = m[[1]], col = m[[2]], est = fit_table(m[[3]], m[[4]], data))
   })
 
-
-  # ---- Write the tables ------------------------------------------------------
-
+  # the regression tables
   cell_text <- function(x, r, what) {
     c <- x$est$cells[[r]]
     if (is.null(c)) return("")
@@ -243,9 +270,8 @@ tables_md <- function(data) {
       row_line("Adj-R2", sapply(rs, function(x) sprintf("%.4f", x$est$AdjR2))))
   }
 
-
-  # ---- Table A1: sample demographics -----------------------------------------
-
+  # Table A1, the sample's composition; education and income back on their
+  # answer codes (seven and nineteen levels)
   edu <- round(data$education * 6)
   inc <- round(data$income_household * 18)
   A1 <- list(
@@ -276,14 +302,16 @@ tables_md <- function(data) {
       a1 <- c(a1, sprintf("| %s: %s | %d | %.2f |", g, lab, n, n / nrow(data)))
     }
   }
-  # the article's order: Table 1, then A1, then C1
+  # the article's order is Table 1, then A1, then C1: insert A1 before the
+  # blank line that precedes the C1 heading
   i  <- match("## Table C1: Y_gov_fix_gap", md) - 1
   md <- append(md, a1, after = i - 1)
   list(res = res, md = md)
 }
 
+# ---- 4. The survey weight, re-raked --------------------------------------------
 # The survey weight was raked on all 992 rows in 2014 (iterative proportional
-# fitting to population totals on gender, party, income, race and education).
+# fitting to population totals on gender, party, income, race, and education).
 # Raking the same way on the 991 distinct rows gives the weight those tables
 # should carry. Strata and targets are the 2014 script's; the targets are
 # scaled from 992 to the rows present.
@@ -333,14 +361,27 @@ d991  <- d[-dup_row, ]
 d991$post_weight <- rake(d991, income_cut = 7)
 dedup <- tables_md(d991)
 res   <- full$res
-md    <- c("# Corrected tables", "", "The published tables with their typos corrected, estimated on the published sample of 992 observations with the 2014 weight. Written by replicate.R (tables_corrected.md) and replicate.py (tables_py.md); the two files are identical. The last section lists every cell that differs from the published tables.", full$md)
-dedup$md <- c("# Final tables", "", "The same tables estimated on the 991 distinct respondents, without the duplicated row and with the survey weight corrected. Written by replicate.R (tables_final.md) and replicate.py (tables_final_py.md); the two files are identical. The last section lists every cell that differs from the corrected tables as published.", dedup$md)
+md    <- c("# Corrected tables", "",
+           paste0("The published tables with their typos corrected, estimated on the ",
+                  "published sample of 992 observations with the 2014 weight. Written by ",
+                  "script_replication.R (tables_corrected_R.md) and script_replication.py ",
+                  "(tables_corrected_python.md); the two files are identical. The last ",
+                  "section lists every cell that differs from the published tables."),
+           full$md)
+dedup$md <- c("# Final tables", "",
+              paste0("The same tables estimated on the 991 distinct respondents, without ",
+                     "the duplicated row and with the survey weight corrected. Written by ",
+                     "script_replication.R (tables_final_R.md) and script_replication.py ",
+                     "(tables_final_python.md); the two files are identical. The last ",
+                     "section lists every cell that differs from the corrected tables as ",
+                     "published."),
+              dedup$md)
 
 
-# ---- Figures -----------------------------------------------------------------
+# ---- 5. Figures ------------------------------------------------------------------
 # Drawn twice: from the published sample (992 rows, 2014 weight), which
 # reproduces the printed figures, and from the final data (991 rows,
-# corrected weight) as figure-*-final.png. Returns the rows of the D1 and D2
+# corrected weight) as figure_*_final-data_R.png. Returns the rows of the D1 and D2
 # regressions for the tables file.
 draw_figures <- function(d, sfx) {
   rows <- character(0)
@@ -350,10 +391,10 @@ draw_figures <- function(d, sfx) {
   }
   sc <- function(v) 2 * v - 1          # a 0-1 score back to its -1 to 1 scale
 
-  if (sfx == "") {
+  if (sfx == "_published-sample") {
     # Figure 1: the General Social Survey percentages the article charts
     # (not from this survey)
-    png_open(sprintf("figure-1%s.png", sfx), 6.5, 2.4)
+    png_open("figure_1_R.png", 6.5, 2.4)
     par(mar = c(3, 12, 2, 1), family = "serif")
     agree    <- c(0.45, 0.5916, 0.6653)
     disagree <- c(0.52, 0.4084, 0.1647)
@@ -367,8 +408,8 @@ draw_figures <- function(d, sfx) {
     legend("topright", c("disagree", "unsure", "agree"), fill = greys, border = NA,
            bty = "n", cex = 0.8, horiz = TRUE, inset = c(0, -0.22), xpd = TRUE)
     invisible(dev.off())
-
   }
+
   # Figures 2 and 3: kernel densities (Gaussian kernel, Silverman's default
   # bandwidth, as Stata's kdensity default). Figure 2 is computed on the 0-1
   # standardized scores and labeled on their original -1 to 1 scale, which is
@@ -379,7 +420,7 @@ draw_figures <- function(d, sfx) {
     k <- density(v[!is.na(v)])
     list(x = sc(k$x), y = k$y)
   }
-  png_open(sprintf("figure-2%s.png", sfx))
+  png_open(sprintf("figure_2%s_R.png", sfx))
   par(mar = c(4, 4, 1, 1), family = "serif")
   plot(dens(d$desert_rich_tot), type = "l", lwd = 2, main = "", ylab = "",
        xlab = "Deservingness", xlim = c(-1, 1), ylim = c(0, 2.8), bty = "l")
@@ -389,7 +430,7 @@ draw_figures <- function(d, sfx) {
          bty = "n")
   invisible(dev.off())
 
-  png_open(sprintf("figure-3%s.png", sfx))
+  png_open(sprintf("figure_3%s_R.png", sfx))
   par(mar = c(4, 4, 1, 1), family = "serif")
   plot(density(d$corr_ideal_agency, na.rm = TRUE), lwd = 2, main = "", ylab = "",
        xlab = "Control-Ideal Importance correlation", xlim = c(-1, 1), bty = "l")
@@ -398,12 +439,13 @@ draw_figures <- function(d, sfx) {
   # Figure 4: share of respondents in each cell of (rich deserve their wealth)
   # x (income differences are too large). The 2014 figure dropped the
   # duplicated respondent record (two rows identical in every answer; the
-  # second is dropped).
+  # second is dropped). Each axis is put back on its answer codes: 13 columns
+  # from -6 to 6, 7 rows from -3 to 3.
   d4  <- d[!duplicated(d[, setdiff(names(d), c("row", "id"))]), ]
   ix  <- round(sc(d4$desert_rich_tot) * 6)     # 13 columns, -6 to 6
   iy  <- round(sc(d4$diff_large) * 3)          # 7 rows, -3 to 3
   tab <- table(factor(iy, levels = -3:3), factor(ix, levels = -6:6)) / nrow(d4)
-  png_open(sprintf("figure-4%s.png", sfx), 6.5, 4.2)
+  png_open(sprintf("figure_4%s_R.png", sfx), 6.5, 4.2)
   par(mar = c(5, 5, 1, 5), family = "serif")
   image(x = -6:6, y = -3:3, z = t(unclass(tab)),
         col = grey.colors(20, start = 0.95, end = 0.1), axes = FALSE,
@@ -454,8 +496,11 @@ draw_figures <- function(d, sfx) {
     V   <- cluster_vcov(fit, sub$state)
     b   <- coef(fit)
     ix  <- paste0("x_", zvar)
-    b1  <- b[[xvar]]; b3 <- b[[ix]]
-    v1  <- V[xvar, xvar]; v3 <- V[ix, ix]; c13 <- V[xvar, ix]
+    b1  <- b[[xvar]]
+    b3  <- b[[ix]]
+    v1  <- V[xvar, xvar]
+    v3  <- V[ix, ix]
+    c13 <- V[xvar, ix]
     zz   <- seq(0, 1, by = 0.01)
     me   <- b1 + b3 * zz
     band <- 1.96 * sqrt(v1 + v3 * zz^2 + 2 * c13 * zz)
@@ -486,9 +531,11 @@ draw_figures <- function(d, sfx) {
   AGENCY <- "Belief that peoples' economic standing is within their control"
   JUST   <- "Belief that economic desert is rewarded"
   RICH   <- "Belief that rich Americans deserve their wealth"
+  # 24 bins of width 1/24, offset half a bin so each answer level sits in the
+  # middle of a bar
   br24   <- seq(-1 / 48, 1 + 1 / 48, by = 1 / 24)
 
-  png_open(sprintf("figure-D1%s.png", sfx), 7, 6)
+  png_open(sprintf("figure_D1%s_R.png", sfx), 7, 6)
   par(mfrow = c(2, 2))
   rows <- c(rows,
     me_panel(GOV, DEFS, "agency_str", AGENCY, X_LAB, c(-3, 1), "agency_str", br24,
@@ -505,7 +552,7 @@ draw_figures <- function(d, sfx) {
   Z_LAB  <- "Importance of agency to definition of desert"
   br100  <- seq(0, 1, by = 0.01)
 
-  png_open(sprintf("figure-D2%s.png", sfx), 7, 6)
+  png_open(sprintf("figure_D2%s_R.png", sfx), 7, 6)
   par(mfrow = c(2, 2))
   rows <- c(rows,
     me_panel(GOV, "agency_str", "agency_str", Z_LAB,
@@ -528,14 +575,15 @@ draw_figures <- function(d, sfx) {
   rows
 }
 
-md <- c(md, draw_figures(d, ""))
-dedup$md <- c(dedup$md, draw_figures(d991, "-final"))
+md <- c(md, draw_figures(d, "_published-sample"))
+dedup$md <- c(dedup$md, draw_figures(d991, "_final-data"))
 
 writeLines(md, OUT)
 
-# ---- The final tables: duplicate dropped, weight corrected -------------------
+# ---- 6. The final tables and the list of cells that change ------------------------
 # Same layout, 991 rows, followed by every regression cell whose coefficient,
 # standard error or stars differ from the as-published tables above.
+# a cell as printed: the coefficient with its stars, and the standard error
 fmt <- function(c) {
   c(sprintf("%.3f%s", c[1], stars(c[3])), sprintf("(%.3f)", c[2]))
 }
@@ -548,9 +596,11 @@ where <- function(t, c) {
 }
 changes <- character(0)
 for (k in seq_along(res)) {
-  a <- res[[k]]$est$cells; b <- dedup$res[[k]]$est$cells
+  a <- res[[k]]$est$cells
+  b <- dedup$res[[k]]$est$cells
   for (r in names(a)) {
-    fa <- fmt(a[[r]]); fb <- fmt(b[[r]])
+    fa <- fmt(a[[r]])
+    fb <- fmt(b[[r]])
     if (!identical(fa, fb)) {
       changes <- c(changes, sprintf("| %s | %s | %s %s | %s %s |",
                                     where(res[[k]]$table, res[[k]]$col), r,
@@ -579,19 +629,23 @@ dd <- c(dedup$md, "",
         "As published: 992 rows, the 2014 weight. Final: 991 rows, the duplicate removed, the weight corrected.", "",
         "| Table | Outcome | Model | Row | As published | Final |",
         "|---|---|---|---|---|---|", changes)
-writeLines(dd, "tables_final.md")
+writeLines(dd, "tables_final_R.md")
 ncells <- sum(sapply(res, function(r) length(r$est$cells)))
-cat(sprintf("wrote tables_final.md: %d of %d regression cells change",
+cat(sprintf("wrote tables_final_R.md: %d of %d regression cells change",
             sum(!startsWith(changes, "| Table A1")), ncells), "at the printed precision\n")
-cat(sprintf("wrote %s and figure-1.png, figure-2.png, figure-3.png,", OUT),
-    "figure-4.png, figure-D1.png, figure-D2.png\n")
+cat(sprintf("wrote %s and the figures, figure_*_R.png\n", OUT))
 
 
-# ---- Compare Tables 1, C1, C2, D1 with the printed page ----------------------
+# ---- 7. Comparison with the printed tables -------------------------------------
+# Every cell of Tables 1, C1, C2, and D1 against tables_as-published.md, a
+# transcription of the printed article. Cells agree when they match to the
+# printed decimals; the tolerances below are half a unit in the last digit.
 
-PUB <- "tables_published.md"
+PUB <- "tables_as-published.md"
 if (file.exists(PUB)) {
 
+  # {section: {column: {row: coef, se}}} for a markdown file of tables; a
+  # standard-error row belongs to the row above it
   parse_md <- function(path) {
     out <- list(); cur <- NULL; cols <- NULL; last <- NULL
     for (ln in readLines(path, warn = FALSE)) {
@@ -620,6 +674,8 @@ if (file.exists(PUB)) {
     }
     out
   }
+  # a printed cell as a number; the published file uses a Unicode minus sign,
+  # and stars and parentheses are dropped
   num <- function(s) as.numeric(gsub("[()*]", "", gsub("−", "-", s)))
 
   pub   <- parse_md(PUB)
@@ -689,7 +745,7 @@ if (file.exists(PUB)) {
                paste("Each line: table | outcome | model | row: what was printed,",
                      "what the re-run gives."),
                "", paste0("- ", gsub("*", "\\*", mism, fixed = TRUE))),
-             "cells_corrected.md")
+             "tables_corrected-cells_R.md")
   # and side by side at the end of the corrected tables: each printed cell
   # beside its corrected value
   cat(c("", "## Cells that differ from the published tables",
