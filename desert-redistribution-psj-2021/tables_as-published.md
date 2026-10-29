@@ -1,6 +1,6 @@
 # Tables as printed in Bower-Bir (2022), PSJ 50(4): 757-795
 
-A cell-for-cell transcription of Table 1 (p. 18) and appendix Tables C1, C2 and D1 (pp. 32-36) from the published PDF, in the layout the replication scripts read. Stars as printed. This is what `replicate.R` and `replicate.py` compare their re-estimates against; the cells that differ are the typos listed in `cells_corrected.md` and corrected in the journal correction (DOI 10.1111/psj.70145).
+A cell-for-cell transcription of Table 1 (p. 18) and appendix Tables C1, C2 and D1 (pp. 32-36) from the published PDF, in the layout the replication scripts read. Stars as printed. This is what `script_replication.R` and `script_replication.py` compare their re-estimates against; the cells that differ are the typos listed in `tables_corrected-cells_R.md` and corrected in the journal correction (DOI 10.1111/psj.70145).
 
 ## Table 1
 | Variable | Y_gov Model 1 | Y_gov Model 2 | Y_gov Model 3 | Y_tax Model 1 | Y_tax Model 2 | Y_tax Model 3 |

@@ -19,29 +19,48 @@ Two further things, found in the 2014 data cleaning rather than in the article. 
 
 ## Files
 
+Files are named by what they are, then which version, then which program wrote them: `category_item_variant_program.ext`. Underscores separate those fields and hyphens join words inside one field, so a folder sorted by name groups into data, figures, scripts, and tables. Every file the R program writes carries `_R`; the Python program writes the same files with `_python`, and the pairs are identical. `README.pdf` is this document, typeset for readers who would rather not open a markdown file.
+
+### Data
+
 | File | What it is |
 |---|---|
-| `economic_justice_v7_ep-replication.csv` | The survey data: 992 respondents and the 54 variables the tables and figures use. No value was changed. The full survey is a separate deposit (see [The data](#the-data)). |
-| `codebook.md` | The 54 columns: question wording, answer options, coding and rescaling, and the label each has in the article. |
-| `replicate.R` | The analysis in R: Tables 1, 2 and 4, the numbers in Figures 3 to 7, the weight check, the final tables, and the seven figures. Writes `tables_corrected.md`, `tables_final.md` and `figure-1.png` to `figure-7.png`, then prints every cell where the printed tables differ. Base R only. |
-| `replicate.py` | The same analysis in Python, without the figures. Writes `tables_py.md` and `tables_final_py.md`, identical to the R files. |
-| `tables_published.md` | Tables 1, 2 and 4 and the numbers printed in Figures 3, 4 and 6 and Section 5, copied cell by cell from the published PDF, stars included. |
-| `tables_corrected.md` | The output of either program: every table and figure statistic as the data give it, the weight check, and the eight cells that differ from the printed article, beside their published values. |
-| `tables_final.md` | Tables 1 and 4 re-estimated with the corrected weight, Table 2 counted on the 991 distinct respondents, a summary of what moves, and every cell that differs from `tables_corrected.md`, beside its value there. These are the replacement tables offered to the journal. The output of either program. |
-| `figure-1.png` … `figure-7.png` | The seven figures, redrawn by `replicate.R` from the survey data. Figure 7 is the corrected version, with the neoliberal end of the index on the right. |
-| `original-code/` | The original code, as a record: the 2014 Stata analysis (`definitions_agency_ORIGINAL.do`, regressions; `factor-correlations_ORIGINAL.do`, the correlations behind Figures 3 to 6; `Appendices_demographics_ORIGINAL.do`, Table 2) and the 2018 R scripts that drew Figures 1 to 5. They read the full survey files, which are not included here. |
+| `data_survey_ep-subset.csv` | The survey data: 992 respondents and the 54 variables the tables and figures use. No value was changed. The full survey is a separate deposit (see [The data](#the-data)). |
+| `data_codebook.md` | The 54 columns: question wording, answer options, coding, and rescaling, and the label each has in the article. |
+
+### Scripts
+
+| File | What it is |
+|---|---|
+| `script_replication.R` | The analysis in R: Tables 1, 2, and 4, the numbers in Figures 3 to 7, the weight check, the final tables, and the seven figures. Writes every `_R` file below and the figures, then prints every cell where the printed tables differ. Base R only. |
+| `script_replication.py` | The same analysis in Python, without the figures. Writes `tables_corrected_python.md` and `tables_final_python.md`, identical to the R files. |
+| `script_original/` | The original code, as a record: the 2014 Stata analysis (`definitions_agency_ORIGINAL.do`, regressions; `factor-correlations_ORIGINAL.do`, the correlations behind Figures 3 to 6; `Appendices_demographics_ORIGINAL.do`, Table 2) and the 2018 R scripts that drew Figures 1 to 5. They read the full survey files, which are not included here. |
+
+### Tables
+
+| File | What it is |
+|---|---|
+| `tables_as-published.md` | Tables 1, 2, and 4 and the numbers printed in Figures 3, 4, and 6 and Section 5, copied cell by cell from the published PDF, stars included. |
+| `tables_corrected_R.md`, `tables_corrected_python.md` | Every table and figure statistic as the data give it, the weight check, and the eight cells that differ from the printed article, beside their published values. |
+| `tables_final_R.md`, `tables_final_python.md` | Tables 1 and 4 re-estimated with the corrected weight, Table 2 counted on the 991 distinct respondents, a summary of what moves, and every cell that differs from `tables_corrected_R.md`, beside its value there. These are the replacement tables offered to the journal. |
+
+### Figures
+
+| File | What it is |
+|---|---|
+| `figure_1_R.png` … `figure_7_R.png` | The seven figures, redrawn by `script_replication.R` from the survey data (the Python program draws none). Figure 7 is the corrected version, with the neoliberal end of the index on the right. |
 
 ## Running it
 
-Put the files in one folder. R needs base R only. Python needs pandas, numpy and scipy.
+Put the files in one folder. R needs base R only. Python needs pandas, numpy, and scipy.
 
-- `Rscript replicate.R` writes `tables_corrected.md`, `tables_final.md` and the seven figures, and prints the comparison with the published tables.
-- `python3 replicate.py` writes `tables_py.md` and `tables_final_py.md` and prints the same comparison.
-- To check the two programs against each other, compare `tables_corrected.md` with `tables_py.md`, and `tables_final.md` with `tables_final_py.md`. They are identical.
+- `Rscript script_replication.R` writes `tables_corrected_R.md`, `tables_final_R.md` and the seven figures, and prints the comparison with the published tables.
+- `python3 script_replication.py` writes `tables_corrected_python.md` and `tables_final_python.md` and prints the same comparison.
+- To check the two programs against each other, compare `tables_corrected_R.md` with `tables_corrected_python.md`, and `tables_final_R.md` with `tables_final_python.md`. They are identical.
 
 ## What is reproduced, and how closely
 
-- **Tables 1 and 4.** Every coefficient, standard error, N and R² matches the printed value to the printed decimals, except the five cells listed in the Summary. The table rows labeled "Adj-R²" hold plain R², which is what Stata's `svy: regress` reports; every printed value matches R² to four decimals.
+- **Tables 1 and 4.** Every coefficient, standard error, N, and R² matches the printed value to the printed decimals, except the five cells listed in the Summary. The table rows labeled "Adj-R²" hold plain R², which is what Stata's `svy: regress` reports; every printed value matches R² to four decimals.
 - **Table 2.** Every count matches.
 - **Figures 3 and 4.** All fifteen correlations in each figure match, except the swapped pair in Figure 3. Figure 4 merges the three "un-important" answers into one, leaving "neither important nor unimportant" separate; that is the reading that reproduces all fifteen of its values.
 - **Figure 5** places each factor at a distance from the center equal to the mean of its Figure 3 and Figure 4 correlations. Which quadrant a factor sits in is the author's reading of Figures 1 and 2, as the article says in its footnote 13, not a computed quantity; the script takes the quadrants from the article.
@@ -56,24 +75,24 @@ The weight (`post_weight`) was built in 2014 by raking: adjusting each responden
 
 The script's lowest income group, however, takes in incomes up to $29,999, while its target describes households earning less than $25,000: its cut-off sits one income bracket too high. The 54 respondents earning $25,000 to $29,999 were weighted as if they earned less than $25,000. The other income groups, and Table 2's own script, draw their lines correctly.
 
-Both programs re-rake the weight with the line at $25,000 and re-estimate Tables 1 and 4, writing the result to `tables_final.md` with every cell that changes. Across the 93 coefficients:
+Both programs re-rake the weight with the line at $25,000 and re-estimate Tables 1 and 4, writing the result to `tables_final_R.md` and `tables_final_python.md` with every cell that changes. Across the 93 coefficients:
 
 - No coefficient that is significant at any level changes sign. Five change sign, all within 0.014 of zero and none significant.
 - The largest change in any coefficient is 0.022.
 - The neoliberal index stays significant at the 1% level in every model, and its four statements keep their signs; Self help rises from the 10% level to the 5% level in all three models that enter it.
-- Sixteen significance stars move by one level, eleven up and five down. Income rises a level in Models 1a, 3a and 3b and in Table 4 Model D; Age falls a level in Models 1a and 2a and stays significant.
+- Sixteen significance stars move by one level, eleven up and five down. Income rises a level in Models 1a, 3a, and 3b and in Table 4 Model D; Age falls a level in Models 1a and 2a and stays significant.
 - Ideology becomes significant at the 5% level in Model 1a (printed at 10%) and at the 10% level in Model 1b (printed as not significant). It stays insignificant in Model 2a and on its own in Table 4, Model A. The article's statement that ideology has no discernible influence therefore holds less firmly in the full models than the printed tables suggest.
 
-The published tables use the 2014 weight, and the scripts reproduce them with it. `tables_final.md` also counts Table 2 on the 991 distinct respondents: five counts are one lower than the article's, and no percentage changes at two decimals.
+The published tables use the 2014 weight, and the scripts reproduce them with it. `tables_final_R.md` also counts Table 2 on the 991 distinct respondents: five counts are one lower than the article's, and no percentage changes at two decimals.
 
 ## The data
 
-SocialSci, an online survey panel company, fielded my Economic Justice Survey (version 7) in November 2013. My 2014 cleaning kept 992 respondents, and this file holds all of them. Of the survey's 241 columns, it keeps the 54 the tables and figures use. The full survey, with the cleaning scripts, questionnaire and codebook, will be deposited separately; its DOI will be added to this record.
+SocialSci, an online survey panel company, fielded my Economic Justice Survey (version 7) in November 2013. My 2014 cleaning kept 992 respondents, and this file holds all of them. Of the survey's 241 columns, it keeps the 54 the tables and figures use. The full survey, with the cleaning scripts, questionnaire, and codebook, will be deposited separately; its DOI will be added to this record.
 
 - `row` is the row number in the full survey file and the only column that identifies a respondent uniquely.
 - `id` is the vendor's respondent number, kept for matching to the full survey. It is unreliable as a key:
   - 55 id values are each carried by two different respondents, because the vendor's numbering collided within one fielding batch.
-  - One respondent's record is in the file twice, under ids 1115 and 1157, identical in every answer, so the 992 rows hold 991 people. The published regressions and figures leave out the second copy, and the scripts do the same. The 2018 figure code removes it explicitly; the 2014 regression code does not show where it was dropped, but only dropping that record reproduces the published sample sizes and R² values. The article's count of 992 respondents, in Section 3.1 and Table 2, includes the second copy; `tables_final.md` gives Table 2 on the 991.
+  - One respondent's record is in the file twice, under ids 1115 and 1157, identical in every answer, so the 992 rows hold 991 people. The published regressions and figures leave out the second copy, and the scripts do the same. The 2018 figure code removes it explicitly; the 2014 regression code does not show where it was dropped, but only dropping that record reproduces the published sample sizes and R² values. The article's count of 992 respondents, in Section 3.1 and Table 2, includes the second copy; `tables_final_R.md` gives Table 2 on the 991.
 - `corr_ideal_agency`, the dependent variable, is missing for 29 respondents, so Table 1's models have N = 953. Models 1a and 1b also include theology, which only respondents who identify with a religion were asked, and have N = 671.
 
 ## The regressions

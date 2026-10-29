@@ -20,43 +20,68 @@ A correction (journal DOI 10.1111/psj.70145) is included. Again, none of the err
 
 ## Files
 
+Files are named by what they are, then which version, then which program wrote them: `category_item_variant_program.ext`. Underscores separate those fields and hyphens join words inside one field, so a folder sorted by name groups into corrigendum, data, figures, scripts, and tables. Every file the R program writes carries `_R`; the Python program writes the same files with `_python`, and the pairs are identical. `README.pdf` is this document, typeset for readers who would rather not open a markdown file.
+
+### Data
+
 | File | What it is |
 |---|---|
-| `economic_justice_v7_psj-replication.csv` | The survey data: 992 respondents and the 27 variables the tables and figures use. No value was changed. The full survey is a separate deposit (see "The data"). |
-| `codebook.md` | The 27 columns: question wording, answer options, coding and rescaling, and the label each has in the article. |
-| `replicate.R` | The analysis in R: Tables 1, C1, C2 and D1 (32 regressions), Table A1, and Figures 1, 2, 3, 4, D1 and D2, on the published sample and on the final data. Writes `tables_corrected.md`, `tables_final.md`, the figures and their final-data versions, then prints every cell where the printed tables differ. Base R only. |
-| `replicate.py` | The same program in Python. Writes the same files with a `_py` or `-py` suffix, identical to the R output. |
-| `tables_published.md` | The four regression tables as printed in the article, copied cell by cell from the published PDF, stars included. |
-| `cells_corrected.md` | The 21 cells where the printed tables differ from the re-run, one line each: what was printed, what the re-run gives. Written by either program. |
-| `tables_corrected.md`, `.pdf` | The four regression tables with the typos corrected, on the published 992 rows (duplicate included), plus Table A1 and the eight regressions behind Figures D1 and D2. Ends with the 21 corrected cells beside their published values. The output of either program. |
-| `tables_final.md`, `.pdf` | The same tables estimated on the 991 distinct records, without the duplicated row and with the survey weight corrected, ending with a list of every cell that changes at the printed precision. These are the replacement tables offered to the journal. The output of either program. |
-| `figure-1.png` … `figure-D2.png` | The six figures, redrawn by `replicate.R` from the survey data, not copied from the article. Figure 1 charts three General Social Survey percentages written into the scripts. `replicate.py` draws the same figures as `figure-*-py.png`. |
-| `figure-2-final.png` … `figure-D2-final.png` | The same figures drawn from the final data (991 respondents, corrected weights). Figure 1 is not derived from this survey and is drawn once. |
-| `PSJ_corrigendum.md`, `.pdf` | The correction as proposed to the journal: the two kinds of error, the one corrected sentence, and corrected Table 1 (991 observations, corrected weights). It points here for every other table. |
-| `policy_taxation_2014_annotated.do` | The original Stata code that produced the article's tables and the D1 and D2 plots, commands untouched, with comment lines (`// [2026]`) saying which command makes which table or figure. A record, not a runnable script: it reads a file not included here. |
+| `data_survey_psj-subset.csv` | The survey data: 992 respondents and the 27 variables the tables and figures use. No value was changed. The full survey is a separate deposit (see "The data"). |
+| `data_codebook.md` | The 27 columns: question wording, answer options, coding, and rescaling, and the label each has in the article. |
+
+### Scripts
+
+| File | What it is |
+|---|---|
+| `script_replication.R` | The analysis in R: Tables 1, C1, C2, and D1 (32 regressions), Table A1, and Figures 1, 2, 3, 4, D1, and D2, on the published sample and on the final data. Writes every `_R` file below, then prints every cell where the printed tables differ. Base R only. |
+| `script_replication.py` | The same program in Python. Writes the same files with `_python` in place of `_R`, identical to the R output. |
+| `script_original_stata-2014.do` | The original Stata code that produced the article's tables and the D1 and D2 plots, commands untouched, with comment lines (`// [2026]`) saying which command makes which table or figure. A record, not a runnable script: it reads a file not included here. |
+
+### Tables
+
+| File | What it is |
+|---|---|
+| `tables_as-published.md` | The four regression tables as printed in the article, copied cell by cell from the published PDF, stars included. |
+| `tables_corrected_R.md`, `tables_corrected_python.md`, `tables_corrected.pdf` | The four regression tables with the typos corrected, on the published 992 rows (duplicate included), plus Table A1 and the eight regressions behind Figures D1 and D2. Ends with the 21 corrected cells beside their published values. The PDF is a typeset reader copy of the R file. |
+| `tables_corrected-cells_R.md`, `tables_corrected-cells_python.md` | The 21 cells where the printed tables differ from the re-run, one line each: what was printed, what the re-run gives. |
+| `tables_final_R.md`, `tables_final_python.md`, `tables_final.pdf` | The same tables estimated on the 991 distinct records, without the duplicated row and with the survey weight corrected, ending with a list of every cell that changes at the printed precision. These are the replacement tables offered to the journal. The PDF is a typeset reader copy of the R file. |
+
+### Figures
+
+| File | What it is |
+|---|---|
+| `figure_1_R.png`, `figure_1_python.png` | Figure 1 charts three General Social Survey percentages written into the scripts. It is not derived from this survey and is drawn once by each program. |
+| `figure_2_published-sample_R.png` … `figure_D2_published-sample_R.png`, and `_python` | Figures 2, 3, 4, D1, and D2, redrawn by each program from the published sample (992 rows, 2014 weight), not copied from the article. |
+| `figure_2_final-data_R.png` … `figure_D2_final-data_R.png`, and `_python` | The same figures drawn from the final data (991 respondents, corrected weights). |
+
+### Corrigendum
+
+| File | What it is |
+|---|---|
+| `corrigendum_psj.md`, `corrigendum_psj.pdf` | The correction as proposed to the journal: the two kinds of error, the one corrected sentence, and corrected Table 1 (991 observations, corrected weights). It points here for every other table. |
 
 ## Running it
 
-Put the files in one folder. R needs base R only. Python needs pandas, numpy, scipy, statsmodels and matplotlib.
+Put the files in one folder. R needs base R only. Python needs pandas, numpy, scipy, statsmodels, and matplotlib.
 
-- `Rscript replicate.R` writes `tables_corrected.md`, `tables_final.md`, the six figures and their final-data versions, and prints the comparison with the printed tables.
-- `python3 replicate.py` writes the same files with a `_py` or `-py` suffix, and prints the same comparison.
-- To check the two programs against each other, compare `tables_corrected.md` with `tables_py.md`, and `tables_final.md` with `tables_final_py.md`. They are identical.
+- `Rscript script_replication.R` writes `tables_corrected_R.md`, `tables_corrected-cells_R.md`, `tables_final_R.md`, the six figures from the published sample and five from the final data, and prints the comparison with the printed tables.
+- `python3 script_replication.py` writes the same files with `_python` in place of `_R`, and prints the same comparison.
+- To check the two programs against each other, compare `tables_corrected_R.md` with `tables_corrected_python.md`, and `tables_final_R.md` with `tables_final_python.md`. They are identical.
 
 ## What is reproduced, and how closely: the published sample (992 observations)
 
 - **Tables 1, C1, C2, D1.** Every coefficient, standard error, N, R² and adjusted R² matches the printed value to the printed decimals, except the 21 corrected cells. The constant's standard error is an approximation of Stata's and is not compared.
-- **Table A1**, the sample's composition by gender, race, education and so on: every group count and share matches.
+- **Table A1**, the sample's composition by gender, race, education, and so on: every group count and share matches.
 - **Figure 2** matches the printed figure: the same curves, the same heights.
 - **Figure 3** is drawn here with R's and Python's default smoothing. The printed figure is smoother because Stata drew it in 2014 with a wider smoothing bandwidth, and that setting was not recorded.
 - **Figure 4** drops the duplicated respondent record, as the 2014 plot did. I found the duplicate while drawing that figure, in 2018, and dropped it there, but the regressions dated from 2014 and I failed to rerun them at the time.
 - **Figure 1** charts three percentages from the 2010 General Social Survey, not from this survey. The numbers are in the scripts.
-- **Figures D1, D2** match the printed panels. The marginal-effect lines and bands come from the eight regressions the 2014 plot code specifies (ordinary weighted regression without state effects, errors clustered by state). The article does not print those regressions, but the scripts nonetheless write them to `tables_corrected.md`.
+- **Figures D1, D2** match the printed panels. The marginal-effect lines and bands come from the eight regressions the 2014 plot code specifies (ordinary weighted regression without state effects, errors clustered by state). The article does not print those regressions, but the scripts nonetheless write them to `tables_corrected_R.md` and `tables_corrected_python.md`.
 - **Figure B1**, the heat maps of Control against Ideal importance, is not in this article. It appears in the companion article, Bower-Bir (2021), *Economia Politica* 38(1): 131–170, https://doi.org/10.1007/s40888-020-00201-9, and is reproduced in that article's replication package.
 
 ## What changes with the two data fixes (991 observations, corrected weights)
 
-`tables_final.md` re-estimates Tables 1, C1, C2 and D1 on the 991 distinct observations, with the survey weights re-raked on those observations and with every respondent in the right income group. The published 2014 weights were originally raked with the duplicate present and with 54 respondents in the wrong income group. The replication scripts repeat the 2014 raking, whose method they first confirm by reproducing the shipped weight on all 992 rows, and then correct the income groups. The file ends with a list of every cell whose printed value changes. Across the 422 coefficient and standard-error cells in those tables:
+`tables_final_R.md` (and its Python twin) re-estimates Tables 1, C1, C2, and D1 on the 991 distinct observations, with the survey weights re-raked on those observations and with every respondent in the right income group. The published 2014 weights were originally raked with the duplicate present and with 54 respondents in the wrong income group. The replication scripts repeat the 2014 raking, whose method they first confirm by reproducing the shipped weight on all 992 rows, and then correct the income groups. The file ends with a list of every cell whose printed value changes. Across the 422 coefficient and standard-error cells in those tables:
 
 - Coefficients move by a few hundredths of a unit.
   - In Table 1 the largest move is on Definition in Y_gov_fix_gap Model 3, from −0.518 to −0.471. Its other two Y_gov_fix_gap coefficients fall by about 0.03.
@@ -71,7 +96,7 @@ Put the files in one folder. R needs base R only. Python needs pandas, numpy, sc
 - R² values move by at most 0.009.
 - Every written claim in the text holds.
 
-The figures are redrawn from the final data as `figure-*-final.png` and are essentially the same as the published ones. The density curves of Figures 2 and 3 are unweighted, so only the duplicate observation affects them. They move by less than 0.01 and 0.03 on the density axis, where the peaks stand at 1.5 to 6. The marginal-effect lines of Figures D1 and D2 move by at most 0.10 on axes spanning 4 to 9 units, well inside their confidence bands. Figure 4 already excludes the duplicate, and Figure 1 is not from this survey.
+The figures are redrawn from the final data as `figure_*_final-data_R.png` and `figure_*_final-data_python.png` and are essentially the same as the published ones. The density curves of Figures 2 and 3 are unweighted, so only the duplicate observation affects them. They move by less than 0.01 and 0.03 on the density axis, where the peaks stand at 1.5 to 6. The marginal-effect lines of Figures D1 and D2 move by at most 0.10 on axes spanning 4 to 9 units, well inside their confidence bands. Figure 4 already excludes the duplicate, and Figure 1 is not from this survey.
 
 ## The data
 
@@ -79,14 +104,14 @@ SocialSci, an online survey panel company, fielded my Economic Justice Survey (v
 
 The 2014 cleaning script built some of the columns in the file from the raw answers: the four attitude measures that combine a direction with a strength (`gov_reducegap_str`, `agency_str`, `justice_str`, `gov_help_str`), the three Deserve scores (`desert_rich_tot`, `desert_americans_tot`, `desert_poor_tot`) and the Definition correlation (`corr_ideal_agency`). I recomputed each from the raw survey items, and each matches on every row. I also recomputed the survey weight (`post_weight`) using the 2014 script's method and population targets. It matches the published weight for every respondent to five decimal places. That re-derivation is how the weighting error came to light. The original script's lowest income group, meant for households earning under $25,000, also took in those earning $25,000 to $29,999. That is the only income group affected. Table A1's income counts come from a different script and were correct as published.
 
-The full survey, with the cleaning scripts, questionnaire and codebook, will be deposited separately; its DOI will be added to this record.
+The full survey, with the cleaning scripts, questionnaire, and codebook, will be deposited separately; its DOI will be added to this record.
 
 A codebook for the relevant subset of data is provided. Additional notes on data:
 
 - `row` is the row number in the full survey file and the only column that identifies a respondent uniquely.
 - `id` is the vendor's respondent number, kept for matching to the full survey. Two things make it unreliable as a key:
-  - 55 id values are each carried by two different respondents. The vendor's numbering collided within one fielding batch, and the pairs are different people (different ages, genders and states). 
-  - One respondent's record is genuinely in the file twice, under ids 1115 and 1157, identical in every answer, so the 992 rows hold 991 people. The duplicate is kept because the published tables were estimated on all 992 rows; dropping it would change every estimate slightly. The one place the 2014 analysis dropped it was Figure 4, and the scripts do the same there. Both scripts also estimate every table a second time on the 991 distinct records, with the weight corrected; see "What changes with the two data fixes" and `tables_final.md`.
+  - 55 id values are each carried by two different respondents. The vendor's numbering collided within one fielding batch, and the pairs are different people (different ages, genders, and states). 
+  - One respondent's record is genuinely in the file twice, under ids 1115 and 1157, identical in every answer, so the 992 rows hold 991 people. The duplicate is kept because the published tables were estimated on all 992 rows; dropping it would change every estimate slightly. The one place the 2014 analysis dropped it was Figure 4, and the scripts do the same there. Both scripts also estimate every table a second time on the 991 distinct records, with the weight corrected; see "What changes with the two data fixes" and `tables_final_R.md`.
   - Use `row`, not `id`, to refer to a respondent.
 - `corr_ideal_agency` is missing for 29 respondents, so regressions that include it have N = 963 and regressions without it have N = 992.
 

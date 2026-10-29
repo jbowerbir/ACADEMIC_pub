@@ -1,8 +1,8 @@
-# Codebook: `economic_justice_v7_ep-replication.csv`
+# Codebook: `data_survey_ep-subset.csv`
 
 A lookup reference for the data used to replicate the tables and figures in Bower-Bir (2021), *Economia Politica* 38(1): 131–170: an unaltered subset of the Economic Justice Survey (version 7, SocialSci, November 2013), 992 respondents by 54 variables. Question wording is quoted from the survey as fielded.
 
-Every scale except `age`, `race`, `party` and `post_weight` is rescaled to run from 0 to 1 by (x − min) / (max − min), so a −3 to 3 scale becomes (x + 3) / 6. The table gives the raw coding; the file holds the rescaled value. The second column gives each variable's label as the article prints it.
+Every scale except `age`, `race`, `party`, and `post_weight` is rescaled to run from 0 to 1 by (x − min) / (max − min), so a −3 to 3 scale becomes (x + 3) / 6. The table gives the raw coding; the file holds the rescaled value. The second column gives each variable's label as the article prints it.
 
 ## The respondent and the weight
 
@@ -34,7 +34,7 @@ Every scale except `age`, `race`, `party` and `post_weight` is rescaled to run f
 | `education` | Education | "What is the highest level of schooling that you have received?" | 0 8th grade or less, 1 Attended high school, 2 Completed high school (or equivalent), 3 Attended college, 4 Associate's or vocational degree, 5 Bachelor's degree, 6 Graduate or professional degree. | 0–1: code / 6 |
 | `age` | Age | "How old are you?" | Years. | years, not rescaled |
 | `urban` | Urban | "In what kind of community do you live?" | Five options, from Large city 4 to Rural community 0. | 0–1; high = large city |
-| `south` | Southern | "In which state do you currently reside?" | 1 for Alabama, Arkansas, Florida, Georgia, Kentucky, Louisiana, Mississippi, North Carolina, South Carolina, Tennessee, Texas, Virginia and West Virginia; else 0. | 0 or 1 |
+| `south` | Southern | "In which state do you currently reside?" | 1 for Alabama, Arkansas, Florida, Georgia, Kentucky, Louisiana, Mississippi, North Carolina, South Carolina, Tennessee, Texas, Virginia, and West Virginia; else 0. | 0 or 1 |
 | `diff_incentives` | Disp. incentives | "How much do you agree or disagree with the following statements? Only if differences in income and social standing are large enough is there an incentive for individual effort." | Strongly agree 3, Agree 2, Somewhat agree 1, Neither agree nor disagree 0, Somewhat disagree −1, Disagree −2, Strongly disagree −3; the 2014 cleaning reversed the sign. | 0–1; **high = disagree (anti-neoliberal)** |
 | `gov_stayout` | Gov. stay out | Same stem: "Government should not intervene in economic matters." | As above, sign reversed. | 0–1; **high = disagree** |
 | `help_self` | Self help | Same stem: "You have to take care of yourself first, and help others only if you have any energy left over." | As above, sign reversed. | 0–1; **high = disagree** |
@@ -45,10 +45,10 @@ Every scale except `age`, `race`, `party` and `post_weight` is rescaled to run f
 
 | Column | In the article | Question (verbatim) | Answer options and raw coding | In the file |
 |---|---|---|---|---|
-| `race` | Table 2 | "What is your race/ethnicity?" | White 0, Black or African American 1, Latino 2, American Indian or Alaskan Native 3, Asian 4, Pacific Islander 5, Other 6. Table 2's "Other" is 3, 5 and 6. | 0–6, not rescaled |
+| `race` | Table 2 | "What is your race/ethnicity?" | White 0, Black or African American 1, Latino 2, American Indian or Alaskan Native 3, Asian 4, Pacific Islander 5, Other 6. Table 2's "Other" is 3, 5, and 6. | 0–6, not rescaled |
 | `party` | Table 2 | The party question above. | As `party_str`. Table 2 counts −3 and −2 as Republican, 2 and 3 as Democrat. | −3 to 3, not rescaled |
 
-`female`, `education` and `income_household` complete Table 2. Its income bands are codes 0–6 (under $25,000), 7–10, 11–12, 13–14, 15–16 and 17–18.
+`female`, `education`, and `income_household` complete Table 2. Its income bands are codes 0–6 (under $25,000), 7–10, 11–12, 13–14, 15–16 and 17–18.
 
 ## The 15 factors (Figures 1–5, and the dependent variable)
 

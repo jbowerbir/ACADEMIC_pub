@@ -5,7 +5,7 @@ Survey data from the Economic Justice survey (v7), fielded by **SocialSci** in N
 - Bower-Bir (2021) "Earning Our Place, More or Less" *Economia Politica* 38(1)
 - Bower-Bir (2022) "Desert and Redistribution" *Policy Studies Journal* 50(4)
 
-> **Public now (2026-10):** the 27 columns the PSJ article's tables and figures use are in `../desert-redistribution-psj-2021/economic_justice_v7_psj-replication.csv`, with a codebook beside it.
+> **Public now (2026-10):** the 27 columns the PSJ article's tables and figures use are in `../desert-redistribution-psj-2021/data_survey_psj-subset.csv`, with a codebook beside it.
 >
 > **Note (2026):** The data files themselves are being finalized for public deposit at IU ScholarWorks and are not in this repository yet. This document describes the dataset and its schema; the CSVs and supporting materials will be posted with the complete, reviewed replication package. De-identification is under review before release.
 

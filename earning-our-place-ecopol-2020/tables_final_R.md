@@ -1,6 +1,6 @@
 # Final tables: Bower-Bir (2021), Economia Politica 38(1): 131-170
 
-Written by replicate.R (tables_final.md) and replicate.py (tables_final_py.md); the two files are identical. Tables 1 and 4 are re-estimated on the 991 distinct respondents with the survey weight raked again with the $25,000 income line in the right place (the 2014 weight placed the 54 respondents earning $25,000 to $29,999 in the group below $25,000). Table 2 counts the 991 distinct respondents; the article's counts include one respondent's duplicated record. The last section lists every cell that differs from the tables as published (tables_corrected.md).
+Written by script_replication.R (tables_final_R.md) and script_replication.py (tables_final_python.md); the two files are identical. Tables 1 and 4 are re-estimated on the 991 distinct respondents with the survey weight raked again with the $25,000 income line in the right place (the 2014 weight placed the 54 respondents earning $25,000 to $29,999 in the group below $25,000). Table 2 counts the 991 distinct respondents; the article's counts include one respondent's duplicated record. The last section lists every cell that differs from the tables as published (tables_corrected_R.md).
 
 ## Table 1
 | Variable | Model 1a | Model 2a | Model 3a | Model 1b | Model 2b | Model 3b |

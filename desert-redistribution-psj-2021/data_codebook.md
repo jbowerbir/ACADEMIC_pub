@@ -1,13 +1,13 @@
-# Codebook: `economic_justice_v7_psj-replication.csv`
+# Codebook: `data_survey_psj-subset.csv`
 
 The data used to replicate the tables and figures in Bower-Bir (2022), *Policy Studies Journal* 50(4): 757–795: an unaltered subset of the Economic Justice Survey (version 7, SocialSci, November 2013), 992 respondents by 27 variables. Question wording is quoted from the survey as fielded.
 
 Two conventions:
 
 - **Direction × strength.** A yes-or-no question coded 1 or −1 is multiplied by a follow-up "How strongly do you feel this way?" coded Very strongly 3, Strongly 2, Somewhat strongly 1, Not at all strongly 0. The product runs from −3 to 3.
-- **Rescaled to 0–1.** Every scale except `age`, `employment`, `state` and `post_weight` is rescaled to run from 0 to 1 by (x − min) / (max − min), so a −3 to 3 scale becomes (x + 3) / 6. The table gives the raw coding; the file holds the rescaled value.
+- **Rescaled to 0–1.** Every scale except `age`, `employment`, `state`, and `post_weight` is rescaled to run from 0 to 1 by (x − min) / (max − min), so a −3 to 3 scale becomes (x + 3) / 6. The table gives the raw coding; the file holds the rescaled value.
 
-The second column gives each variable's label as the article prints it. A label with no location in parentheses appears in all four regression tables: Table 1 and appendix Tables C1, C2 and D1.
+The second column gives each variable's label as the article prints it. A label with no location in parentheses appears in all four regression tables: Table 1 and appendix Tables C1, C2, and D1.
 
 | Column | In the article | Question (verbatim) | Answer options and raw coding | In the file |
 |---|---|---|---|---|
@@ -34,9 +34,9 @@ The second column gives each variable's label as the article prints it. A label 
 | `income_household` | Income; Household income (Table A1) | Q21.12 "What is your household's approximate annual income?" or, where unanswered, Q21.13 "What is your parents' or guardians' approximate annual income?" | Nineteen brackets from under $5,000 (0) to $175,000 and over (18). | 0–1 |
 | `diff_large` | Are income differences too large? (Figure 4) | Q11.05 "Differences in income in America are too large." | Strongly agree 3, Agree 2, Somewhat agree 1, Neither 0, Somewhat disagree −1, Disagree −2, Strongly disagree −3. | 0–1; high = agrees the gap is too large |
 | `gender` | Gender (Table A1) | Q21.01 "What is your gender?" | Male 1, Female 0. `female` above is the reverse coding. | 0 or 1 |
-| `race` | Race (Table A1) | Q21.16 "What is your race/ethnicity?" | White 0, Black or African American 1, Latino 2, American Indian or Alaskan Native 3, Asian 4, Pacific Islander 5, Other 6. Table A1 groups 3, 5 and 6 as Other. | code |
+| `race` | Race (Table A1) | Q21.16 "What is your race/ethnicity?" | White 0, Black or African American 1, Latino 2, American Indian or Alaskan Native 3, Asian 4, Pacific Islander 5, Other 6. Table A1 groups 3, 5, and 6 as Other. | code |
 | `party` | Political party (Table A1) | Q21.19 party identification | Strong Democrat 3, Democrat 2, Lean Democrat 1, Independent 0, Lean Republican −1, Republican −2, Strong Republican −3. Table A1 groups 3 and 2 as Democrat, 1 as Lean Democrat, −1 as Lean Republican, −2 and −3 as Republican. | code |
-| `state` | state fixed effects (table notes) | Q21.05 "In which state do you currently reside?" | Coded 1 to 53 in alphabetical order, District of Columbia 9, "I do not reside in the United States" 53. Montana, Wisconsin and Wyoming have no respondents. | code. Every regression has a separate intercept for each state. |
-| `post_weight` | | | Made by raking the sample to population totals on gender, party identification, household income, race and education (Census Bureau 2012 projections; Pew 2012 for party). Mean 1, range 0.07 to 29.95. | weight, used in every regression |
+| `state` | state fixed effects (table notes) | Q21.05 "In which state do you currently reside?" | Coded 1 to 53 in alphabetical order, District of Columbia 9, "I do not reside in the United States" 53. Montana, Wisconsin, and Wyoming have no respondents. | code. Every regression has a separate intercept for each state. |
+| `post_weight` | | | Made by raking the sample to population totals on gender, party identification, household income, race, and education (Census Bureau 2012 projections; Pew 2012 for party). Mean 1, range 0.07 to 29.95. | weight, used in every regression |
 
 The 29 respondents with no value for `corr_ideal_agency` are why regressions that include Definition have N = 963 and regressions without it have N = 992.
