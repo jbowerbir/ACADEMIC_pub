@@ -64,13 +64,13 @@ Files are named by what they are, then which version, then which program wrote t
 
 Put the files in one folder. R needs base R only. Python needs pandas, numpy, scipy, statsmodels, and matplotlib.
 
-- `Rscript script_replication.R` writes `tables_corrected_R.md`, `tables_corrected-cells_R.md`, `tables_final_R.md`, the six figures from the published sample and five from the final data, and prints the comparison with the printed tables.
+- `Rscript script_replication.R` writes `tables_corrected_R.md`, `tables_corrected-cells_R.md`, `tables_final_R.md`, Figure 1, and the other five figures from the published sample and again from the final data, and prints the comparison with the printed tables.
 - `python3 script_replication.py` writes the same files with `_python` in place of `_R`, and prints the same comparison.
 - To check the two programs against each other, compare `tables_corrected_R.md` with `tables_corrected_python.md`, and `tables_final_R.md` with `tables_final_python.md`. They are identical.
 
 ## What is reproduced, and how closely: the published sample (992 observations)
 
-- **Tables 1, C1, C2, D1.** Every coefficient, standard error, N, R² and adjusted R² matches the printed value to the printed decimals, except the 21 corrected cells. The constant's standard error is an approximation of Stata's and is not compared.
+- **Tables 1, C1, C2, D1.** Every coefficient, standard error, N, R², and adjusted R² matches the printed value to the printed decimals, except the 21 corrected cells. The constant's standard error is an approximation of Stata's and is not compared.
 - **Table A1**, the sample's composition by gender, race, education, and so on: every group count and share matches.
 - **Figure 2** matches the printed figure: the same curves, the same heights.
 - **Figure 3** is drawn here with R's and Python's default smoothing. The printed figure is smoother because Stata drew it in 2014 with a wider smoothing bandwidth, and that setting was not recorded.
@@ -85,13 +85,13 @@ Put the files in one folder. R needs base R only. Python needs pandas, numpy, sc
 
 - Coefficients move by a few hundredths of a unit.
   - In Table 1 the largest move is on Definition in Y_gov_fix_gap Model 3, from −0.518 to −0.471. Its other two Y_gov_fix_gap coefficients fall by about 0.03.
-  - Agency, Justice, Rich deserve, Avg. deserve and Poor deserve move by 0.015 or less.
+  - Agency, Justice, Rich deserve, Avg. deserve, and Poor deserve move by 0.015 or less.
   - The largest moves anywhere are 0.15, on the two Poor deserve terms of Table D1, Y_prog_tax Model 3, whose standard errors are 0.8 to 0.9 and which were not significant before and are not now.
 - Twenty-eight coefficients whose p-values sit near a significance threshold cross it, so their stars change: twenty-four increasing in statistical significance and four decreasing. Six cross the 5% line, five of them gaining in significance.
   - Six of the twenty-eight affected coefficients are on Definition, Agency, Rich deserve, or Poor deserve; the other twenty-two are on control variables, of which seventeen gain or lose significance at the 10% level, and five move between the 10% and 5% levels.
   - Definition, in Table 1, Y_gov_fix_gap Model 1, drops from the 1% significance level to the 5% level (p = 0.0099 to 0.012) and stays at 1% in the other two Y_gov_fix_gap models. In Table D1, Y_gov_fix_gap Model 1, its main effect (as opposed to its interaction effect) gains a star (p = 0.108 to 0.062).
   - Agency, in Table 1, Y_prog_tax Model 1, rises from the 5% significance level to the 1% level (p = 0.0119 to 0.0100).
-  - Rich deserve, in Table D1, Y_gov_fix_gap Model 3, rises from the from 5% significance level to the 1% level (p = 0.015 to 0.008).
+  - Rich deserve, in Table D1, Y_gov_fix_gap Model 3, rises from the 5% significance level to the 1% level (p = 0.015 to 0.008).
   - Poor deserve on Y_prog_tax, the one effect the article already calls statistically questionable, loses a star in two appendix models. In Table C1 Model E, it moves from the 10% significance level to none (p = 0.096 to 0.108), and in Table C2 Model E, it moves from 5% to 10% (p = 0.041 to 0.050). In Table 1 it keeps its one star.
 - R² values move by at most 0.009.
 - Every written claim in the text holds.
@@ -100,9 +100,9 @@ The figures are redrawn from the final data as `figure_*_final-data_R.png` and `
 
 ## The data
 
-SocialSci, an online survey panel company, fielded my Economic Justice Survey (version 7) in November 2013. My 2014 cleaning kept 992 respondents, and this file holds all of them. To remove the single duplicate row, please run the corresponding lines of code in the provided R or Python scripts. Of the survey dataset's 241 columns, the dataset provided here keeps the 27 columns the tables and figures use. The R and Python scripts build the variables the regressions need from them (age squared, the married and unemployed indicators, the four-level tax outcome, the interaction terms), as the 2014 Stata code did.
+SocialSci, an online survey panel company, fielded my Economic Justice Survey (version 7) in November 2013. My 2014 cleaning kept 992 respondents, and this file holds all of them. To remove the single duplicate row, please run the corresponding lines of code in the provided R or Python scripts. Of the survey dataset's 241 columns, the dataset provided here keeps the 27 columns the tables and figures use. The R and Python scripts build the variables the regressions need from them (age squared, the married and unemployed indicators, the four-level tax outcome, and the interaction terms), as the 2014 Stata code did.
 
-The 2014 cleaning script built some of the columns in the file from the raw answers: the four attitude measures that combine a direction with a strength (`gov_reducegap_str`, `agency_str`, `justice_str`, `gov_help_str`), the three Deserve scores (`desert_rich_tot`, `desert_americans_tot`, `desert_poor_tot`) and the Definition correlation (`corr_ideal_agency`). I recomputed each from the raw survey items, and each matches on every row. I also recomputed the survey weight (`post_weight`) using the 2014 script's method and population targets. It matches the published weight for every respondent to five decimal places. That re-derivation is how the weighting error came to light. The original script's lowest income group, meant for households earning under $25,000, also took in those earning $25,000 to $29,999. That is the only income group affected. Table A1's income counts come from a different script and were correct as published.
+The 2014 cleaning script built some of the columns in the file from the raw answers: the four attitude measures that combine a direction with a strength (`gov_reducegap_str`, `agency_str`, `justice_str`, `gov_help_str`), the three Deserve scores (`desert_rich_tot`, `desert_americans_tot`, `desert_poor_tot`), and the Definition correlation (`corr_ideal_agency`). I recomputed each from the raw survey items, and each matches on every row. I also recomputed the survey weight (`post_weight`) using the 2014 script's method and population targets. It matches the published weight for every respondent to five decimal places. That re-derivation is how the weighting error came to light. The original script's lowest income group, meant for households earning under $25,000, also took in those earning $25,000 to $29,999. That is the only income group affected. Table A1's income counts come from a different script and were correct as published.
 
 The full survey, with the cleaning scripts, questionnaire, and codebook, will be deposited separately; its DOI will be added to this record.
 
@@ -128,7 +128,7 @@ Every regression in the tables is one Stata command, `areg <outcome> <predictors
 
 **Testing decimals for equality.** The 2014 code recodes variables by exact comparison (`if married == .8`, `if progtaxes2_str == 4`). That works in Stata. In R or Python it silently matches no rows, because the stored values are 0.7999… and 3.9999…; the tax outcome is then wrong and every coefficient moves by about 0.03, with no error. Round to the nearest integer first. Both scripts do.
 
-**The interaction terms.** Lines 46–59 of the Stata code build the interaction variables from Definition rescaled to 0 to 1 but store them under the unscaled names. So every interaction term in Table D1 uses the rescaled Definition, and in two of the six D1 regressions (Y_gov_fix_gap Model 1, Y_prog_tax Model 3) the Definition variable itself is also the rescaled one. The fit is identical either way; only the printed coefficients differ, by a factor of two. The scripts reproduce what the article printed. Build the interactions from the unscaled Definition and you will get coefficients half as large and conclude, wrongly, that the table is wrong.
+**The interaction terms.** Lines 93–106 of `script_original_stata-2014.do` (lines 46–59 of the file as run in 2014, before the annotations) build the interaction variables from Definition rescaled to 0 to 1 but store them under the unscaled names. So every interaction term in Table D1 uses the rescaled Definition, and in two of the six D1 regressions (Y_gov_fix_gap Model 1, Y_prog_tax Model 3) the Definition variable itself is also the rescaled one. The fit is identical either way; only the printed coefficients differ, by a factor of two. The scripts reproduce what the article printed. Build the interactions from the unscaled Definition and you will get coefficients half as large and conclude, wrongly, that the table is wrong.
 
 ## Citation and license
 

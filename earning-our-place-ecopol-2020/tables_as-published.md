@@ -1,6 +1,6 @@
 # Tables as printed in Bower-Bir (2021), Economia Politica 38(1): 131-170
 
-A lookup transcription, cell for cell, of Table 1, appendix Tables 2 and 4, and the numbers printed in Figures 3, 4 and 6 and Section 5 of the published PDF, in the layout the replication scripts read. Stars as printed. `script_replication.R` and `script_replication.py` compare their output with this file and list every cell that differs.
+A lookup transcription, cell for cell, of Table 1, appendix Tables 2 and 4, and the numbers printed in Figures 3, 4, and 6, and Section 5 of the published PDF, in the layout the replication scripts read. Stars as printed. `script_replication.R` and `script_replication.py` compare their output with this file and list every cell that differs.
 
 ## Table 1
 | Variable | Model 1a | Model 2a | Model 3a | Model 1b | Model 2b | Model 3b |

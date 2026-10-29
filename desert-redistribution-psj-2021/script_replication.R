@@ -22,9 +22,11 @@
 #                                ending with every cell that changes at the
 #                                printed precision
 #   tables_corrected-cells_R.md  the printed cells that differ from the re-run,
-#                                one line each
+#                                one line each (written only when
+#                                tables_as-published.md is present)
 #   figure_1_R.png, figure_*_published-sample_R.png, figure_*_final-data_R.png
-#                                the six figures, from each data set
+#                                the six figures: Figure 1 once, the other
+#                                five from each data set
 #
 # Sections, in order:
 #   1. The data and the two corrections it needs
@@ -38,14 +40,15 @@
 # Run from this folder:  Rscript script_replication.R
 # Takes under a minute.
 #
-# Two things carried over from the 2014 Stata code on purpose. (1) The Stata
-# code recodes by exact comparison (`married == .8`); here the values are
-# rounded to the integer grid first, because 0.8 is stored as 0.7999... and an
-# exact test matches no rows. (2) The interaction terms are built on Definition
-# rescaled to 0-1 (the Stata stored them under the unscaled names), and the
-# Definition main effect is the rescaled variable in two of the six Table D1
-# regressions (Y_gov Model 1, Y_prog_tax Model 3) and the raw one in the other
-# four. That is how the article's tables were estimated.
+# Two things carried over from the 2014 Stata code on purpose:
+#   - The Stata code recodes by exact comparison (`married == .8`). Here the
+#     values are rounded to the integer grid first, because 0.8 is stored as
+#     0.7999... and an exact test matches no rows.
+#   - The interaction terms are built on Definition rescaled to 0-1 (the Stata
+#     stored them under the unscaled names), and the Definition main effect is
+#     the rescaled variable in two of the six Table D1 regressions (Y_gov
+#     Model 1, Y_prog_tax Model 3) and the raw one in the other four. That is
+#     how the article's tables were estimated.
 # =============================================================================
 
 
@@ -204,7 +207,7 @@ hc1 <- function(fit) {
 
 # One table regression: weighted least squares with a separate intercept for
 # each state (the state fixed effects) and HC1 standard errors. Returns each
-# predictor's coefficient, standard error and p-value, with N, R2 and
+# predictor's coefficient, standard error, and p-value, with N, R2, and
 # adjusted R2.
 fit_table <- function(dv, rhs, data) {
   sub <- data[complete.cases(data[, c(dv, rhs, "post_weight", "state")]), ]
@@ -373,8 +376,8 @@ dedup$md <- c("# Final tables", "",
                      "the duplicated row and with the survey weight corrected. Written by ",
                      "script_replication.R (tables_final_R.md) and script_replication.py ",
                      "(tables_final_python.md); the two files are identical. The last ",
-                     "section lists every cell that differs from the corrected tables as ",
-                     "published."),
+                     "section lists every cell that differs from the corrected tables ",
+                     "(tables_corrected_R.md)."),
               dedup$md)
 
 
@@ -480,8 +483,8 @@ draw_figures <- function(d, sfx) {
   }
 
   # the right-hand side of each plot regression: rescaled Definition, the
-  # justice measure and their product (the three deserve variables and their
-  # products entered together), and the controls
+  # moderator, their product, and the controls; for the rich-deserve panels
+  # all three deserve variables and their products enter together
   plot_rhs <- function(zvar) {
     block <- if (zvar == "desert_rich_tot") DES_X else c(zvar, paste0("x_", zvar))
     c(DEFS, block, CTRL)
@@ -582,7 +585,7 @@ writeLines(md, OUT)
 
 # ---- 6. The final tables and the list of cells that change ------------------------
 # Same layout, 991 rows, followed by every regression cell whose coefficient,
-# standard error or stars differ from the as-published tables above.
+# standard error, or stars differ from the as-published tables above.
 # a cell as printed: the coefficient with its stars, and the standard error
 fmt <- function(c) {
   c(sprintf("%.3f%s", c[1], stars(c[3])), sprintf("(%.3f)", c[2]))
@@ -639,7 +642,9 @@ cat(sprintf("wrote %s and the figures, figure_*_R.png\n", OUT))
 # ---- 7. Comparison with the printed tables -------------------------------------
 # Every cell of Tables 1, C1, C2, and D1 against tables_as-published.md, a
 # transcription of the printed article. Cells agree when they match to the
-# printed decimals; the tolerances below are half a unit in the last digit.
+# printed decimals; the tolerances below are half a unit in the last printed
+# digit, except adjusted R2, which is allowed 0.0004 because one printed
+# adjusted R2 sits 0.0002 from the re-estimate.
 
 PUB <- "tables_as-published.md"
 if (file.exists(PUB)) {

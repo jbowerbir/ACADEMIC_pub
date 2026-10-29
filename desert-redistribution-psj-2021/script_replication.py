@@ -22,9 +22,11 @@ Writes, to this folder:
                                     corrected, ending with every cell that
                                     changes at the printed precision
   tables_corrected-cells_python.md  the printed cells that differ from the
-                                    re-run, one line each
+                                    re-run, one line each (written only when
+                                    tables_as-published.md is present)
   figure_1_python.png, figure_*_published-sample_python.png,
-  figure_*_final-data_python.png    the six figures, from each data set
+  figure_*_final-data_python.png    the six figures: Figure 1 once, the other
+                                    five from each data set
 
 Sections, in order:
   1. The data and the two corrections it needs
@@ -38,14 +40,15 @@ Sections, in order:
 Run from this folder:  python3 script_replication.py
 Needs pandas, numpy, scipy, statsmodels, and matplotlib. Takes under a minute.
 
-Two things carried over from the 2014 Stata code on purpose. (1) The Stata code
-recodes by exact comparison (`married == .8`); here the values are rounded to
-the integer grid first, because 0.8 is stored as 0.7999... and an exact test
-matches no rows. (2) The interaction terms are built on Definition rescaled to
-0-1 (the Stata stored them under the unscaled names), and the Definition main
-effect is the rescaled variable in two of the six Table D1 regressions (Y_gov
-Model 1, Y_prog_tax Model 3) and the raw one in the other four. That is how the
-article's tables were estimated.
+Two things carried over from the 2014 Stata code on purpose:
+  - The Stata code recodes by exact comparison (`married == .8`). Here the
+    values are rounded to the integer grid first, because 0.8 is stored as
+    0.7999... and an exact test matches no rows.
+  - The interaction terms are built on Definition rescaled to 0-1 (the Stata
+    stored them under the unscaled names), and the Definition main effect is
+    the rescaled variable in two of the six Table D1 regressions (Y_gov
+    Model 1, Y_prog_tax Model 3) and the raw one in the other four. That is
+    how the article's tables were estimated.
 """
 import os
 import re
@@ -202,8 +205,8 @@ def design(sub, rhs, fe=True):
 def fit_table(dv, rhs, data):
     """One table regression: weighted least squares with state fixed effects and
     HC1 standard errors (Stata: areg ..., absorb(state) [pw=post_weight]).
-    Returns each predictor's coefficient, standard error and p-value, with N,
-    R2 and adjusted R2."""
+    Returns each predictor's coefficient, standard error, and p-value, with N,
+    R2, and adjusted R2."""
     sub = data[[dv] + rhs + ["post_weight", "state"]].dropna()
     X = design(sub, rhs)
     w = sub["post_weight"].astype(float)
@@ -355,7 +358,7 @@ PREAMBLE_FINAL = (
     "The same tables estimated on the 991 distinct respondents, without the duplicated row and "
     "with the survey weight corrected. Written by script_replication.R (tables_final_R.md) and "
     "script_replication.py (tables_final_python.md); the two files are identical. The last "
-    "section lists every cell that differs from the corrected tables as published."
+    "section lists every cell that differs from the corrected tables (tables_corrected_R.md)."
 )
 
 res, md = tables_md(d)
@@ -497,9 +500,10 @@ def draw_figures(d, sfx):
         )
         return r, sub
 
-    # the right-hand side of each plot regression: rescaled Definition, the
-    # justice measure and their product (the three deserve variables and their
-    # products entered together), and the controls
+    # the right-hand side of each plot regression: the first term (rescaled
+    # Definition for the D1 panels, the moderator for D2), the moderator and its
+    # product with rescaled Definition, and the controls; for the rich-deserve
+    # panels all three deserve variables and their products enter together
     def plot_rhs(first, zvar):
         block = DES_X if zvar == "desert_rich_tot" else [zvar, "x_" + zvar]
         return [first] + block + CTRL
@@ -601,7 +605,7 @@ open(OUT, "w", encoding="utf-8").write("\n".join(md) + "\n")
 
 # ---- 6. The final tables and the list of cells that change ------------------------
 # Same layout, 991 rows, followed by every regression cell whose coefficient,
-# standard error or stars differ from the as-published tables above.
+# standard error, or stars differ from the as-published tables above.
 
 def fmt(c):
     """A cell as printed: the coefficient with its stars, and the standard error."""
@@ -660,7 +664,9 @@ print(f"wrote {OUT} and the figures, figure_*_python.png")
 # ---- 7. Comparison with the printed tables -------------------------------------
 # Every cell of Tables 1, C1, C2, and D1 against tables_as-published.md, a
 # transcription of the printed article. Cells agree when they match to the
-# printed decimals; the tolerances below are half a unit in the last digit.
+# printed decimals; the tolerances below are half a unit in the last printed
+# digit, except adjusted R2, which is allowed 0.0004 because one printed
+# adjusted R2 sits 0.0002 from the re-estimate.
 
 PUB = "tables_as-published.md"
 if os.path.exists(PUB):

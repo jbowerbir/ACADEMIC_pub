@@ -28,7 +28,7 @@
 //   the tail                 console scratch
 //
 // Two things to know
-//   1. Lines 46-59 create variables named interact_*_scale but each `replace`
+//   1. Lines 93-106 below (46-59 of the file as run in 2014) create variables named interact_*_scale but each `replace`
 //      writes to the UNscaled name (interact_agency_def and so on). So every
 //      interaction term below is Z * corr_ideal_agency_scale, where
 //      corr_ideal_agency_scale = (corr_ideal_agency + 1)/2, while the main

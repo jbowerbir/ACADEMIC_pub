@@ -35,13 +35,15 @@
 # Run from this folder:  Rscript script_replication.R
 # Takes a few seconds.
 #
-# Three things carried over from the 2014 Stata code on purpose. (1) The data
-# file holds every scale rescaled to 0-1, including the dependent variable; the
-# article reports it on its -1 to 1 scale, so it is rescaled back. (2) The
-# variable named `neoliberal` runs from neoliberal (0) to anti-neoliberal (1);
-# the article's Neoliberal rows use it with its sign reversed, as do the four
-# items. (3) One respondent's record is in the file twice; every analysis
-# except Table 2 drops the second copy, as the published regressions did.
+# Three things carried over from the 2014 Stata code on purpose:
+#   1. The data file holds every scale rescaled to 0-1, including the dependent
+#      variable; the article reports it on its -1 to 1 scale, so it is rescaled
+#      back.
+#   2. The variable named `neoliberal` runs from neoliberal (0) to
+#      anti-neoliberal (1); the article's Neoliberal rows use it with its sign
+#      reversed, as do the four items.
+#   3. One respondent's record is in the file twice; every analysis except
+#      Table 2 drops the second copy, as the published regressions did.
 # =============================================================================
 
 
@@ -100,7 +102,7 @@ T4 <- list("Model A" = c("ideo_str", "religiosity"),
 ORDER <- c(FULL, "neoliberal_r", ITEMS, "const")
 
 
-# ---- 3. Tables 1 and 4 ------------------------------------------------------------
+# ---- 3. Tables 1 and 4: 15 weighted regressions ---------------------------------
 
 # Weighted least squares with Stata's `svy: reg` standard errors when only a
 # pweight is declared: the HC0 sandwich times n/(n-1), t with n-1 df.
@@ -324,7 +326,7 @@ final <- c("# Final tables: Bower-Bir (2021), Economia Politica 38(1): 131-170",
                   "respondents earning $25,000 to $29,999 in the group below $25,000). ",
                   "Table 2 counts the 991 distinct respondents; the article's counts ",
                   "include one respondent's duplicated record. The last section lists ",
-                  "every cell that differs from the tables as published ",
+                  "every cell that differs from the corrected tables ",
                   "(tables_corrected_R.md)."), "",
            f1$lines, "", f2, "", f4$lines, "", "## What changes",
            sprintf("Across the %d coefficients of Tables 1 and 4:", length(moves)), "",
@@ -382,7 +384,7 @@ cat(paste0("  ", diffs, "\n"), sep = "")
 
 
 
-# ---- 10. The figures ---------------------------------------------------------------
+# ---- 10. The figures, drawn last ---------------------------------------------------
 # Unweighted, on the 991 distinct respondents, as the published figures were
 # drawn. Each factor's two ratings are plotted on the same 0-1 width: control
 # from no control to total control, importance from very un-important to very
