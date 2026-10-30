@@ -12,7 +12,7 @@ Reads, from this folder:
                                at the end (skipped if the file is absent)
 
 Writes, to this folder:
-  tables_corrected_python.md        Tables 1, A1, C1, C2, D1, and the eight
+  tables_typos-fixed_python.md        Tables 1, A1, C1, C2, D1, and the eight
                                     regressions behind Figures D1 and D2, on
                                     the published sample (992 rows, 2014
                                     weight), with a list of every printed cell
@@ -21,7 +21,7 @@ Writes, to this folder:
                                     respondents with the survey weight
                                     corrected, ending with every cell that
                                     changes at the printed precision
-  tables_corrected-cells_python.md  the printed cells that differ from the
+  tables_typos-fixed-cells_python.md  the printed cells that differ from the
                                     re-run, one line each (written only when
                                     tables_as-published.md is present)
   figure_1_python.png, figure_*_published-sample_python.png,
@@ -65,7 +65,7 @@ import matplotlib.pyplot as plt
 
 # ---- 1. The data and the two corrections it needs ----------------------------
 
-OUT = "tables_corrected_python.md"
+OUT = "tables_typos-fixed_python.md"
 d = pd.read_csv("data_survey_psj-subset.csv")
 
 # One respondent's record is in the file twice (rows identical in every
@@ -350,19 +350,19 @@ assert np.abs(rake(d) - d["post_weight"].values).max() < 1e-4
 
 PREAMBLE_CORRECTED = (
     "The published tables with their typos corrected, estimated on the published sample of 992 "
-    "observations with the 2014 weight. Written by script_replication.R (tables_corrected_R.md) "
-    "and script_replication.py (tables_corrected_python.md); the two files are identical. The "
+    "observations with the 2014 weight. Written by script_replication.R (tables_typos-fixed_R.md) "
+    "and script_replication.py (tables_typos-fixed_python.md); the two files are identical. The "
     "last section lists every cell that differs from the published tables."
 )
 PREAMBLE_FINAL = (
     "The same tables estimated on the 991 distinct respondents, without the duplicated row and "
     "with the survey weight corrected. Written by script_replication.R (tables_final_R.md) and "
     "script_replication.py (tables_final_python.md); the two files are identical. The last "
-    "section lists every cell that differs from the corrected tables (tables_corrected_R.md)."
+    "section lists every cell that differs from the typos-fixed tables (tables_typos-fixed_R.md)."
 )
 
 res, md = tables_md(d)
-md = ["# Corrected tables", "", PREAMBLE_CORRECTED] + md
+md = ["# Tables with the typos fixed", "", PREAMBLE_CORRECTED] + md
 d991 = d[~dup_mask].reset_index(drop=True)
 d991["post_weight"] = rake(d991, income_cut=7)
 res_dedup, md_dedup = tables_md(d991)
@@ -747,12 +747,12 @@ if os.path.exists(PUB):
 
     # the same list as a file: the cell-by-cell record of the transcription
     # errors (stars escaped so a markdown viewer shows them)
-    open("tables_corrected-cells_python.md", "w", encoding="utf-8", newline="\n").write("\n".join(
+    open("tables_typos-fixed-cells_python.md", "w", encoding="utf-8", newline="\n").write("\n".join(
         ["# Cells where the printed tables differ from the re-run", "(992 observations)", "",
          "Each line: table | outcome | model | row: what was printed, what the re-run gives.", ""]
         + ["- " + m.replace("*", r"\*") for m in mism]) + "\n")
 
-    # and side by side at the end of the corrected tables: each printed cell
+    # and side by side at the end of the typos-fixed tables: each printed cell
     # beside its corrected value
     open(OUT, "a", encoding="utf-8", newline="\n").write("\n".join(
         ["", "## Cells that differ from the published tables",

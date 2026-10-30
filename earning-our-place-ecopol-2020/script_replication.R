@@ -11,7 +11,7 @@
 #   tables_as-published.md      the tables as printed, for the comparison
 #
 # Writes, to this folder:
-#   tables_corrected_R.md       Tables 1, 2, and 4, the numbers behind Figures
+#   tables_typos-fixed_R.md       Tables 1, 2, and 4, the numbers behind Figures
 #                               3 to 7, the survey-weight check, and a list of
 #                               every printed cell that differs from the re-run
 #   tables_final_R.md           Tables 1 and 4 re-estimated with the weight's
@@ -49,7 +49,7 @@
 
 # ---- 1. The data and the duplicated record -----------------------------------
 
-OUT <- "tables_corrected_R.md"
+OUT <- "tables_typos-fixed_R.md"
 PUB <- "tables_as-published.md"
 d992 <- read.csv("data_survey_ep-subset.csv")
 
@@ -148,8 +148,8 @@ regtable <- function(title, models, df, w = "post_weight") {
 }
 
 lines <- c("# Reproduced tables: Bower-Bir (2021), Economia Politica 38(1): 131-170", "",
-           paste0("Written by script_replication.R (tables_corrected_R.md) and ",
-                  "script_replication.py (tables_corrected_python.md); the two files are ",
+           paste0("Written by script_replication.R (tables_typos-fixed_R.md) and ",
+                  "script_replication.py (tables_typos-fixed_python.md); the two files are ",
                   "identical. Every regression and every figure statistic uses the 991 ",
                   "distinct respondents; Table 2 describes all 992 rows, as the article's ",
                   "does. The R2 row is the article's \"Adj-R2\" row: `svy: reg` reports ",
@@ -326,8 +326,8 @@ final <- c("# Final tables: Bower-Bir (2021), Economia Politica 38(1): 131-170",
                   "respondents earning $25,000 to $29,999 in the group below $25,000). ",
                   "Table 2 counts the 991 distinct respondents; the article's counts ",
                   "include one respondent's duplicated record. The last section lists ",
-                  "every cell that differs from the corrected tables ",
-                  "(tables_corrected_R.md)."), "",
+                  "every cell that differs from the typos-fixed tables ",
+                  "(tables_typos-fixed_R.md)."), "",
            f1$lines, "", f2, "", f4$lines, "", "## What changes",
            sprintf("Across the %d coefficients of Tables 1 and 4:", length(moves)), "",
            sprintf("- Coefficients that change sign: %d.", length(signs)), paste0("  - ", signs),
@@ -505,7 +505,7 @@ invisible(dev.off())
 
 # Figure 7, corrected: the index with its sign reversed, so that the right end is
 # neoliberal. The published figure plotted the index as stored and labeled its
-# right end neoliberal; see tables_corrected_R.md, Figure 7.
+# right end neoliberal; see tables_typos-fixed_R.md, Figure 7.
 png_open("figure_7_R.png", 1300, 800)
 par(mar = c(4.5, 4.5, 1, 1))
 nr <- -neo

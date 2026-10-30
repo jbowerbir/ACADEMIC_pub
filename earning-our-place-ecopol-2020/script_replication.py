@@ -12,13 +12,13 @@ Reads, from this folder:
   tables_as-published.md      the tables as printed, for the comparison
 
 Writes, to this folder:
-  tables_corrected_python.md  Tables 1, 2, and 4, the numbers behind Figures
+  tables_typos-fixed_python.md  Tables 1, 2, and 4, the numbers behind Figures
                               3 to 7, the survey-weight check, and a list of
                               every printed cell that differs from the re-run
   tables_final_python.md      Tables 1 and 4 re-estimated with the weight's
                               income line corrected, Table 2 on the 991
                               distinct respondents, and every cell that changes
-  (both identical to the R script's tables_corrected_R.md and tables_final_R.md)
+  (both identical to the R script's tables_typos-fixed_R.md and tables_final_R.md)
 
 Sections, in order:
   1. The data and the duplicated record
@@ -51,7 +51,7 @@ from scipy import stats
 
 # ---- 1. The data and the duplicated record -----------------------------------
 
-OUT = "tables_corrected_python.md"
+OUT = "tables_typos-fixed_python.md"
 PUB = "tables_as-published.md"
 d992 = pd.read_csv("data_survey_ep-subset.csv")
 
@@ -150,8 +150,8 @@ def regtable(title, models, df, w="post_weight"):
 
 
 lines = ["# Reproduced tables: Bower-Bir (2021), Economia Politica 38(1): 131-170", "",
-         "Written by script_replication.R (tables_corrected_R.md) and "
-         "script_replication.py (tables_corrected_python.md); the two files are "
+         "Written by script_replication.R (tables_typos-fixed_R.md) and "
+         "script_replication.py (tables_typos-fixed_python.md); the two files are "
          "identical. Every regression and every figure statistic uses the 991 "
          "distinct respondents; Table 2 describes all 992 rows, as the article's "
          "does. The R2 row is the article's \"Adj-R2\" row: `svy: reg` reports "
@@ -325,8 +325,8 @@ final = ["# Final tables: Bower-Bir (2021), Economia Politica 38(1): 131-170", "
          "respondents earning $25,000 to $29,999 in the group below $25,000). "
          "Table 2 counts the 991 distinct respondents; the article's counts "
          "include one respondent's duplicated record. The last section lists "
-         "every cell that differs from the corrected tables "
-         "(tables_corrected_R.md).", ""]
+         "every cell that differs from the typos-fixed tables "
+         "(tables_typos-fixed_R.md).", ""]
 final += f1 + [""] + f2 + [""] + f4
 final += ["", "## What changes",
           f"Across the {len(moves)} coefficients of Tables 1 and 4:", "",

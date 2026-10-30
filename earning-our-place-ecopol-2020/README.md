@@ -33,7 +33,7 @@ Files are named by what they are, then which version, then which program wrote t
 | File | What it is |
 |---|---|
 | `script_replication.R` | The analysis in R: Tables 1, 2, and 4, the numbers in Figures 3 to 7, the weight check, the final tables, and the seven figures. Writes every `_R` file below and the figures, then prints every cell where the printed tables differ. Base R only. |
-| `script_replication.py` | The same analysis in Python, without the figures. Writes `tables_corrected_python.md` and `tables_final_python.md`, identical to the R files. |
+| `script_replication.py` | The same analysis in Python, without the figures. Writes `tables_typos-fixed_python.md` and `tables_final_python.md`, identical to the R files. |
 | `script_original/` | The original code, as a record: the 2014 Stata analysis (`definitions_agency_ORIGINAL.do`, regressions; `factor-correlations_ORIGINAL.do`, the correlations behind Figures 3 to 6; `Appendices_demographics_ORIGINAL.do`, Table 2) and the 2018 R scripts that drew Figures 1 to 5. They read the full survey files, which are not included here. |
 
 ### Tables
@@ -41,8 +41,8 @@ Files are named by what they are, then which version, then which program wrote t
 | File | What it is |
 |---|---|
 | `tables_as-published.md` | Tables 1, 2, and 4 and the numbers printed in Figures 3, 4, and 6, and Section 5, copied cell by cell from the published PDF, stars included. |
-| `tables_corrected_R.md`, `tables_corrected_python.md` | Every table and figure statistic as the data give it, the weight check, and the eight cells that differ from the printed article, beside their published values. |
-| `tables_final_R.md`, `tables_final_python.md` | Tables 1 and 4 re-estimated with the corrected weight, Table 2 counted on the 991 distinct respondents, a summary of what moves, and every cell that differs from `tables_corrected_R.md`, beside its value there. These are the replacement tables offered to the journal. |
+| `tables_typos-fixed_R.md`, `tables_typos-fixed_python.md` | Every table and figure statistic as the data give it, the weight check, and the eight cells that differ from the printed article, beside their published values. |
+| `tables_final_R.md`, `tables_final_python.md` | Tables 1 and 4 re-estimated with the corrected weight, Table 2 counted on the 991 distinct respondents, a summary of what moves, and every cell that differs from `tables_typos-fixed_R.md`, beside its value there. These are the replacement tables offered to the journal. |
 
 ### Figures
 
@@ -54,9 +54,9 @@ Files are named by what they are, then which version, then which program wrote t
 
 Put the files in one folder. R needs base R only. Python needs pandas, numpy, and scipy.
 
-- `Rscript script_replication.R` writes `tables_corrected_R.md`, `tables_final_R.md`, and the seven figures, and prints the comparison with the published tables.
-- `python3 script_replication.py` writes `tables_corrected_python.md` and `tables_final_python.md` and prints the same comparison.
-- To check the two programs against each other, compare `tables_corrected_R.md` with `tables_corrected_python.md`, and `tables_final_R.md` with `tables_final_python.md`. They are identical.
+- `Rscript script_replication.R` writes `tables_typos-fixed_R.md`, `tables_final_R.md`, and the seven figures, and prints the comparison with the published tables.
+- `python3 script_replication.py` writes `tables_typos-fixed_python.md` and `tables_final_python.md` and prints the same comparison.
+- To check the two programs against each other, compare `tables_typos-fixed_R.md` with `tables_typos-fixed_python.md`, and `tables_final_R.md` with `tables_final_python.md`. They are identical.
 
 ## What is reproduced, and how closely
 

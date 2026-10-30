@@ -14,6 +14,9 @@
 // paths. Use script_replication.R or script_replication.py, which rewrite
 // every published model from this file and reproduce every printed cell.
 //
+// [2026] The log and use commands named files by their full Windows paths. The
+//        directories have been removed; only the file names are kept.
+//
 // Structure
 //   lines 1-106    variable construction (age squared, dummies, the collapsed
 //                  tax outcome, interaction terms); 1-59 before the annotations

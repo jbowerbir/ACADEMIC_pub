@@ -42,8 +42,8 @@ Files are named by what they are, then which version, then which program wrote t
 | File | What it is |
 |---|---|
 | `tables_as-published.md` | The four regression tables as printed in the article, copied cell by cell from the published PDF, stars included. |
-| `tables_corrected_R.md`, `tables_corrected_python.md`, `tables_corrected.pdf` | The four regression tables with the typos corrected, on the published 992 rows (duplicate included), plus Table A1 and the eight regressions behind Figures D1 and D2. Ends with the 22 corrected cells beside their published values. The PDF is a typeset reader copy of the R file. |
-| `tables_corrected-cells_R.md`, `tables_corrected-cells_python.md` | The 22 cells where the printed tables differ from the re-run, one line each: what was printed, what the re-run gives. |
+| `tables_typos-fixed_R.md`, `tables_typos-fixed_python.md`, `tables_typos-fixed.pdf` | The four regression tables with the typos corrected, on the published 992 rows (duplicate included), plus Table A1 and the eight regressions behind Figures D1 and D2. Ends with the 22 corrected cells beside their published values. The PDF is a typeset reader copy of the R file. |
+| `tables_typos-fixed-cells_R.md`, `tables_typos-fixed-cells_python.md` | The 22 cells where the printed tables differ from the re-run, one line each: what was printed, what the re-run gives. |
 | `tables_final_R.md`, `tables_final_python.md`, `tables_final.pdf` | The same tables estimated on the 991 distinct records, without the duplicated row and with the survey weight corrected, ending with a list of every cell that changes at the printed precision. These are the replacement tables offered to the journal. The PDF is a typeset reader copy of the R file. |
 
 ### Figures
@@ -64,9 +64,9 @@ Files are named by what they are, then which version, then which program wrote t
 
 Put the files in one folder. R needs base R only. Python needs pandas, numpy, scipy, statsmodels, and matplotlib.
 
-- `Rscript script_replication.R` writes `tables_corrected_R.md`, `tables_corrected-cells_R.md`, `tables_final_R.md`, Figure 1, and the other five figures from the published sample and again from the final data, and prints the comparison with the printed tables.
+- `Rscript script_replication.R` writes `tables_typos-fixed_R.md`, `tables_typos-fixed-cells_R.md`, `tables_final_R.md`, Figure 1, and the other five figures from the published sample and again from the final data, and prints the comparison with the printed tables.
 - `python3 script_replication.py` writes the same files with `_python` in place of `_R`, and prints the same comparison.
-- To check the two programs against each other, compare `tables_corrected_R.md` with `tables_corrected_python.md`, and `tables_final_R.md` with `tables_final_python.md`. They are identical.
+- To check the two programs against each other, compare `tables_typos-fixed_R.md` with `tables_typos-fixed_python.md`, and `tables_final_R.md` with `tables_final_python.md`. They are identical.
 
 ## What is reproduced, and how closely: the published sample (992 observations)
 
@@ -76,7 +76,7 @@ Put the files in one folder. R needs base R only. Python needs pandas, numpy, sc
 - **Figure 3** is drawn here with R's and Python's default smoothing. The printed figure is smoother because Stata drew it in 2014 with a wider smoothing bandwidth, and that setting was not recorded.
 - **Figure 4** drops the duplicated respondent record, as the published figure did. I found the duplicate while drawing that figure, in 2018, and dropped it there, but the regressions dated from 2014 and I failed to rerun them at the time.
 - **Figure 1** charts three percentages from the 2010 General Social Survey, not from this survey. The numbers are in the scripts.
-- **Figures D1, D2** match the printed panels. The marginal-effect lines and bands come from the eight regressions the 2014 plot code specifies (ordinary weighted regression without state effects, errors clustered by state). The article does not print those regressions, but the scripts nonetheless write them to `tables_corrected_R.md` and `tables_corrected_python.md`.
+- **Figures D1, D2** match the printed panels. The marginal-effect lines and bands come from the eight regressions the 2014 plot code specifies (ordinary weighted regression without state effects, errors clustered by state). The article does not print those regressions, but the scripts nonetheless write them to `tables_typos-fixed_R.md` and `tables_typos-fixed_python.md`.
 - **Figure B1**, the heat maps of Control against Ideal importance, is not in this article. It appears in the companion article, Bower-Bir (2021), *Economia Politica* 38(1): 131–170, https://doi.org/10.1007/s40888-020-00201-9, and is reproduced in that article's replication package.
 
 ## What changes with the two data fixes (991 observations, corrected weights)

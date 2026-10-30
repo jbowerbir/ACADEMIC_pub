@@ -1,6 +1,6 @@
 # Reproduced tables: Bower-Bir (2021), Economia Politica 38(1): 131-170
 
-Written by script_replication.R (tables_corrected_R.md) and script_replication.py (tables_corrected_python.md); the two files are identical. Every regression and every figure statistic uses the 991 distinct respondents; Table 2 describes all 992 rows, as the article's does. The R2 row is the article's "Adj-R2" row: `svy: reg` reports plain R2, and the printed values are that.
+Written by script_replication.R (tables_typos-fixed_R.md) and script_replication.py (tables_typos-fixed_python.md); the two files are identical. Every regression and every figure statistic uses the 991 distinct respondents; Table 2 describes all 992 rows, as the article's does. The R2 row is the article's "Adj-R2" row: `svy: reg` reports plain R2, and the printed values are that.
 
 ## Table 1
 | Variable | Model 1a | Model 2a | Model 3a | Model 1b | Model 2b | Model 3b |

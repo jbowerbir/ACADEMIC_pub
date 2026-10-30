@@ -12,7 +12,7 @@
 #                                the end (skipped if the file is absent)
 #
 # Writes, to this folder:
-#   tables_corrected_R.md        Tables 1, A1, C1, C2, D1, and the eight
+#   tables_typos-fixed_R.md        Tables 1, A1, C1, C2, D1, and the eight
 #                                regressions behind Figures D1 and D2, on the
 #                                published sample (992 rows, 2014 weight), with
 #                                a list of every printed cell that differs
@@ -21,7 +21,7 @@
 #                                respondents with the survey weight corrected,
 #                                ending with every cell that changes at the
 #                                printed precision
-#   tables_corrected-cells_R.md  the printed cells that differ from the re-run,
+#   tables_typos-fixed-cells_R.md  the printed cells that differ from the re-run,
 #                                one line each (written only when
 #                                tables_as-published.md is present)
 #   figure_1_R.png, figure_*_published-sample_R.png, figure_*_final-data_R.png
@@ -54,7 +54,7 @@
 
 # ---- 1. The data and the two corrections it needs ----------------------------
 
-OUT <- "tables_corrected_R.md"
+OUT <- "tables_typos-fixed_R.md"
 d   <- read.csv("data_survey_psj-subset.csv")
 
 # One respondent's record is in the file twice (rows identical in every
@@ -364,11 +364,11 @@ d991  <- d[-dup_row, ]
 d991$post_weight <- rake(d991, income_cut = 7)
 dedup <- tables_md(d991)
 res   <- full$res
-md    <- c("# Corrected tables", "",
+md    <- c("# Tables with the typos fixed", "",
            paste0("The published tables with their typos corrected, estimated on the ",
                   "published sample of 992 observations with the 2014 weight. Written by ",
-                  "script_replication.R (tables_corrected_R.md) and script_replication.py ",
-                  "(tables_corrected_python.md); the two files are identical. The last ",
+                  "script_replication.R (tables_typos-fixed_R.md) and script_replication.py ",
+                  "(tables_typos-fixed_python.md); the two files are identical. The last ",
                   "section lists every cell that differs from the published tables."),
            full$md)
 dedup$md <- c("# Final tables", "",
@@ -376,8 +376,8 @@ dedup$md <- c("# Final tables", "",
                      "the duplicated row and with the survey weight corrected. Written by ",
                      "script_replication.R (tables_final_R.md) and script_replication.py ",
                      "(tables_final_python.md); the two files are identical. The last ",
-                     "section lists every cell that differs from the corrected tables ",
-                     "(tables_corrected_R.md)."),
+                     "section lists every cell that differs from the typos-fixed tables ",
+                     "(tables_typos-fixed_R.md)."),
               dedup$md)
 
 
@@ -749,8 +749,8 @@ if (file.exists(PUB)) {
                paste("Each line: table | outcome | model | row: what was printed,",
                      "what the re-run gives."),
                "", paste0("- ", gsub("*", "\\*", mism, fixed = TRUE))),
-             "tables_corrected-cells_R.md")
-  # and side by side at the end of the corrected tables: each printed cell
+             "tables_typos-fixed-cells_R.md")
+  # and side by side at the end of the typos-fixed tables: each printed cell
   # beside its corrected value
   cat(c("", "## Cells that differ from the published tables",
         "| Table | Outcome | Model | Row | Published | Corrected |",
