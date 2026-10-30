@@ -8,14 +8,16 @@ This package replicates every table and figure in the article from the survey da
 
 The article's findings hold. Every regression reproduces: all fifteen models in Tables 1 and 4, with their sample sizes and R² values, and every count in Table 2. The re-run found one error of interpretation and a handful of copying slips:
 
-- **Neoliberals are a smaller minority than the article says.** The neoliberal index, as stored in the data, runs from neoliberal at its low end to anti-neoliberal at its high end. The regressions reverse it correctly, so every Neoliberal coefficient and every sentence interpreting them stands. Figure 7 and one sentence of Section 5, however, read the stored index the wrong way round. About 60% of respondents fall on the index's positive side, as the article says, but that is the anti-neoliberal side. The corrected shares: 32.5% lean neoliberal, 7.8% are neutral, 59.7% lean anti-neoliberal. A third of the sample is still a sizeable constituency, so the article's point that neoliberals are a substantial group of dissenters from the responsibility-desert link survives; the group is smaller than stated.
+- **Neoliberals are a smaller share of the population than the article says.** The neoliberal index, as stored in the data, runs from neoliberal at its low end to anti-neoliberal at its high end. The regressions reverse it correctly, so every Neoliberal coefficient and every sentence interpreting them stands. Figure 7 and one sentence of Section 5, however, read the stored index the wrong way round: They treat its positive side as neoliberal, when it is the anti-neoliberal side. The 60% the article calls neoliberal-leaning are the opposite. The corrected shares: 32.5% lean neoliberal, 7.8% are neutral, 59.7% lean anti-neoliberal. A third of the sample is still a sizeable constituency, so the article's point that neoliberals are a substantial group of dissenters from the responsibility-desert link survives; the group is smaller than stated.
 - **Copying slips.** Eight printed numbers differ from the re-run, most of them slips made when typing results into the manuscript. None touches a conclusion:
   - Table 1: two standard errors in Model 1b (Political party printed 0.0073 for 0.073; Female printed 0.023 for 0.027), and one significance star in Model 3b (Income, printed at the 1% level; its p-value is 0.0104, so it is significant at 5%).
   - Table 4: two standard errors off by one in the last digit (Model F, Neoliberal, 0.064 for 0.063; Model E, Constant, 0.035 for 0.036).
   - Figure 3: the correlations for health and state of the economy are swapped (0.32 and 0.33 for 0.33 and 0.32).
   - Figure 6: the mean correlation is 0.685, printed as 0.69.
 
-Two further things, found in the 2014 data cleaning rather than in the article. The survey weight's lowest income group ends at $30,000 instead of the intended $25,000, and one respondent's record is in the data twice. The regressions already exclude the duplicate; the article's sample count of 992, in Section 3.1 and Table 2, includes it. The final tables, re-weighted with the line where it belongs and counted on the 991 distinct respondents, change no finding; see [The survey weight](#the-survey-weight).
+Two further things, found in the 2014 data cleaning rather than in the article. The survey weight's lowest income group ends at $30,000 instead of the intended $25,000, and one respondent's record is in the data twice. The regressions already exclude the duplicate; the article's sample count of 992, in Section 3.1 and Table 2, includes it. The final tables, re-weighted with the $25,000 income line in the right place and counted on the 991 distinct respondents, change no finding; see [The survey weight](#the-survey-weight).
+
+To reproduce everything, run `Rscript script_replication.R` (tables and figures) or `python3 script_replication.py` (tables) in this folder.
 
 ## Files
 
@@ -60,7 +62,7 @@ Put the files in one folder. R needs base R only. Python needs pandas, numpy, an
 
 ## What is reproduced, and how closely
 
-- **Tables 1 and 4.** Every coefficient, standard error, N, and R² matches the printed value to the printed decimals, except the five cells listed in the Summary. The table rows labeled "Adj-R²" hold plain R², which is what Stata's `svy: regress` reports; every printed value matches R² to four decimals.
+- **Tables 1 and 4.** Every coefficient, standard error, N, and R² matches the printed value to the printed decimals, except the five regression cells listed in the Summary (the other three differing numbers are figure statistics). The table rows labeled "Adj-R²" hold plain R², which is what Stata's `svy: regress` reports; every printed value matches R² to four decimals.
 - **Table 2.** Every count matches.
 - **Figures 3 and 4.** All fifteen correlations in each figure match, except the swapped pair in Figure 3. Figure 4 merges the three "un-important" answers into one, leaving "neither important nor unimportant" separate; that is the reading that reproduces all fifteen of its values.
 - **Figure 5** places each factor at a distance from the center equal to the mean of its Figure 3 and Figure 4 correlations. Which quadrant a factor sits in is the author's reading of Figures 1 and 2, as the article says in its footnote 13, not a computed quantity; the script takes the quadrants from the article.

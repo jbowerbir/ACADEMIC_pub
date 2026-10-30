@@ -28,7 +28,7 @@ Files are named by what they are, then which version, then which program wrote t
 
 | File | What it is |
 |---|---|
-| `data_survey_psj-subset.csv` | The survey data: 992 respondents and the 27 variables the tables and figures use. No value was changed. The full survey is a separate deposit (see "The data"). |
+| `data_survey_psj-subset.csv` | The survey data: 992 respondents and the 27 variables the tables and figures use. No value was changed. The full survey is a separate deposit (see [The data](#the-data)). |
 | `data_codebook.md` | The 27 columns: question wording, answer options, coding and rescaling, and the label each has in the article. |
 
 ### Scripts
@@ -112,7 +112,7 @@ A codebook for the relevant subset of data is provided. Additional notes on data
 - `row` is the row number in the full survey file and the only column that identifies a respondent uniquely.
 - `id` is the vendor's respondent number, kept for matching to the full survey. Two things make it unreliable as a key:
   - 55 id values are each carried by two different respondents. The vendor's numbering collided within one fielding batch, and the pairs are different people (different ages, genders, and states). 
-  - One respondent's record is genuinely in the file twice, under ids 1115 and 1157, identical in every answer, so the 992 rows hold 991 people. The duplicate is kept because the published tables were estimated on all 992 rows; dropping it would change every estimate slightly. The one place the published analysis dropped it was Figure 4 (redrawn in 2018), and the scripts do the same there. Both scripts also estimate every table a second time on the 991 distinct records, with the weight corrected; see "What changes with the two data fixes" and `tables_final_R.md`.
+  - One respondent's record is genuinely in the file twice, under ids 1115 and 1157, identical in every answer, so the 992 rows hold 991 people. The duplicate is kept because the published tables were estimated on all 992 rows; dropping it would change every estimate slightly. The one place the published analysis dropped it was Figure 4 (redrawn in 2018), and the scripts do the same there. Both scripts also estimate every table a second time on the 991 distinct records, with the weight corrected; see [What changes with the two data fixes](#what-changes-with-the-two-data-fixes-991-observations-corrected-weights) and `tables_final_R.md`.
   - Use `row`, not `id`, to refer to a respondent.
 - `corr_ideal_agency` is missing for 29 respondents, so regressions that include it have N = 963 and regressions without it have N = 992 (or 962 and 991, respectively, in the final data).
 
