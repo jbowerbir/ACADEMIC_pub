@@ -340,10 +340,10 @@ areg gov_reducegap_str corr_ideal_agency desert_rich_tot interact_rich_def deser
 * **************************************************************** *;
 
 #delimit ;
-log using "C:\Users\jbowerbi\Documents\My Box Files\Research\Dissertation\Data and methods\Surveys\Survey\Analysis\interaction1.log", replace;
+log using "interaction1.log", replace;
 set more off;
 
-use "C:\Users\jbowerbi\Documents\My Box Files\Research\Dissertation\Data and methods\Surveys\Survey\Data\Working_interaction.dta";
+use "Working_interaction.dta";
 
 set obs 10000;
 
@@ -428,10 +428,10 @@ graph twoway hist agency_str, start(-.0208375) width(0.041675) percent color(gs1
 * **************************************************************** *;
 
 #delimit ;
-log using "C:\Users\jbowerbi\Documents\My Box Files\Research\Dissertation\Data and methods\Surveys\Survey\Analysis\interaction1.log", replace;
+log using "interaction1.log", replace;
 set more off;
 
-use "C:\Users\jbowerbi\Documents\My Box Files\Research\Dissertation\Data and methods\Surveys\Survey\Data\Working_interaction.dta";
+use "Working_interaction.dta";
 
 set obs 10000;
 
@@ -516,10 +516,10 @@ graph twoway hist agency_str, start(-.0208375) width(0.041675) percent color(gs1
 * **************************************************************** *;
 
 #delimit ;
-log using "C:\Users\jbowerbi\Documents\My Box Files\Research\Dissertation\Data and methods\Surveys\Survey\Analysis\interaction1.log", replace;
+log using "interaction1.log", replace;
 set more off;
 
-use "C:\Users\jbowerbi\Documents\My Box Files\Research\Dissertation\Data and methods\Surveys\Survey\Data\Working_interaction.dta";
+use "Working_interaction.dta";
 
 set obs 10000;
 
@@ -604,10 +604,10 @@ graph twoway hist justice_str, start(-.0208375) width(0.041675) percent color(gs
 * **************************************************************** *;
 
 #delimit ;
-log using "C:\Users\jbowerbi\Documents\My Box Files\Research\Dissertation\Data and methods\Surveys\Survey\Analysis\interaction1.log", replace;
+log using "interaction1.log", replace;
 set more off;
 
-use "C:\Users\jbowerbi\Documents\My Box Files\Research\Dissertation\Data and methods\Surveys\Survey\Data\Working_interaction.dta";
+use "Working_interaction.dta";
 
 set obs 10000;
 
@@ -696,10 +696,10 @@ graph twoway hist desert_rich_tot, start(-.0208333333) width(0.0416666667) perce
 * **************************************************************** *;
 
 #delimit ;
-log using "C:\Users\jbowerbi\Documents\My Box Files\Research\Dissertation\Data and methods\Surveys\Survey\Analysis\interaction1.log", replace;
+log using "interaction1.log", replace;
 set more off;
 
-use "C:\Users\jbowerbi\Documents\My Box Files\Research\Dissertation\Data and methods\Surveys\Survey\Data\Working_interaction.dta";
+use "Working_interaction.dta";
 
 set obs 10000;
 
@@ -785,10 +785,10 @@ graph twoway hist corr_ideal_agency, width(0.01) percent color(gs14) yaxis(2)
 * **************************************************************** *;
 
 #delimit ;
-log using "C:\Users\jbowerbi\Documents\My Box Files\Research\Dissertation\Data and methods\Surveys\Survey\Analysis\interaction1.log", replace;
+log using "interaction1.log", replace;
 set more off;
 
-use "C:\Users\jbowerbi\Documents\My Box Files\Research\Dissertation\Data and methods\Surveys\Survey\Data\Working_interaction.dta";
+use "Working_interaction.dta";
 
 set obs 10000;
 
@@ -875,10 +875,10 @@ graph twoway hist corr_ideal_agency, width(0.01) percent color(gs14) yaxis(2)
 * **************************************************************** *;
 
 #delimit ;
-log using "C:\Users\jbowerbi\Documents\My Box Files\Research\Dissertation\Data and methods\Surveys\Survey\Analysis\interaction1.log", replace;
+log using "interaction1.log", replace;
 set more off;
 
-use "C:\Users\jbowerbi\Documents\My Box Files\Research\Dissertation\Data and methods\Surveys\Survey\Data\Working_interaction.dta";
+use "Working_interaction.dta";
 
 set obs 10000;
 
@@ -965,10 +965,10 @@ graph twoway hist corr_ideal_agency, width(0.01) percent color(gs14) yaxis(2)
 * **************************************************************** *;
 
 #delimit ;
-log using "C:\Users\jbowerbi\Documents\My Box Files\Research\Dissertation\Data and methods\Surveys\Survey\Analysis\interaction1.log", replace;
+log using "interaction1.log", replace;
 set more off;
 
-use "C:\Users\jbowerbi\Documents\My Box Files\Research\Dissertation\Data and methods\Surveys\Survey\Data\Working_interaction.dta";
+use "Working_interaction.dta";
 
 set obs 10000;
 
