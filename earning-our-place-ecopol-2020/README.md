@@ -15,7 +15,7 @@ The article's findings hold. Every regression reproduces: all fifteen models in 
   - Figure 3: the correlations for health and state of the economy are swapped (0.32 and 0.33 for 0.33 and 0.32).
   - Figure 6: the mean correlation is 0.685, printed as 0.69.
 
-Two further things, found in the 2014 data cleaning rather than in the article. The survey weight's lowest income group ends at $30,000 instead of the intended $25,000, and one respondent's record is in the data twice. The regressions already exclude the duplicate; the article's sample count of 992, in Section 3.1 and Table 2, includes it. The final tables, re-weighted with the $25,000 income line in the right place and counted on the 991 distinct respondents, change no finding; see [The survey weight](#the-survey-weight).
+Two further things, found in the 2014 data cleaning rather than in the article. The survey weight's lowest income group ends at $30,000 instead of the intended $25,000, and one respondent's record is in the data twice. The regressions already exclude the duplicate; the article's sample count of 992, in Section 3.1 and Table 2, includes it. The final tables, re-weighted with the $25,000 income line in the right place and counted on the 991 distinct respondents, change no finding, though ideology gains significance in two models; see [The survey weight](#the-survey-weight).
 
 To reproduce everything, run `Rscript script_replication.R` (tables and figures) or `python3 script_replication.py` (tables) in this folder.
 
@@ -27,7 +27,7 @@ Files are named by what they are, then which version, then which program wrote t
 
 | File | What it is |
 |---|---|
-| `data_survey_ep-subset.csv` | The survey data: 992 respondents and the 54 variables the tables and figures use. No value was changed. The full survey is a separate deposit (see [The data](#the-data)). |
+| `data_survey_ep-subset.csv` | The survey data: 992 respondents and 54 columns, two identifiers and the 52 variables the tables and figures use. No value was changed. The full survey is a separate deposit (see [The data](#the-data)). |
 | `data_codebook.md` | The 54 columns: question wording, answer options, coding and rescaling, and the label each has in the article. |
 
 ### Scripts
@@ -81,7 +81,7 @@ Both programs re-rake the weight with the line at $25,000 and re-estimate Tables
 
 - No coefficient that is significant at any level changes sign. Five change sign, all within 0.014 of zero and none significant.
 - The largest change in any coefficient is 0.022 (0.023 at the printed precision, Theology in Table 4 Model B).
-- The neoliberal index stays significant at the 1% level in every model, and three of its four statements keep their signs (Profits, in Model 1b, moves from 0.011 to −0.000); Self help rises from the 10% level to the 5% level in all three models that enter it.
+- The neoliberal index stays significant at the 1% level in every model, and three of its four statements keep their signs (Profits, in Model 1b, moves from 0.011 to −0.000); Self help rises from the 10% level to the 5% level in all four models that enter it.
 - Sixteen significance stars move by one level, eleven up and five down. Income rises a level in Models 1a, 3a, and 3b and in Table 4 Models D and I; Age falls a level in Models 1a and 2a and stays significant, and in Table 4 Model I falls from the 10% level to none.
 - Ideology becomes significant at the 5% level in Model 1a (printed at 10%) and at the 10% level in Model 1b (printed as not significant). It stays insignificant in Model 2a and on its own in Table 4, Model A. The article's statement that ideology has no discernible influence therefore holds less firmly in the full models than the printed tables suggest.
 
@@ -95,7 +95,7 @@ SocialSci, an online survey panel company, fielded my Economic Justice Survey (v
 - `id` is the vendor's respondent number, kept for matching to the full survey. It is unreliable as a key:
   - 55 id values are each carried by two different respondents, because the vendor's numbering collided within one fielding batch.
   - One respondent's record is in the file twice, under ids 1115 and 1157, identical in every answer, so the 992 rows hold 991 people. The published regressions and figures leave out the second copy, and the scripts do the same. The 2018 figure code removes it explicitly; the 2014 regression code does not show where it was dropped, but only dropping that record reproduces the published sample sizes and R² values. The article's count of 992 respondents, in Section 3.1 and Table 2, includes the second copy; `tables_final_R.md` gives Table 2 on the 991.
-- `corr_ideal_agency`, the dependent variable, is missing for 29 respondents, so Table 1's models have N = 953. Models 1a and 1b also include theology, which only respondents who identify with a religion were asked, and have N = 671.
+- `corr_ideal_agency`, the dependent variable, is missing for 29 respondents, so Table 1's models have N = 953 (the 29, plus nine respondents missing one of the other predictors). Models 1a and 1b also include theology, which only respondents who identify with a religion were asked, and have N = 671.
 
 ## The regressions
 

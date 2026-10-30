@@ -336,9 +336,9 @@ final += [f"- Largest change in a coefficient: {max(moves):.3f}.",
           f"- Significance stars that change: {len(starmoves)}, {up} up and {len(starmoves) - up} down."]
 final += [f"  - {x}" for x in starmoves]
 final += ["", "## Cells that change",
-          "As published: the 2014 weight; Table 2 on all 992 rows. "
+          "Typos fixed: the 2014 weight; Table 2 on all 992 rows. "
           "Final: the corrected weight; Table 2 on the 991 distinct respondents.", "",
-          "| Table | Model | Row | As published | Final |", "|---|---|---|---|---|"]
+          "| Table | Model | Row | Typos fixed | Final |", "|---|---|---|---|---|"]
 final += changes
 open("tables_final_python.md", "w", encoding="utf-8", newline="\n").write("\n".join(final) + "\n")
 print(f"wrote tables_final_python.md: {len(changes)} cells change at the printed precision")

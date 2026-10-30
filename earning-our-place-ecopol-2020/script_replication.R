@@ -335,8 +335,8 @@ final <- c("# Final tables: Bower-Bir (2021), Economia Politica 38(1): 131-170",
            sprintf("- Significance stars that change: %d, %d up and %d down.", length(starmoves), up, length(starmoves) - up),
            paste0("  - ", starmoves),
            "", "## Cells that change",
-           "As published: the 2014 weight; Table 2 on all 992 rows. Final: the corrected weight; Table 2 on the 991 distinct respondents.", "",
-           "| Table | Model | Row | As published | Final |", "|---|---|---|---|---|", changes)
+           "Typos fixed: the 2014 weight; Table 2 on all 992 rows. Final: the corrected weight; Table 2 on the 991 distinct respondents.", "",
+           "| Table | Model | Row | Typos fixed | Final |", "|---|---|---|---|---|", changes)
 writeLines(final, "tables_final_R.md", useBytes = TRUE)
 cat(sprintf("wrote tables_final_R.md: %d cells change at the printed precision\n", length(changes)))
 

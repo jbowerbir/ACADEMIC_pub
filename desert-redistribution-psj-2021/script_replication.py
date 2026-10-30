@@ -602,7 +602,7 @@ open(OUT, "w", encoding="utf-8", newline="\n").write("\n".join(md) + "\n")
 
 # ---- 6. The final tables and the list of cells that change ------------------------
 # Same layout, 991 rows, followed by every regression cell whose coefficient,
-# standard error, or stars differ from the as-published tables above.
+# standard error, or stars differ from the typos-fixed tables above.
 
 def fmt(c):
     """A cell as printed: the coefficient with its stars, and the standard error."""
@@ -645,9 +645,9 @@ for (g, n1, s1), (_, n2, s2) in zip(a1_before, a1_after):
 
 dd = md_dedup + [
     "", "## Cells that change with the two data fixes",
-    "As published: 992 rows, the 2014 weight. Final: 991 rows, the duplicate removed, the weight corrected.",
+    "Typos fixed: 992 rows, the 2014 weight. Final: 991 rows, the duplicate removed, the weight corrected.",
     "",
-    "| Table | Outcome | Model | Row | As published | Final |",
+    "| Table | Outcome | Model | Row | Typos fixed | Final |",
     "|---|---|---|---|---|---|",
 ] + changes
 open("tables_final_python.md", "w", encoding="utf-8", newline="\n").write("\n".join(dd) + "\n")

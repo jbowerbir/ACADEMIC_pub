@@ -582,7 +582,7 @@ writeLines(md, OUT)
 
 # ---- 6. The final tables and the list of cells that change ------------------------
 # Same layout, 991 rows, followed by every regression cell whose coefficient,
-# standard error, or stars differ from the as-published tables above.
+# standard error, or stars differ from the typos-fixed tables above.
 # a cell as printed: the coefficient with its stars, and the standard error
 fmt <- function(c) {
   c(sprintf("%.3f%s", c[1], stars(c[3])), sprintf("(%.3f)", c[2]))
@@ -626,8 +626,8 @@ for (x in Map(list, a1_rows(full$md), a1_rows(dedup$md))) {
 }
 dd <- c(dedup$md, "",
         "## Cells that change with the two data fixes",
-        "As published: 992 rows, the 2014 weight. Final: 991 rows, the duplicate removed, the weight corrected.", "",
-        "| Table | Outcome | Model | Row | As published | Final |",
+        "Typos fixed: 992 rows, the 2014 weight. Final: 991 rows, the duplicate removed, the weight corrected.", "",
+        "| Table | Outcome | Model | Row | Typos fixed | Final |",
         "|---|---|---|---|---|---|", changes)
 writeLines(dd, "tables_final_R.md")
 ncells <- sum(sapply(res, function(r) length(r$est$cells)))

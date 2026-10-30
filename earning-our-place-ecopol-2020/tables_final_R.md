@@ -145,9 +145,9 @@ Across the 93 coefficients of Tables 1 and 4:
   - Table 4, Model I, Age: * to none (p = 0.083 to 0.147)
 
 ## Cells that change
-As published: the 2014 weight; Table 2 on all 992 rows. Final: the corrected weight; Table 2 on the 991 distinct respondents.
+Typos fixed: the 2014 weight; Table 2 on all 992 rows. Final: the corrected weight; Table 2 on the 991 distinct respondents.
 
-| Table | Model | Row | As published | Final |
+| Table | Model | Row | Typos fixed | Final |
 |---|---|---|---|---|
 | Table 1 | Model 1a | Ideology | -0.166* (0.093) | -0.178** (0.085) |
 | Table 1 | Model 1a | Political party | 0.007 (0.071) | 0.016 (0.066) |

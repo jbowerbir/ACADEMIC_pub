@@ -346,9 +346,9 @@ The same tables estimated on the 991 distinct respondents, without the duplicate
 | D2(d) Z_agency given X, on Y_prog_tax | progtaxes2_str | agency_str | 1.912 | 0.576 | -2.275 | 0.624 | 962 |
 
 ## Cells that change with the two data fixes
-As published: 992 rows, the 2014 weight. Final: 991 rows, the duplicate removed, the weight corrected.
+Typos fixed: 992 rows, the 2014 weight. Final: 991 rows, the duplicate removed, the weight corrected.
 
-| Table | Outcome | Model | Row | As published | Final |
+| Table | Outcome | Model | Row | Typos fixed | Final |
 |---|---|---|---|---|---|
 | Table 1 | Y_gov_fix_gap | Model 1 | Definition | -0.382*** (0.148) | -0.350** (0.139) |
 | Table 1 | Y_gov_fix_gap | Model 1 | Agency | -0.215*** (0.051) | -0.216*** (0.049) |
