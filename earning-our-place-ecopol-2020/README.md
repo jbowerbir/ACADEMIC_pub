@@ -26,7 +26,7 @@ Files are named by what they are, then which version, then which program wrote t
 | File | What it is |
 |---|---|
 | `data_survey_ep-subset.csv` | The survey data: 992 respondents and the 54 variables the tables and figures use. No value was changed. The full survey is a separate deposit (see [The data](#the-data)). |
-| `data_codebook.md` | The 54 columns: question wording, answer options, coding, and rescaling, and the label each has in the article. |
+| `data_codebook.md` | The 54 columns: question wording, answer options, coding and rescaling, and the label each has in the article. |
 
 ### Scripts
 

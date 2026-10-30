@@ -21,9 +21,6 @@
 #                                respondents with the survey weight corrected,
 #                                ending with every cell that changes at the
 #                                printed precision
-#   tables_typos-fixed-cells_R.md  the printed cells that differ from the re-run,
-#                                one line each (written only when
-#                                tables_as-published.md is present)
 #   figure_1_R.png, figure_*_published-sample_R.png, figure_*_final-data_R.png
 #                                the six figures: Figure 1 once, the other
 #                                five from each data set
@@ -742,16 +739,8 @@ if (file.exists(PUB)) {
                 length(mism)), "\n")
     cat(paste0("  ", mism, "\n"), sep = "")
   }
-  # the same list as a file: the cell-by-cell record of the errors
-  # (stars escaped so a markdown viewer shows them)
-  writeLines(c("# Cells where the printed tables differ from the re-run",
-               "(992 observations)", "",
-               paste("Each line: table | outcome | model | row: what was printed,",
-                     "what the re-run gives."),
-               "", paste0("- ", gsub("*", "\\*", mism, fixed = TRUE))),
-             "tables_typos-fixed-cells_R.md")
-  # and side by side at the end of the typos-fixed tables: each printed cell
-  # beside its corrected value
+  # the same list, side by side at the end of the typos-fixed tables: each
+  # printed cell beside its corrected value
   cat(c("", "## Cells that differ from the published tables",
         "| Table | Outcome | Model | Row | Published | Corrected |",
         "|---|---|---|---|---|---|", side), file = OUT, sep = "\n", append = TRUE)

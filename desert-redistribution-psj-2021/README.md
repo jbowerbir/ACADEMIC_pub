@@ -6,7 +6,7 @@ Bower-Bir, J. S. (2022). Desert and redistribution: Justice as a remedy for, and
 
 This package allows users to replicate every table and figure in the article using the provided survey data. In addition to the original Stata script used to analyze the data---included in this package---I translated the analysis into R and Python, and expanded the analysis to compare the tables it produces with the published tables. The R and Python scripts produce identical output, and both reproduce the results the Stata code gave in 2014. I found, however, a few typos in the published tables, none of which alter the paper’s conclusions. Below is a summary of discrepancies between the verified output and the published tables:
 
-- Twenty-two published cells (a cell being a printed coefficient with its standard error) differ from the re-run, all copying errors I made when typing the tables into the manuscript: mostly digits mistyped or transposed, a decimal point in the wrong place, significance stars off by a level (in one case two), plus three dropped minus signs. Four of those are in Table 1, the most visible on Definition, where the text already states the correct, negative coefficient. Correcting these typos does not contradict the published prose.
+- Twenty-two published cells differ from the re-run, all copying errors I made when typing the tables into the manuscript: mostly digits mistyped or transposed, a decimal point in the wrong place, significance stars off by a level (in one case two), plus three dropped minus signs. Four of those are in Table 1, the most visible on Definition, where the text already states the correct, negative coefficient. Correcting these typos does not contradict the published prose.
 - One sentence of the published text misreads a coefficient sign. The coefficient on Age² is so small that it prints as 0.000. The offending sentence in the article calls it positive when it is negative, such that support for government action to reduce the income gap (Y_gov_fix_gap) rises with age into the late thirties and then falls rather than accelerating.
 
 In the course of re-engaging with the data, I also found two errors in my 2014 data cleaning. First, a duplicate row. One respondent’s submission appears twice in the dataset provided by the online survey panel vendor, under two different survey ids. My 2014 cleaning removed all other duplicates in the delivered data but missed this one. Second, a weighting error. My original weighting script put the 54 respondents earning $25,000 to $29,999 per year in the under-$25,000 income group, one bracket off. Every table has been re-estimated on the 991 distinct observations, rather than the original 992, with the weights recomputed with every respondent in the correct income group; I call this the final data below. The figures have also been redrawn from it, though they are essentially the same as the published ones. As before, nothing contradicts the published conclusions or the prose. A summary of the changes:
@@ -29,7 +29,7 @@ Files are named by what they are, then which version, then which program wrote t
 | File | What it is |
 |---|---|
 | `data_survey_psj-subset.csv` | The survey data: 992 respondents and the 27 variables the tables and figures use. No value was changed. The full survey is a separate deposit (see "The data"). |
-| `data_codebook.md` | The 27 columns: question wording, answer options, coding, and rescaling, and the label each has in the article. |
+| `data_codebook.md` | The 27 columns: question wording, answer options, coding and rescaling, and the label each has in the article. |
 
 ### Scripts
 
@@ -45,7 +45,6 @@ Files are named by what they are, then which version, then which program wrote t
 |---|---|
 | `tables_as-published.md` | The four regression tables as printed in the article, copied cell by cell from the published PDF, stars included. |
 | `tables_typos-fixed_R.md`, `tables_typos-fixed_python.md`, `tables_typos-fixed.pdf` | The four regression tables with the typos corrected, on the published 992 rows (duplicate included), plus Table A1 and the eight regressions behind Figures D1 and D2. Ends with the 22 corrected cells beside their published values. The PDF is a typeset reader copy of the R file. |
-| `tables_typos-fixed-cells_R.md`, `tables_typos-fixed-cells_python.md` | The 22 cells where the printed tables differ from the re-run, one line each: what was printed, what the re-run gives. |
 | `tables_final_R.md`, `tables_final_python.md`, `tables_final.pdf` | The same tables estimated on the 991 distinct records, without the duplicated row and with the survey weight corrected, ending with a list of every cell that changes at the printed precision. These are the replacement tables offered to the journal. The PDF is a typeset reader copy of the R file. |
 
 ### Figures
@@ -66,13 +65,13 @@ Files are named by what they are, then which version, then which program wrote t
 
 Put the files in one folder. R needs base R only. Python needs pandas, numpy, scipy, statsmodels, and matplotlib.
 
-- `Rscript script_replication.R` writes `tables_typos-fixed_R.md`, `tables_typos-fixed-cells_R.md`, `tables_final_R.md`, Figure 1, and the other five figures from the published sample and again from the final data, and prints the comparison with the printed tables.
+- `Rscript script_replication.R` writes `tables_typos-fixed_R.md`, `tables_final_R.md`, and the figures, and prints the comparison with the printed tables.
 - `python3 script_replication.py` writes the same files with `_python` in place of `_R`, and prints the same comparison.
 - To check the two programs against each other, compare `tables_typos-fixed_R.md` with `tables_typos-fixed_python.md`, and `tables_final_R.md` with `tables_final_python.md`. They are identical.
 
 ## What is reproduced, and how closely: the published sample (992 observations)
 
-- **Tables 1, C1, C2, D1.** Every coefficient, standard error, N, R², and adjusted R² matches the printed value to the printed decimals, except the 22 corrected cells. The constant's standard error is an approximation of Stata's and is not compared.
+- **Tables 1, C1, C2, D1.** Every coefficient, standard error, N, R², and adjusted R² matches the printed value to the printed decimals, except the 22 corrected cells (a cell is a coefficient with its standard error). The constant's standard error is an approximation of Stata's and is not compared.
 - **Table A1**, the sample's composition by gender, race, education, and so on: every group count and share matches.
 - **Figure 2** matches the printed figure: the same curves, the same heights.
 - **Figure 3** is drawn here with R's and Python's default smoothing. The printed figure is smoother because Stata drew it in 2014 with a wider smoothing bandwidth, and that setting was not recorded.
@@ -88,7 +87,7 @@ Put the files in one folder. R needs base R only. Python needs pandas, numpy, sc
 - Coefficients move by a few hundredths of a unit.
   - In Table 1 the largest move is on Definition in Y_gov_fix_gap Model 3, from −0.518 to −0.471. Its other two Y_gov_fix_gap coefficients fall by about 0.03.
   - Agency, Justice, Rich deserve, Avg. deserve, and Poor deserve move by 0.016 or less.
-  - The largest moves anywhere are up to 0.15, on the two Poor deserve terms of Table D1, Y_prog_tax Model 3, whose standard errors are 0.8 to 0.9 and which were not significant before and are not now.
+  - The largest moves anywhere, up to 0.15, are on the two Poor deserve terms of Table D1, Y_prog_tax Model 3, whose standard errors are 0.8 to 0.9 and which were not significant before and are not now.
 - Twenty-eight coefficients whose p-values sit near a significance threshold cross it, so their stars change: twenty-four increasing in statistical significance and four decreasing; three constants do the same. Six cross the 5% line, five of them gaining in significance.
   - Six of the twenty-eight affected coefficients are on Definition, Agency, Rich deserve, or Poor deserve; the other twenty-two are on control variables, of which seventeen gain or lose significance at the 10% level, and five move between the 10% and 5% levels.
   - Definition, in Table 1, Y_gov_fix_gap Model 1, drops from the 1% significance level to the 5% level (p = 0.0099 to 0.012) and stays at 1% in the other two Y_gov_fix_gap models. In Table D1, Y_gov_fix_gap Model 1, its main effect (as opposed to its interaction effect) gains a star (p = 0.108 to 0.062).
@@ -113,7 +112,7 @@ A codebook for the relevant subset of data is provided. Additional notes on data
 - `row` is the row number in the full survey file and the only column that identifies a respondent uniquely.
 - `id` is the vendor's respondent number, kept for matching to the full survey. Two things make it unreliable as a key:
   - 55 id values are each carried by two different respondents. The vendor's numbering collided within one fielding batch, and the pairs are different people (different ages, genders, and states). 
-  - One respondent's record is genuinely in the file twice, under ids 1115 and 1157, identical in every answer, so the 992 rows hold 991 people. The duplicate is kept because the published tables were estimated on all 992 rows; dropping it would change every estimate slightly. The one place the 2014 analysis dropped it was Figure 4, and the scripts do the same there. Both scripts also estimate every table a second time on the 991 distinct records, with the weight corrected; see "What changes with the two data fixes" and `tables_final_R.md`.
+  - One respondent's record is genuinely in the file twice, under ids 1115 and 1157, identical in every answer, so the 992 rows hold 991 people. The duplicate is kept because the published tables were estimated on all 992 rows; dropping it would change every estimate slightly. The one place the published analysis dropped it was Figure 4 (redrawn in 2018), and the scripts do the same there. Both scripts also estimate every table a second time on the 991 distinct records, with the weight corrected; see "What changes with the two data fixes" and `tables_final_R.md`.
   - Use `row`, not `id`, to refer to a respondent.
 - `corr_ideal_agency` is missing for 29 respondents, so regressions that include it have N = 963 and regressions without it have N = 992 (or 962 and 991, respectively, in the final data).
 
@@ -130,7 +129,7 @@ Every regression in the tables is one Stata command, `areg <outcome> <predictors
 
 **Testing decimals for equality.** The 2014 code recodes variables by exact comparison (`if married == .8`, `if progtaxes2_str == 4`). That works in Stata. In R or Python it silently matches no rows, because the stored values are 0.7999… and 3.9999…; the tax outcome is then wrong and every coefficient moves by about 0.03, with no error. Round to the nearest integer first. Both scripts do.
 
-**The interaction terms.** Lines 93–106 of `script_original_stata-2014.do` (lines 46–59 of the file as run in 2014, before the annotations) build the interaction variables from Definition rescaled to 0 to 1 but store them under the unscaled names. So every interaction term in Table D1 uses the rescaled Definition, and in two of the six D1 regressions (Y_gov_fix_gap Model 1, Y_prog_tax Model 3) the Definition variable itself is also the rescaled one. The fit is identical either way; only the printed coefficients differ, by a factor of two. The scripts reproduce what the article printed. Build the interactions from the unscaled Definition and you will get coefficients half as large and conclude, wrongly, that the table is wrong.
+**The interaction terms.** Lines 93–106 of `script_original_stata-2014.do` (lines 46–59 before the 2026 annotations were added) build the interaction variables from Definition rescaled to 0 to 1 but store them under the unscaled names. So every interaction term in Table D1 uses the rescaled Definition, and in two of the six D1 regressions (Y_gov_fix_gap Model 1, Y_prog_tax Model 3) the Definition variable itself is also the rescaled one. The fit is identical either way; only the printed coefficients differ, by a factor of two. The scripts reproduce what the article printed. Build the interactions from the unscaled Definition and you will get coefficients half as large and conclude, wrongly, that the table is wrong.
 
 Each of these fails silently: you get plausible numbers, not an error.
 

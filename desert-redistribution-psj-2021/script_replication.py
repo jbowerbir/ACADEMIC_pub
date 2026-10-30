@@ -21,9 +21,6 @@ Writes, to this folder:
                                     respondents with the survey weight
                                     corrected, ending with every cell that
                                     changes at the printed precision
-  tables_typos-fixed-cells_python.md  the printed cells that differ from the
-                                    re-run, one line each (written only when
-                                    tables_as-published.md is present)
   figure_1_python.png, figure_*_published-sample_python.png,
   figure_*_final-data_python.png    the six figures: Figure 1 once, the other
                                     five from each data set
@@ -745,15 +742,8 @@ if os.path.exists(PUB):
         for m in mism:
             print("  " + m)
 
-    # the same list as a file: the cell-by-cell record of the transcription
-    # errors (stars escaped so a markdown viewer shows them)
-    open("tables_typos-fixed-cells_python.md", "w", encoding="utf-8", newline="\n").write("\n".join(
-        ["# Cells where the printed tables differ from the re-run", "(992 observations)", "",
-         "Each line: table | outcome | model | row: what was printed, what the re-run gives.", ""]
-        + ["- " + m.replace("*", r"\*") for m in mism]) + "\n")
-
-    # and side by side at the end of the typos-fixed tables: each printed cell
-    # beside its corrected value
+    # the same list, side by side at the end of the typos-fixed tables: each
+    # printed cell beside its corrected value
     open(OUT, "a", encoding="utf-8", newline="\n").write("\n".join(
         ["", "## Cells that differ from the published tables",
          "| Table | Outcome | Model | Row | Published | Corrected |",
