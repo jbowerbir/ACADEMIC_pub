@@ -11,12 +11,12 @@
 //
 // This file is not the way to reproduce the tables. It reads a Stata dataset
 // that is not part of this package, and its plot blocks reference 2014 local
-// paths. Use replicate_all_tables.R or replicate_all_tables.py, which rewrite
+// paths. Use script_replication.R or script_replication.py, which rewrite
 // every published model from this file and reproduce every printed cell.
 //
 // Structure
-//   lines 1-59     variable construction (age squared, dummies, the collapsed
-//                  tax outcome, interaction terms)
+//   lines 1-106    variable construction (age squared, dummies, the collapsed
+//                  tax outcome, interaction terms); 1-59 before the annotations
 //   "BELIEF IN JUSTICE"      perceived justice without Definition: Table C1,
 //                            plus unpublished variants
 //   "DEFINITION OF JUSTICE"  Definition with each Z: Table 1 and Table C1

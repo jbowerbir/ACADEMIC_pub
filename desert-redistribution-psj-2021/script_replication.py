@@ -463,7 +463,7 @@ def draw_figures(d, sfx):
     save(fig, f"figure_3{sfx}_python.png")
 
     # Figure 4: share of respondents in each cell of (rich deserve their wealth)
-    # x (income differences are too large). The 2014 figure dropped the
+    # x (income differences are too large). The published figure, drawn in 2018, dropped the
     # duplicated respondent record (two rows identical in every answer; the
     # second is dropped). Each axis is put back on its answer codes: 13 columns
     # from -6 to 6, 7 rows from -3 to 3.
@@ -600,7 +600,7 @@ def draw_figures(d, sfx):
 
 md += draw_figures(d, "_published-sample")
 md_dedup += draw_figures(d991, "_final-data")
-open(OUT, "w", encoding="utf-8").write("\n".join(md) + "\n")
+open(OUT, "w", encoding="utf-8", newline="\n").write("\n".join(md) + "\n")
 
 
 # ---- 6. The final tables and the list of cells that change ------------------------
@@ -653,7 +653,7 @@ dd = md_dedup + [
     "| Table | Outcome | Model | Row | As published | Final |",
     "|---|---|---|---|---|---|",
 ] + changes
-open("tables_final_python.md", "w", encoding="utf-8").write("\n".join(dd) + "\n")
+open("tables_final_python.md", "w", encoding="utf-8", newline="\n").write("\n".join(dd) + "\n")
 n_changed = sum(not ch.startswith("| Table A1") for ch in changes)
 n_cells = sum(len(e["cells"]) for _, _, e in res)
 print(f"wrote tables_final_python.md: {n_changed} of {n_cells} regression cells change "
@@ -747,14 +747,14 @@ if os.path.exists(PUB):
 
     # the same list as a file: the cell-by-cell record of the transcription
     # errors (stars escaped so a markdown viewer shows them)
-    open("tables_corrected-cells_python.md", "w", encoding="utf-8").write("\n".join(
+    open("tables_corrected-cells_python.md", "w", encoding="utf-8", newline="\n").write("\n".join(
         ["# Cells where the printed tables differ from the re-run", "(992 observations)", "",
          "Each line: table | outcome | model | row: what was printed, what the re-run gives.", ""]
         + ["- " + m.replace("*", r"\*") for m in mism]) + "\n")
 
     # and side by side at the end of the corrected tables: each printed cell
     # beside its corrected value
-    open(OUT, "a", encoding="utf-8").write("\n".join(
+    open(OUT, "a", encoding="utf-8", newline="\n").write("\n".join(
         ["", "## Cells that differ from the published tables",
          "| Table | Outcome | Model | Row | Published | Corrected |",
          "|---|---|---|---|---|---|"] + side) + "\n")

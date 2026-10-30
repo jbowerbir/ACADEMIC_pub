@@ -40,7 +40,7 @@ Files are named by what they are, then which version, then which program wrote t
 
 | File | What it is |
 |---|---|
-| `tables_as-published.md` | Tables 1, 2, and 4 and the numbers printed in Figures 3, 4, and 6 and Section 5, copied cell by cell from the published PDF, stars included. |
+| `tables_as-published.md` | Tables 1, 2, and 4 and the numbers printed in Figures 3, 4, and 6, and Section 5, copied cell by cell from the published PDF, stars included. |
 | `tables_corrected_R.md`, `tables_corrected_python.md` | Every table and figure statistic as the data give it, the weight check, and the eight cells that differ from the printed article, beside their published values. |
 | `tables_final_R.md`, `tables_final_python.md` | Tables 1 and 4 re-estimated with the corrected weight, Table 2 counted on the 991 distinct respondents, a summary of what moves, and every cell that differs from `tables_corrected_R.md`, beside its value there. These are the replacement tables offered to the journal. |
 
@@ -64,7 +64,7 @@ Put the files in one folder. R needs base R only. Python needs pandas, numpy, an
 - **Table 2.** Every count matches.
 - **Figures 3 and 4.** All fifteen correlations in each figure match, except the swapped pair in Figure 3. Figure 4 merges the three "un-important" answers into one, leaving "neither important nor unimportant" separate; that is the reading that reproduces all fifteen of its values.
 - **Figure 5** places each factor at a distance from the center equal to the mean of its Figure 3 and Figure 4 correlations. Which quadrant a factor sits in is the author's reading of Figures 1 and 2, as the article says in its footnote 13, not a computed quantity; the script takes the quadrants from the article.
-- **Figure 6.** The median (0.74), the quartiles (0.62 and 0.82), the standard deviation (0.22), and the share of respondents between 0.44 and 0.98 (90%) match. The mean is 0.685, printed as 0.69.
+- **Figure 6.** The median (0.74), the quartiles (0.62 and 0.82), the standard deviation (0.22), and the share of respondents between 0.44 and 0.98 (90%) match. The mean is 0.685 (0.68 at two decimals), printed as 0.69.
 - **Figure 7.** See the Summary. The corrected figure puts the neoliberal end on the right; the mean of the index sits just on the anti-neoliberal side of the midpoint.
 - **Figures 1 and 2** are drawn from the data, unweighted. They print no numbers to compare.
 - **Sample.** Every regression and figure uses the 991 distinct respondents (see [The data](#the-data)). Table 2 describes all 992 rows, as the article's does.
@@ -78,9 +78,9 @@ The script's lowest income group, however, takes in incomes up to $29,999, while
 Both programs re-rake the weight with the line at $25,000 and re-estimate Tables 1 and 4, writing the result to `tables_final_R.md` and `tables_final_python.md` with every cell that changes. Across the 93 coefficients:
 
 - No coefficient that is significant at any level changes sign. Five change sign, all within 0.014 of zero and none significant.
-- The largest change in any coefficient is 0.022.
-- The neoliberal index stays significant at the 1% level in every model, and its four statements keep their signs; Self help rises from the 10% level to the 5% level in all three models that enter it.
-- Sixteen significance stars move by one level, eleven up and five down. Income rises a level in Models 1a, 3a, and 3b and in Table 4 Model D; Age falls a level in Models 1a and 2a and stays significant.
+- The largest change in any coefficient is 0.022 (0.023 at the printed precision, Theology in Table 4 Model B).
+- The neoliberal index stays significant at the 1% level in every model, and three of its four statements keep their signs (Profits, in Model 1b, moves from 0.011 to −0.000); Self help rises from the 10% level to the 5% level in all three models that enter it.
+- Sixteen significance stars move by one level, eleven up and five down. Income rises a level in Models 1a, 3a, and 3b and in Table 4 Models D and I; Age falls a level in Models 1a and 2a and stays significant, and in Table 4 Model I falls from the 10% level to none.
 - Ideology becomes significant at the 5% level in Model 1a (printed at 10%) and at the 10% level in Model 1b (printed as not significant). It stays insignificant in Model 2a and on its own in Table 4, Model A. The article's statement that ideology has no discernible influence therefore holds less firmly in the full models than the printed tables suggest.
 
 The published tables use the 2014 weight, and the scripts reproduce them with it. `tables_final_R.md` also counts Table 2 on the 991 distinct respondents: five counts are one lower than the article's, and no percentage changes at two decimals.

@@ -340,7 +340,7 @@ final += ["", "## Cells that change",
           "Final: the corrected weight; Table 2 on the 991 distinct respondents.", "",
           "| Table | Model | Row | As published | Final |", "|---|---|---|---|---|"]
 final += changes
-open("tables_final_python.md", "w", encoding="utf-8").write("\n".join(final) + "\n")
+open("tables_final_python.md", "w", encoding="utf-8", newline="\n").write("\n".join(final) + "\n")
 print(f"wrote tables_final_python.md: {len(changes)} cells change at the printed precision")
 
 
@@ -383,7 +383,7 @@ for (sec, lab, col), v in pub.items():
 lines += ["", "## Cells that differ from the published tables",
           "| Table | Column | Row | Published | Reproduced |", "|---|---|---|---|---|"] + diff
 
-open(OUT, "w", encoding="utf-8").write("\n".join(lines) + "\n")
+open(OUT, "w", encoding="utf-8", newline="\n").write("\n".join(lines) + "\n")
 print(f"wrote {OUT}")
 print(f"{len(pub)} printed cells compared; {len(diff)} differ:")
 for x in diff:

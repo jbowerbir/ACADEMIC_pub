@@ -440,7 +440,7 @@ draw_figures <- function(d, sfx) {
   invisible(dev.off())
 
   # Figure 4: share of respondents in each cell of (rich deserve their wealth)
-  # x (income differences are too large). The 2014 figure dropped the
+  # x (income differences are too large). The published figure, drawn in 2018, dropped the
   # duplicated respondent record (two rows identical in every answer; the
   # second is dropped). Each axis is put back on its answer codes: 13 columns
   # from -6 to 6, 7 rows from -3 to 3.
