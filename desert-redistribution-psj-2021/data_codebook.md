@@ -1,6 +1,6 @@
 # Codebook: `data_survey_psj-subset.csv`
 
-The data used to replicate the tables and figures in Bower-Bir (2022), *Policy Studies Journal* 50(4): 757–795: an unaltered subset of the Economic Justice Survey (version 7, SocialSci, November 2013), 992 respondents by 27 variables. Question wording is quoted from the survey as fielded.
+The data used to replicate the tables and figures in Bower-Bir (2022), *Policy Studies Journal* 50(4): 757–795: an unaltered subset of the Economic Justice Survey (version 7, SocialSci, November 2013 to April 2014), 992 respondents by 27 variables. Question wording is quoted from the survey as fielded.
 
 Two conventions:
 

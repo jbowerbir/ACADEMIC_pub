@@ -1,6 +1,6 @@
 # Codebook: `data_survey_ep-subset.csv`
 
-A lookup reference for the data used to replicate the tables and figures in Bower-Bir (2021), *Economia Politica* 38(1): 131–170: an unaltered subset of the Economic Justice Survey (version 7, SocialSci, November 2013), 992 respondents by 54 variables. Question wording is quoted from the survey as fielded.
+A lookup reference for the data used to replicate the tables and figures in Bower-Bir (2021), *Economia Politica* 38(1): 131–170: an unaltered subset of the Economic Justice Survey (version 7, SocialSci, November 2013 to April 2014), 992 respondents by 54 variables. Question wording is quoted from the survey as fielded.
 
 Every scale except `age`, `race`, `party`, and `post_weight` is rescaled to run from 0 to 1 by (x − min) / (max − min), so a −3 to 3 scale becomes (x + 3) / 6. The table gives the raw coding; the file holds the rescaled value. The second column gives each variable's label as the article prints it.
 

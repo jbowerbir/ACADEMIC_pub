@@ -87,7 +87,7 @@ The published tables use the 2014 weight, and the scripts reproduce them with it
 
 ## The data
 
-SocialSci, an online survey panel company, fielded my Economic Justice Survey (version 7) in November 2013. My 2014 cleaning kept 992 respondents, and this file holds all of them. Of the survey's 241 columns, it keeps the 54 the tables and figures use. The full survey, with the cleaning scripts, questionnaire, and codebook, will be deposited separately; its DOI will be added to this record.
+SocialSci, an online survey panel company, fielded my Economic Justice Survey (version 7) between November 2013 and April 2014. My 2014 cleaning kept 992 respondents, and this file holds all of them. Of the survey's 241 columns, it keeps the 54 the tables and figures use. The full survey, with the cleaning scripts, questionnaire, and codebook, will be deposited separately; its DOI will be added to this record.
 
 - `row` is the row number in the full survey file and the only column that identifies a respondent uniquely.
 - `id` is the vendor's respondent number, kept for matching to the full survey. It is unreliable as a key:
