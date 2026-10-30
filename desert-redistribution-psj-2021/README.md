@@ -6,7 +6,7 @@ Bower-Bir, J. S. (2022). Desert and redistribution: Justice as a remedy for, and
 
 This package allows users to replicate every table and figure in the article using the provided survey data. In addition to the original Stata script used to analyze the data---included in this package---I translated the analysis into R and Python, and expanded the analysis to compare the tables it produces with the published tables. The R, Python, and Stata scripts produce identical output. I found, however, a few typos in the published tables, none of which alter the paper’s conclusions. Below is a summary of discrepancies between the verified output and the published tables:
 
-- Twenty-one published cells differ from the output, all copying errors I made when typing the tables into the manuscript: mostly digits mistyped or transposed, a decimal point in the wrong place, significance stars one level off, plus three dropped minus signs. One of those is in Table 1, on Definition, where the text already states the correct, negative coefficient. Correcting these typos does not contradict the published prose.
+- Twenty-two published cells differ from the output, all copying errors I made when typing the tables into the manuscript: mostly digits mistyped or transposed, a decimal point in the wrong place, significance stars one level off, plus three dropped minus signs. One of those is in Table 1, on Definition, where the text already states the correct, negative coefficient. Correcting these typos does not contradict the published prose.
 - One sentence of the published text misreads a coefficient sign. The coefficient on Age² is so small that it prints as 0.000. The offending sentence in the article calls it positive when it is negative, such that support for government action to reduce the income gap (Y_gov_fix_gap) rises with age into the late thirties and then falls rather than accelerating.
 
 In the course of re-engaging with the data, I also found two errors in my 2014 data cleaning. First, a duplicate row. One respondent’s submission appears twice in the dataset provided by the online survey panel vendor, under two different survey ids. My initial cleaning removed every other duplicated row in the delivered dataset, save the remaining offender. Second, a weighting error. My original weighting script put the 54 respondents earning $25,000 to $29,999 per year in the under-$25,000 income group, one bracket off. Every table has been re-estimated on the 991 distinct observations, rather than the original 992, with the weights recomputed with every respondent in the correct income group. The figures have also been redrawn from the final data, though they are essentially the same as the published ones. As before, nothing contradicts the published conclusions or the prose. A summary of the changes:
@@ -42,8 +42,8 @@ Files are named by what they are, then which version, then which program wrote t
 | File | What it is |
 |---|---|
 | `tables_as-published.md` | The four regression tables as printed in the article, copied cell by cell from the published PDF, stars included. |
-| `tables_corrected_R.md`, `tables_corrected_python.md`, `tables_corrected.pdf` | The four regression tables with the typos corrected, on the published 992 rows (duplicate included), plus Table A1 and the eight regressions behind Figures D1 and D2. Ends with the 21 corrected cells beside their published values. The PDF is a typeset reader copy of the R file. |
-| `tables_corrected-cells_R.md`, `tables_corrected-cells_python.md` | The 21 cells where the printed tables differ from the re-run, one line each: what was printed, what the re-run gives. |
+| `tables_corrected_R.md`, `tables_corrected_python.md`, `tables_corrected.pdf` | The four regression tables with the typos corrected, on the published 992 rows (duplicate included), plus Table A1 and the eight regressions behind Figures D1 and D2. Ends with the 22 corrected cells beside their published values. The PDF is a typeset reader copy of the R file. |
+| `tables_corrected-cells_R.md`, `tables_corrected-cells_python.md` | The 22 cells where the printed tables differ from the re-run, one line each: what was printed, what the re-run gives. |
 | `tables_final_R.md`, `tables_final_python.md`, `tables_final.pdf` | The same tables estimated on the 991 distinct records, without the duplicated row and with the survey weight corrected, ending with a list of every cell that changes at the printed precision. These are the replacement tables offered to the journal. The PDF is a typeset reader copy of the R file. |
 
 ### Figures
@@ -70,7 +70,7 @@ Put the files in one folder. R needs base R only. Python needs pandas, numpy, sc
 
 ## What is reproduced, and how closely: the published sample (992 observations)
 
-- **Tables 1, C1, C2, D1.** Every coefficient, standard error, N, R², and adjusted R² matches the printed value to the printed decimals, except the 21 corrected cells. The constant's standard error is an approximation of Stata's and is not compared.
+- **Tables 1, C1, C2, D1.** Every coefficient, standard error, N, R², and adjusted R² matches the printed value to the printed decimals, except the 22 corrected cells. The constant's standard error is an approximation of Stata's and is not compared.
 - **Table A1**, the sample's composition by gender, race, education, and so on: every group count and share matches.
 - **Figure 2** matches the printed figure: the same curves, the same heights.
 - **Figure 3** is drawn here with R's and Python's default smoothing. The printed figure is smoother because Stata drew it in 2014 with a wider smoothing bandwidth, and that setting was not recorded.

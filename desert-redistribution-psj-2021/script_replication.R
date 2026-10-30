@@ -643,8 +643,7 @@ cat(sprintf("wrote %s and the figures, figure_*_R.png\n", OUT))
 # Every cell of Tables 1, C1, C2, and D1 against tables_as-published.md, a
 # transcription of the printed article. Cells agree when they match to the
 # printed decimals; the tolerances below are half a unit in the last printed
-# digit, except adjusted R2, which is allowed 0.0004 because one printed
-# adjusted R2 sits 0.0002 from the re-estimate.
+# digit.
 
 PUB <- "tables_as-published.md"
 if (file.exists(PUB)) {
@@ -695,7 +694,7 @@ if (file.exists(PUB)) {
       tag   <- sprintf("%s | %s", where(r$table, r$col), row)
       if (row %in% c("N", "R2", "Adj-R2")) {
         got <- switch(row, N = r$est$N, R2 = r$est$R2, `Adj-R2` = r$est$AdjR2)
-        tol <- switch(row, N = 0.5, R2 = 0.00005, `Adj-R2` = 0.0004)
+        tol <- switch(row, N = 0.5, R2 = 0.00005, `Adj-R2` = 0.00005)
         if (abs(got - num(cell$coef)) > tol) {
           shown <- if (row == "N") sprintf("%d", got) else sprintf("%.4f", got)
           mism  <- c(mism, sprintf("%s: printed %s, re-estimated %s",

@@ -12,6 +12,7 @@ Each line: table | outcome | model | row: what was printed, what the re-run give
 - Table C1 | Y_gov_fix_gap | Model D | Education: SE printed (0.56), re-estimated (0.056)
 - Table C1 | Y_prog_tax | Model B | Married: coef printed 0.320, re-estimated 0.032
 - Table C1 | Y_prog_tax | Model D | Education: SE printed (0.55), re-estimated (0.055)
+- Table C2 | Y_gov_fix_gap | Model A | Adj-R2: printed 0.4284, re-estimated 0.4282
 - Table C2 | Y_gov_fix_gap | Model D | N: printed 992, re-estimated 963
 - Table C2 | Y_gov_fix_gap | Model E | Income: coef printed 0.136, re-estimated -0.136
 - Table C2 | Y_prog_tax | Model A | N: printed 963, re-estimated 992

@@ -357,6 +357,7 @@ The published tables with their typos corrected, estimated on the published samp
 | Table C1 | Y_gov_fix_gap | Model D | Education | -0.023 (0.56) | -0.023 (0.056) |
 | Table C1 | Y_prog_tax | Model B | Married | 0.320 (0.036) | 0.032 (0.036) |
 | Table C1 | Y_prog_tax | Model D | Education | 0.088 (0.55) | 0.088 (0.055) |
+| Table C2 | Y_gov_fix_gap | Model A | Adj-R2 | 0.4284 | 0.4282 |
 | Table C2 | Y_gov_fix_gap | Model D | N | 992 | 963 |
 | Table C2 | Y_gov_fix_gap | Model E | Income | 0.136*** (0.049) | -0.136*** (0.049) |
 | Table C2 | Y_prog_tax | Model A | N | 963 | 992 |

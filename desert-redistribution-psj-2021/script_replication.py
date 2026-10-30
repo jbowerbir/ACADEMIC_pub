@@ -665,8 +665,7 @@ print(f"wrote {OUT} and the figures, figure_*_python.png")
 # Every cell of Tables 1, C1, C2, and D1 against tables_as-published.md, a
 # transcription of the printed article. Cells agree when they match to the
 # printed decimals; the tolerances below are half a unit in the last printed
-# digit, except adjusted R2, which is allowed 0.0004 because one printed
-# adjusted R2 sits 0.0002 from the re-estimate.
+# digit.
 
 PUB = "tables_as-published.md"
 if os.path.exists(PUB):
@@ -715,10 +714,11 @@ if os.path.exists(PUB):
             tag = f"{where(t, c)} | {row}"
             if row in ("N", "R2", "Adj-R2"):
                 got = {"N": e["N"], "R2": e["R2"], "Adj-R2": e["AdjR2"]}[row]
-                tol = {"N": 0.5, "R2": 0.00005, "Adj-R2": 0.0004}[row]
+                tol = {"N": 0.5, "R2": 0.00005, "Adj-R2": 0.00005}[row]
                 if abs(got - num(cell["coef"])) > tol:
-                    mism.append(f"{tag}: printed {cell['coef']}, re-estimated {got:g}")
-                    side.append(f"| {tag} | {cell['coef']} | {got:g} |")
+                    shown = f"{got:d}" if row == "N" else f"{got:.4f}"
+                    mism.append(f"{tag}: printed {cell['coef']}, re-estimated {shown}")
+                    side.append(f"| {tag} | {cell['coef']} | {shown} |")
                 continue
             if row not in e["cells"]:
                 mism.append(f"{tag}: printed but not in this model")
