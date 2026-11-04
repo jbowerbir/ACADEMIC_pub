@@ -18,7 +18,7 @@
 //        directories have been removed; only the file names are kept.
 //
 // Structure
-//   lines 1-106    variable construction (age squared, dummies, the collapsed
+//   lines 51-109   variable construction (age squared, dummies, the collapsed
 //                  tax outcome, interaction terms); 1-59 before the annotations
 //   "BELIEF IN JUSTICE"      perceived justice without Definition: Table C1,
 //                            plus unpublished variants
@@ -31,7 +31,7 @@
 //   the tail                 console scratch
 //
 // Two things to know
-//   1. Lines 93-106 below (46-59 of the file as run in 2014) create variables named interact_*_scale but each `replace`
+//   1. Lines 96-109 below (46-59 of the file as run in 2014) create variables named interact_*_scale but each `replace`
 //      writes to the UNscaled name (interact_agency_def and so on). So every
 //      interaction term below is Z * corr_ideal_agency_scale, where
 //      corr_ideal_agency_scale = (corr_ideal_agency + 1)/2, while the main
@@ -43,10 +43,10 @@
 //      work in Stata because Stata stores these as float and compares as float.
 //      Copied into R or Python they match zero rows; see the two scripts.
 //
-// `svyset` on line 1 is not used by `areg`; the weighting enters through
+// `svyset` on line 51 (line 1 in 2014) is not used by `areg`; the weighting enters through
 // [pw=post_weight] on every command. "Definition" in the tables is
 // corr_ideal_agency. Y_gov_fix_gap is gov_reducegap_str; Y_prog_tax is
-// progtaxes2_str, built at lines 17-23.
+// progtaxes2_str, built at lines 67-73 (17-23 in 2014).
 // =============================================================================
 svyset [pweight = post_weight]
 
