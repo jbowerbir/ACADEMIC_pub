@@ -4,12 +4,12 @@ Bower-Bir, J. S. (2022). Desert and redistribution: Justice as a remedy for, and
 
 ## Summary
 
-This package allows users to replicate every table and figure in the article using the provided survey data. In addition to the original Stata script used to analyze the data---included in this package---I translated the analysis into R and Python, and expanded the analysis to compare the tables it produces with the published tables. The R and Python scripts produce identical output, and both reproduce the results the Stata code gave in 2014. I found, however, a few typos in the published tables, none of which alter the paper’s conclusions. Below is a summary of discrepancies between the verified output and the published tables:
+This package allows users to replicate every table and figure in the article using the provided survey data. In addition to the original Stata script used to analyze the data---included in this package---I translated the analysis into R and Python, and expanded the analysis to compare the tables it produces with the published tables. The R and Python scripts produce identical tables, and both reproduce the results the Stata code gave in 2014. I found, however, a few typos in the published tables, none of which alter the paper’s conclusions. Below is a summary of discrepancies between the verified output and the published tables:
 
 - Twenty-two published cells differ from the re-run, all copying errors I made when typing the tables into the manuscript: mostly digits mistyped or transposed, a decimal point in the wrong place, significance stars off by a level (in one case two), plus three dropped minus signs, two sample sizes, and one adjusted R². Four of those are in Table 1, the most visible on Definition, printed positive where the text already states the correct, negative coefficient. Correcting these typos does not contradict the published prose.
-- One sentence of the published text misreads a coefficient sign. The coefficient on Age² is so small that it prints as 0.000. The offending sentence in the article calls it positive when it is negative, such that support for government action to reduce the income gap (Y_gov_fix_gap) rises with age into the late thirties and then falls rather than accelerating.
+- Two sentences of the published text misread the coefficient on Age². It is so small that it prints as 0.000. The article calls it positive when it is negative, such that support for government action to reduce the income gap (Y_gov_fix_gap) rises with age up to about 34 and then falls, rather than accelerating. The turning point is from Table 1, Y_gov_fix_gap Model 1, the one model where Age² is significant.
 
-In the course of re-engaging with the data, I also found two errors in my 2014 data cleaning. First, a duplicate row. One respondent’s submission appears twice in the dataset provided by the online survey panel vendor, under two different survey ids. My 2014 cleaning removed all other duplicates in the delivered data but missed this one. Second, a weighting error. My original weighting script put the 54 respondents earning $25,000 to $29,999 per year in the under-$25,000 income group, one bracket off. Every table has been re-estimated on the 991 distinct observations, rather than the original 992, with the weights recomputed with every respondent in the correct income group; I call this the final data below. The tables on the original 992 rows, with only the typos fixed, I call the typos-fixed tables. The figures have also been redrawn from the final data, though they are essentially the same as the published ones. As before, nothing contradicts the published conclusions or the prose. A summary of the changes:
+While re-running the analysis, I also found two errors in my 2014 data cleaning. First, a duplicate row. One respondent’s submission appears twice in the dataset provided by the online survey panel vendor, under two different survey ids. My 2014 cleaning removed all other duplicates in the delivered data but missed this one. Second, a weighting error. My original weighting script put the 54 respondents earning $25,000 to $29,999 per year in the under-$25,000 income group, one bracket off. Every table has been re-estimated on the 991 distinct observations, rather than the original 992, with the weights recomputed with every respondent in the correct income group; I call this the final data below. The tables on the original 992 rows, with only the typos fixed, I call the typos-fixed tables. The figures have also been redrawn from the final data, though they are essentially the same as the published ones. As before, nothing contradicts the published conclusions or the prose. A summary of the changes:
 
 - Coefficients move by a few hundredths of a unit in Table 1, where the largest move is 0.047, on Definition; the largest move anywhere is 0.15, in one Table D1 model. Coefficients for the other key independent variables---Agency, Justice, Rich deserve, Avg. deserve, and Poor deserve---move by 0.016 or less.
 - Twenty-eight coefficients whose p-values sit near a significance threshold cross it, so their stars move by one level, twenty-four up and four down; three constants, not counted here, do the same. In Table 1 the key independent variables---Definition, Agency, Justice, Rich deserve, Avg. deserve, and Poor deserve---all keep their signs and their significance. Definition moves from the 1% significance level to the 5% level in one of its three Y_gov_fix_gap models, and Agency from the 5% level to the 1% level in one model. In the appendix tables, Rich deserve and Definition each gain a star in one Table D1 model, and Poor deserve's already marginal effect on Y_prog_tax loses a star in two models. The remaining changes are on control variables.
@@ -22,13 +22,13 @@ To reproduce everything, run `Rscript script_replication.R` or `python3 script_r
 
 ## Files
 
-Files are named by what they are, then which version, then which program wrote them: `category_item_variant_program.ext`. Underscores separate those fields and hyphens join words inside one field, so a folder sorted by name groups into corrigendum, data, figures, scripts, and tables. Every file the R program writes carries `_R`; the Python program writes the same files with `_python`, and the pairs are identical. `README.pdf` is this document, typeset for readers who would rather not open a markdown file.
+Files are named by what they are, then which version, then which program wrote them: `category_item_variant_program.ext`. Underscores separate those fields and hyphens join words inside one field, so a folder sorted by name groups into corrigendum, data, figures, scripts, and tables. Every file the R program writes carries `_R`; the Python program writes the same files with `_python`; the table pairs are identical, and the figure pairs plot the same values, each in its program's own style. `README.pdf` is this document, typeset for readers who would rather not open a markdown file.
 
 ### Data
 
 | File | What it is |
 |---|---|
-| `data_survey_psj-subset.csv` | The survey data: 992 respondents and 27 columns, two identifiers and the 25 variables the tables and figures use. No value was changed. The full survey is a separate deposit (see [The data](#the-data)). |
+| `data_survey_psj-subset.csv` | The survey data: 992 records (991 respondents) and 27 columns, two identifiers and the 25 variables the tables and figures use. No value was changed. The full survey is a separate deposit (see [The data](#the-data)). |
 | `data_codebook.md` | The 27 columns: question wording, answer options, coding and rescaling, and the label each has in the article. |
 
 ### Scripts
@@ -36,7 +36,7 @@ Files are named by what they are, then which version, then which program wrote t
 | File | What it is |
 |---|---|
 | `script_replication.R` | The analysis in R: Tables 1, C1, C2, and D1 (32 regressions), Table A1, and Figures 1, 2, 3, 4, D1, and D2, on the published sample and on the final data. Writes every `_R` file below, then prints every cell where the printed tables differ. Base R only. |
-| `script_replication.py` | The same program in Python. Writes the same files with `_python` in place of `_R`, identical to the R output. |
+| `script_replication.py` | The same program in Python. Writes the same files with `_python` in place of `_R`, with tables identical to the R output. |
 | `script_original_stata-2014.do` | The original Stata code that produced the article's tables and the D1 and D2 plots, commands untouched, with comment lines (`// [2026]`) saying which command makes which table or figure. A record, not a runnable script: it reads a file not included here. |
 
 ### Tables
@@ -59,7 +59,7 @@ Files are named by what they are, then which version, then which program wrote t
 
 | File | What it is |
 |---|---|
-| `corrigendum_psj.md`, `corrigendum_psj.pdf` | The correction as proposed to the journal: the two kinds of error, the one corrected sentence, and corrected Table 1 (991 observations, corrected weights). It points here for every other table. |
+| `corrigendum_psj.md`, `corrigendum_psj.pdf` | The correction as proposed to the journal: the two kinds of error, the two corrected sentences on Age², and corrected Table 1 (991 observations, corrected weights). It points here for every other table. |
 
 ## Running it
 
@@ -101,7 +101,7 @@ The figures are redrawn from the final data as `figure_*_final-data_R.png` and `
 
 ## The data
 
-SocialSci, an online survey panel company, fielded my Economic Justice Survey (version 7) between November 2013 and April 2014. My 2014 cleaning kept 992 respondents, and this file holds all of them. The duplicate observation is removed in section 1 of either script. Of the survey dataset's 241 columns, the dataset provided here keeps the 27 columns the tables and figures use. The R and Python scripts build the variables the regressions need from them (age squared, the married and unemployed indicators, the four-level tax outcome, and the interaction terms), as the 2014 Stata code did.
+SocialSci, an online survey panel company, fielded my Economic Justice Survey (version 7) between November 2013 and April 2014. My 2014 cleaning kept 992 records, and this file holds all of them. The duplicate observation is removed in section 1 of either script. Of the survey dataset's 241 columns, the dataset provided here keeps the 27 columns the tables and figures use. The R and Python scripts build the variables the regressions need from them (age squared, the married and unemployed indicators, the four-level tax outcome, and the interaction terms), as the 2014 Stata code did.
 
 The 2014 cleaning script built some of the columns in the file from the raw answers: the four attitude measures that combine a direction with a strength (`gov_reducegap_str`, `agency_str`, `justice_str`, `gov_help_str`), the three Deserve scores (`desert_rich_tot`, `desert_americans_tot`, `desert_poor_tot`), and the Definition correlation (`corr_ideal_agency`). I recomputed each from the raw survey items, and each matches on every row. I also recomputed the survey weight (`post_weight`) using the 2014 script's method and population targets. It matches the published weight for every respondent to four decimal places (the largest difference is 0.000014). That re-derivation is how the weighting error came to light. The original script's lowest income group, meant for households earning under $25,000, also took in those earning $25,000 to $29,999. That is the only income group affected. Table A1's income counts come from a different script and were correct as published.
 
