@@ -6,7 +6,7 @@ Policy Studies Journal 50(4): 757-795. The same program as
 script_replication.R, in Python.
 
 Reads, from this folder:
-  data_survey_psj-subset.csv   992 respondents, the 27 survey variables the
+  data_survey_psj-subset.csv   992 records, the 27 survey variables the
                                tables and figures use
   tables_as-published.md       the tables as printed, for the comparison
                                at the end (skipped if the file is absent)
