@@ -41,10 +41,11 @@
 #   - The Stata code recodes by exact comparison (`married == .8`). Here the
 #     values are rounded to the integer grid first, because 0.8 is stored as
 #     0.7999... and an exact test matches no rows.
-#   - The interaction terms are built on Definition rescaled to 0-1 (the Stata
-#     stored them under the unscaled names), and the Definition main effect is
-#     the rescaled variable in two of the six Table D1 regressions (Y_gov
-#     Model 1, Y_prog_tax Model 3) and the raw one in the other four. That is
+#   - The interaction terms are built on (Definition + 1) / 2, a second rescaling
+#     of a column already on 0-1 (the Stata stored them under the unscaled
+#     names), and the Definition main effect is that rescaled variable in two of
+#     the six Table D1 regressions (Y_gov Model 1, Y_prog_tax Model 3) and
+#     Definition as filed in the other four. That is
 #     how the article's tables were estimated.
 # =============================================================================
 
@@ -85,7 +86,8 @@ d$married_bin <- ifelse(m >= 4, 1, 0)
 p <- round(d$progtaxes_str * 6)
 d$progtaxes2_str <- ifelse(p <= 3, 0, p - 3) / 3
 
-# Definition (a correlation, -1 to 1) rescaled to 0-1 for the interaction terms
+# Definition, already on 0-1 in the file, rescaled again as the 2014 code did
+# for the interaction terms: (Definition + 1) / 2, which runs from 0.5 to 1
 d$def_scaled <- (d$corr_ideal_agency + 1) / 2
 
 Z_ALL <- c("agency_str", "justice_str",
@@ -188,7 +190,7 @@ M <- list(
 )
 
 # Standard errors that stay valid when the error variance differs across
-# respondents (heteroskedasticity-robust, Stata's default for areg), computed
+# respondents (heteroskedasticity-robust, as areg reports under pweights), computed
 # for a weighted fit: the HC1 sandwich
 # (X'WX)^-1 X'W diag(e^2) W X (X'WX)^-1, times n/(n-k).
 hc1 <- function(fit) {
@@ -369,7 +371,7 @@ md    <- c("# Tables with the typos fixed", "",
                   "section lists every cell that differs from the published tables."),
            full$md)
 dedup$md <- c("# Final tables", "",
-              paste0("The same tables estimated on the 991 distinct respondents, without ",
+              paste0("The published tables re-estimated on the 991 distinct respondents, without ",
                      "the duplicated row and with the survey weight corrected. Written by ",
                      "script_replication.R (tables_final_R.md) and script_replication.py ",
                      "(tables_final_python.md); the two files are identical. The last ",
@@ -410,12 +412,13 @@ draw_figures <- function(d, sfx) {
     invisible(dev.off())
   }
 
-  # Figures 2 and 3: kernel densities (Gaussian kernel, Silverman's default
-  # bandwidth, as Stata's kdensity default). Figure 2 is computed on the 0-1
+  # Figures 2 and 3: kernel densities (Gaussian kernel, Silverman's rule-of-thumb
+  # bandwidth: R's density() default). Figure 2 is computed on the 0-1
   # standardized scores and labeled on their original -1 to 1 scale, which is
   # how the 2014 plot was drawn; its heights match the printed figure. Figure 3
-  # is the raw correlation; the printed figure is more heavily smoothed than
-  # the default here, and the smoothing it used is not recorded.
+  # converts Definition back to the correlation's own -1 to 1 scale, as the
+  # printed figure shows it; the printed curve is slightly smoother, and the
+  # smoothing it used is not recorded.
   dens <- function(v) {
     k <- density(v[!is.na(v)])
     list(x = sc(k$x), y = k$y)
@@ -432,7 +435,7 @@ draw_figures <- function(d, sfx) {
 
   png_open(sprintf("figure_3%s_R.png", sfx))
   par(mar = c(4, 4, 1, 1), family = "serif")
-  plot(density(d$corr_ideal_agency, na.rm = TRUE), lwd = 2, main = "", ylab = "",
+  plot(density(sc(d$corr_ideal_agency), na.rm = TRUE), lwd = 2, main = "", ylab = "",
        xlab = "Control-Ideal Importance correlation", xlim = c(-1, 1), bty = "l")
   invisible(dev.off())
 

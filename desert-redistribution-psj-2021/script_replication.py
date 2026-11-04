@@ -41,10 +41,11 @@ Two things carried over from the 2014 Stata code on purpose:
   - The Stata code recodes by exact comparison (`married == .8`). Here the
     values are rounded to the integer grid first, because 0.8 is stored as
     0.7999... and an exact test matches no rows.
-  - The interaction terms are built on Definition rescaled to 0-1 (the Stata
-    stored them under the unscaled names), and the Definition main effect is
-    the rescaled variable in two of the six Table D1 regressions (Y_gov
-    Model 1, Y_prog_tax Model 3) and the raw one in the other four. That is
+  - The interaction terms are built on (Definition + 1) / 2, a second rescaling
+    of a column already on 0-1 (the Stata stored them under the unscaled
+    names), and the Definition main effect is that rescaled variable in two of
+    the six Table D1 regressions (Y_gov Model 1, Y_prog_tax Model 3) and
+    Definition as filed in the other four. That is
     how the article's tables were estimated.
 """
 import os
@@ -97,7 +98,8 @@ d["married_bin"] = np.where((d["married"] * 5).round() >= 4, 1.0, 0.0)
 p = (d["progtaxes_str"] * 6).round()
 d["progtaxes2_str"] = np.where(p <= 3, 0, p - 3) / 3
 
-# Definition (a correlation, -1 to 1) rescaled to 0-1 for the interaction terms
+# Definition, already on 0-1 in the file, rescaled again as the 2014 code did
+# for the interaction terms: (Definition + 1) / 2, which runs from 0.5 to 1
 d["def_scaled"] = (d["corr_ideal_agency"] + 1) / 2
 for z in ["agency_str", "justice_str", "desert_rich_tot", "desert_americans_tot", "desert_poor_tot"]:
     d["x_" + z] = d[z] * d["def_scaled"]
@@ -352,7 +354,7 @@ PREAMBLE_CORRECTED = (
     "last section lists every cell that differs from the published tables."
 )
 PREAMBLE_FINAL = (
-    "The same tables estimated on the 991 distinct respondents, without the duplicated row and "
+    "The published tables re-estimated on the 991 distinct respondents, without the duplicated row and "
     "with the survey weight corrected. Written by script_replication.R (tables_final_R.md) and "
     "script_replication.py (tables_final_python.md); the two files are identical. The last "
     "section lists every cell that differs from the typos-fixed tables (tables_typos-fixed_R.md)."
@@ -376,8 +378,8 @@ plt.rcParams.update({"font.family": "serif", "font.size": 9})
 
 
 def silverman(x):
-    """Silverman's rule-of-thumb bandwidth, the default in R's density() and
-    Stata's kdensity."""
+    """Silverman's rule-of-thumb bandwidth, the default in R's density()
+    (bw.nrd0)."""
     x = x[~np.isnan(x)]
     iqr = np.subtract(*np.percentile(x, [75, 25]))
     return 0.9 * min(x.std(ddof=1), iqr / 1.34) * len(x) ** -0.2
@@ -431,12 +433,13 @@ def draw_figures(d, sfx):
         hide_spines(ax, ["top", "right", "left"])
         save(fig, "figure_1_python.png")
 
-    # Figures 2 and 3: kernel densities (Gaussian kernel, Silverman's default
-    # bandwidth, as Stata's kdensity default). Figure 2 is computed on the 0-1
+    # Figures 2 and 3: kernel densities (Gaussian kernel, Silverman's rule-of-thumb
+    # bandwidth: R's density() default). Figure 2 is computed on the 0-1
     # standardized scores and labeled on their original -1 to 1 scale, which is
     # how the 2014 plot was drawn; its heights match the printed figure. Figure 3
-    # is the raw correlation; the printed figure is more heavily smoothed than
-    # the default here, and the smoothing it used is not recorded. The grids run
+    # converts Definition back to the correlation's own -1 to 1 scale, as the
+    # printed figure shows it; the printed curve is slightly smoother, and the
+    # smoothing it used is not recorded. The grids run
     # a little past the data's range so the curves reach the axis.
     grid = np.linspace(-0.15, 1.15, 512)
     fig, ax = plt.subplots(figsize=(6.5, 4))
@@ -453,7 +456,7 @@ def draw_figures(d, sfx):
 
     grid3 = np.linspace(-1.1, 1.1, 512)
     fig, ax = plt.subplots(figsize=(6.5, 4))
-    ax.plot(grid3, dens(d["corr_ideal_agency"].values, grid3), color="k", lw=2)
+    ax.plot(grid3, dens(scale_back(d["corr_ideal_agency"].values), grid3), color="k", lw=2)
     ax.set_xlim(-1, 1)
     ax.set_xlabel("Control-Ideal Importance correlation")
     hide_spines(ax, ["top", "right"])
@@ -497,10 +500,10 @@ def draw_figures(d, sfx):
         )
         return r, sub
 
-    # the right-hand side of each plot regression: the first term (rescaled
-    # Definition for the D1 panels, the moderator for D2), the moderator and its
-    # product with rescaled Definition, and the controls; for the rich-deserve
-    # panels all three deserve variables and their products enter together
+    # the right-hand side of each D1 plot regression: rescaled Definition, the
+    # moderator and its product with rescaled Definition, and the controls; for
+    # the rich-deserve panel all three deserve variables and their products enter
+    # together. The D2 panels below list the same terms, moderator first.
     def plot_rhs(first, zvar):
         block = DES_X if zvar == "desert_rich_tot" else [zvar, "x_" + zvar]
         return [first] + block + CTRL

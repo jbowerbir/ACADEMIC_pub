@@ -97,7 +97,7 @@ Put the files in one folder. R needs base R only. Python needs pandas, numpy, sc
 - R² values move by at most 0.009, and adjusted R² by at most 0.010.
 - Every written claim in the text holds.
 
-The figures are redrawn from the final data as `figure_*_final-data_R.png` and `figure_*_final-data_python.png` and are essentially the same as the published ones. The density curves of Figures 2 and 3 are unweighted, so only the duplicate observation affects them. They move by less than 0.01 and 0.03 on the density axis, where the peaks stand at 1.5 to 6. The marginal-effect lines of Figures D1 and D2 move by at most 0.10 on axes spanning 4 to 9 units, well inside their confidence bands. Figure 4 already excludes the duplicate, and Figure 1 is not from this survey.
+The figures are redrawn from the final data as `figure_*_final-data_R.png` and `figure_*_final-data_python.png` and are essentially the same as the published ones. The density curves of Figures 2 and 3 are unweighted, so only the duplicate observation affects them. They move by less than 0.01 and 0.02 on the density axis, where the peaks stand at 1.5 to 3. The marginal-effect lines of Figures D1 and D2 move by at most 0.10 on axes spanning 4 to 9 units, well inside their confidence bands. Figure 4 already excludes the duplicate, and Figure 1 is not from this survey.
 
 ## The data
 
@@ -110,10 +110,9 @@ The full survey, with the cleaning scripts, questionnaire, and codebook, will be
 A codebook for the relevant subset of data is provided. Additional notes on data:
 
 - `row` is the row number in the full survey file and the only column that identifies a respondent uniquely.
-- `id` is the vendor's respondent number, kept for matching to the full survey. Two things make it unreliable as a key:
-  - 55 id values are each carried by two different respondents. The vendor's numbering collided within one fielding batch, and the pairs are different people (different ages, genders, and states). 
+- `id` is the vendor's respondent number, kept for matching to the full survey. Use `row`, not `id`, to refer to a respondent. Two things make `id` unreliable as a key:
+  - 55 id values are each carried by two different respondents. The vendor's numbering collided within one fielding batch, and the pairs are different people (different ages, genders, and states).
   - One respondent's record is genuinely in the file twice, under ids 1115 and 1157, identical in every answer, so the 992 rows hold 991 people. The duplicate is kept because the published tables were estimated on all 992 rows; dropping it would change every estimate slightly. The one place the published analysis dropped it was Figure 4 (redrawn in 2018), and the scripts do the same there. Both scripts also estimate every table a second time on the 991 distinct records, with the weight corrected; see [What changes with the two data fixes](#what-changes-with-the-two-data-fixes-991-observations-corrected-weights) and `tables_final_R.md`.
-  - Use `row`, not `id`, to refer to a respondent.
 - `corr_ideal_agency` is missing for 29 respondents, so regressions that include it have N = 963 and regressions without it have N = 992 (or 962 and 991, respectively, in the final data).
 
 ## The regressions
@@ -129,7 +128,7 @@ Every regression in the tables is one Stata command, `areg <outcome> <predictors
 
 **Testing decimals for equality.** The 2014 code recodes variables by exact comparison (`if married == .8`, `if progtaxes2_str == 4`). That works in Stata. In R or Python it silently matches no rows, because the stored values are 0.7999… and 3.9999…; the tax outcome is then wrong and every coefficient moves by about 0.03, with no error. Round to the nearest integer first. Both scripts do.
 
-**The interaction terms.** Lines 93–106 of `script_original_stata-2014.do` (lines 46–59 before the 2026 annotations were added) build the interaction variables from Definition rescaled to 0 to 1 but store them under the unscaled names. So every interaction term in Table D1 uses the rescaled Definition, and in two of the six D1 regressions (Y_gov_fix_gap Model 1, Y_prog_tax Model 3) the Definition variable itself is also the rescaled one. The fit is identical either way; only the printed coefficients differ, by a factor of two. The scripts reproduce what the article printed. To match the table, build the interactions from Definition rescaled to 0 to 1, as the scripts do. Build them from the unscaled Definition and you will get coefficients half as large and conclude, wrongly, that the table is wrong.
+**The interaction terms.** Lines 96–109 of `script_original_stata-2014.do` (lines 46–59 before the 2026 annotations were added) build the interaction variables from (Definition + 1) / 2, a second rescaling of a column the cleaning had already put on 0 to 1, but store them under the unscaled names. So every interaction term in Table D1 uses this rescaled Definition, and in two of the six D1 regressions (Y_gov_fix_gap Model 1, Y_prog_tax Model 3) the Definition variable itself is also the rescaled one. The fit is identical either way; only the printed coefficients differ, by a factor of two. The scripts reproduce what the article printed. To match the table, build the interactions from (Definition + 1) / 2, as the scripts do. Build them from Definition as it stands in the file and you will get coefficients half as large and conclude, wrongly, that the table is wrong.
 
 Each of these fails silently: you get plausible numbers, not an error.
 
