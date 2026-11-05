@@ -41,7 +41,7 @@
 //      R and Python versions reproduce that exactly.
 //   2. The float-equality tests (`married == float(.8)`, `progtaxes2_str == 4`)
 //      work in Stata because Stata stores these as float and compares as float.
-//      Copied into R or Python they match zero rows; see the two scripts.
+//      Copied into R or Python the tax test matches zero rows. See the scripts.
 //
 // `svyset` on line 51 (line 1 in 2014) is not used by `areg`; the weighting enters through
 // [pw=post_weight] on every command. "Definition" in the tables is

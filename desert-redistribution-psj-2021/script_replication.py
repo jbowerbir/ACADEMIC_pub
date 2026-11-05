@@ -38,9 +38,9 @@ Run from this folder:  python3 script_replication.py
 Needs pandas, numpy, scipy, statsmodels, and matplotlib. Takes under a minute.
 
 Two things carried over from the 2014 Stata code on purpose:
-  - The Stata code recodes by exact comparison (`married == .8`). Here the
-    values are rounded to the integer grid first, because 0.8 is stored as
-    0.7999... and an exact test matches no rows.
+  - The Stata code recodes by exact comparison (`progtaxes2_str == 4`). Here
+    the values are rounded to the integer grid first, because they come out a
+    hair off (4.0000000002) and an exact test matches no rows.
   - The interaction terms are built on (Definition + 1) / 2, a second rescaling
     of a column already on 0-1 (the Stata stored them under the unscaled
     names), and the Definition main effect is that rescaled variable in two of
@@ -412,23 +412,27 @@ def draw_figures(d, sfx):
     rows = []
 
     if sfx == "_published-sample":
-        # Figure 1: the General Social Survey percentages the article charts
-        # (not from this survey), so it is drawn once
+        # Figure 1: the percentages the article charts, not from this survey, so
+        # it is drawn once. The first two bars (income differences, conflicts)
+        # are from the 2010 General Social Survey (n = 1512), the third from a
+        # Gallup poll of 2011-11-28 to 2011-12-01 (n = 1012). As printed, agree
+        # is on the left.
         agree = [0.45, 0.5916, 0.6653]
         disagree = [0.52, 0.4084, 0.1647]
         unsure = [1 - a - b for a, b in zip(agree, disagree)]
         labels = ["the income gap is a\nproblem that needs fixing",
                   "there are strong conflicts\nbetween the rich and poor",
                   "differences in income\nare too large"]
-        fig, ax = plt.subplots(figsize=(6.5, 2.4))
+        fig, ax = plt.subplots(figsize=(6.5, 2.6))
         left = np.zeros(3)
-        for vals, col, lab in [(disagree, "0.85", "disagree"),
+        for vals, col, lab in [(agree, "0.3", "agree"),
                                (unsure, "0.6", "unsure"),
-                               (agree, "0.3", "agree")]:
+                               (disagree, "0.85", "disagree")]:
             ax.barh(labels, vals, left=left, color=col, label=lab)
             left += np.array(vals)
         ax.axvline(0.5, ls=":", color="k")
         ax.set_xlim(0, 1)
+        ax.set_xlabel("percentage")
         ax.legend(ncol=3, frameon=False, loc="lower right", bbox_to_anchor=(1, 1))
         hide_spines(ax, ["top", "right", "left"])
         save(fig, "figure_1_python.png")
@@ -483,43 +487,37 @@ def draw_figures(d, sfx):
     ax.set_ylabel("Are income differences too large?")
     save(fig, f"figure_4{sfx}_python.png")
 
-    # Figures D1 and D2: marginal-effect plots. Each panel: an ordinary weighted
-    # regression with the interaction, errors clustered by state (Stata:
-    # reg ... [pw=post_weight], cluster(state)); the marginal effect of X at each
-    # value of the moderator Z, b1 + b3*Z, with a 95% band, over a histogram of Z.
-    # D2 reverses the roles: the marginal effect of Z at each value of Definition.
+    # Figures D1 and D2: marginal-effect plots drawn from the Table D1 models
+    # (state fixed effects, robust errors), with Definition on one scale. Those
+    # models build the interactions from (Definition + 1) / 2. So the marginal
+    # effect of Definition as filed is km * b(main) + b(X x Z) * Z / 2, where km
+    # is 1/2 when the main term is itself (Definition + 1) / 2 and 1 otherwise.
+    # The moderator's effect at a value of Definition is
+    # b(Z) + b(X x Z) * (Definition + 1) / 2. In panel D1(c) the other two
+    # deserve scores are held at their means. Each line has a 95% band. The
+    # printed figures came from other regressions and mixed the two scalings.
+    # The README explains.
 
-    def cluster_fit(dv, rhs):
-        sub = d[[dv] + rhs + ["post_weight", "state"]].dropna()
-        X = design(sub, rhs, fe=False)
-        w = sub["post_weight"].astype(float)
-        groups = sub["state"].astype(int).values
-        r = sm.WLS(sub[dv].astype(float), X, weights=w).fit(
-            cov_type="cluster",
-            cov_kwds={"groups": groups, "use_correction": True, "df_correction": True},
-        )
-        return r, sub
+    def d1_model(model):
+        _, _, dv, rhs = [m for m in M if m[0].startswith("Table D1") and m[1] == model][0]
+        sub = d[list(dict.fromkeys([dv] + rhs + [DEF, "post_weight", "state"]))].dropna()
+        r = sm.WLS(sub[dv].astype(float), design(sub, rhs),
+                   weights=sub["post_weight"].astype(float)).fit(cov_type="HC1")
+        return r, sub, rhs
 
-    # the right-hand side of each D1 plot regression: rescaled Definition, the
-    # moderator and its product with rescaled Definition, and the controls; for
-    # the rich-deserve panel all three deserve variables and their products enter
-    # together. The D2 panels below list the same terms, moderator first.
-    def plot_rhs(first, zvar):
-        block = DES_X if zvar == "desert_rich_tot" else [zvar, "x_" + zvar]
-        return [first] + block + CTRL
+    def effect(r, terms, G):
+        """The marginal effect G b at each grid point, and its standard error."""
+        b = r.params[terms].values
+        V = r.cov_params().loc[terms, terms].values
+        return G @ b, np.sqrt(np.einsum("ij,jk,ik->i", G, V, G))
 
-    def me_panel(ax, dv, xvar, zvar, rhs, xlab, ylab, ylim, zhist, bins, title, rug=False):
-        r, sub = cluster_fit(dv, rhs)
-        ix = "x_" + zvar
-        V = r.cov_params()
-        b1, b3 = r.params[xvar], r.params[ix]
-        v1, v3, c13 = V.loc[xvar, xvar], V.loc[ix, ix], V.loc[xvar, ix]
-        zz = np.linspace(0, 1, 101)
-        me = b1 + b3 * zz
-        band = 1.96 * np.sqrt(v1 + v3 * zz ** 2 + 2 * c13 * zz)
-        # the histogram of Z on a second axis, behind the lines
+    def panel(ax, grid, me, se, hist_vals, bins, xlab, ylab, title, rug):
+        band = 1.96 * se
+        lo = np.floor(min((me - band).min(), 0))
+        hi = np.ceil(max((me + band).max(), 0))
+        # the histogram on a second axis, behind the lines
         ax2 = ax.twinx()
-        cnt, edges = np.histogram(sub[zhist], bins=bins)
+        cnt, edges = np.histogram(hist_vals, bins=bins)
         width = (edges[1] - edges[0]) * (0.5 if rug else 0.6)
         ax2.bar((edges[:-1] + edges[1:]) / 2, 100 * cnt / cnt.sum(), width=width,
                 color="0.8", zorder=0)
@@ -527,73 +525,79 @@ def draw_figures(d, sfx):
         ax2.tick_params(labelsize=7)
         ax.set_zorder(ax2.get_zorder() + 1)
         ax.patch.set_visible(False)
-        ax.plot(zz, me, "k", lw=2)
-        ax.plot(zz, me + band, "k--", lw=1)
-        ax.plot(zz, me - band, "k--", lw=1)
+        ax.plot(grid, me, "k", lw=2)
+        ax.plot(grid, me + band, "k--", lw=1)
+        ax.plot(grid, me - band, "k--", lw=1)
         ax.axhline(0, color="k", lw=1)
         if rug:
-            ax.plot(sub[zhist], np.full(len(sub), ylim[0]), "|", color="0.3", ms=6)
+            ax.plot(hist_vals, np.full(len(hist_vals), lo), "|", color="0.3", ms=6)
         ax.set_xlim(0, 1)
-        ax.set_ylim(*ylim)
+        ax.set_ylim(lo, hi)
         ax.set_xlabel(xlab, fontsize=7)
         ax.set_ylabel(ylab, fontsize=7)
         ax.set_title(title, fontsize=8)
         ax.tick_params(labelsize=7)
-        return (f"| {title} | {dv} | {zvar} | {b1:.3f} | {np.sqrt(v1):.3f} | {b3:.3f} | "
-                f"{np.sqrt(v3):.3f} | {int(r.nobs)} |")
 
-    rows += ["", "## Figure D1 and D2 regressions",
-             "| Panel | Outcome | Z | b(X) | SE | b(X x Z) | SE | N |",
-             "|---|---|---|---|---|---|---|---|"]
+    def me_row(title, model, me, se, n):
+        return (f"| {title} | {model} | {me[0]:.3f} | {se[0]:.3f} | {me[-1]:.3f} | "
+                f"{se[-1]:.3f} | {n} |")
+
+    rows += ["", "## The marginal effects in Figures D1 and D2", "",
+             "Each line's value at the two ends of its horizontal axis, with its standard "
+             "error. In D1 that is the marginal effect of Definition at Z = 0 and Z = 1. "
+             "In D2 it is the marginal effect of Z at Definition = 0 and Definition = 1.",
+             "",
+             "| Panel | Table D1 model | At 0 | SE | At 1 | SE | N |",
+             "|---|---|---|---|---|---|---|"]
 
     X_LAB = "Marginal effect of definition"
+    Z_LAB = "Importance of agency to definition of desert"
     AGENCY = "Belief that peoples' economic standing is within their control"
     JUST = "Belief that economic desert is rewarded"
     RICH = "Belief that rich Americans deserve their wealth"
     # 24 bins of width 1/24, offset half a bin so each answer level sits in the
     # middle of a bar
     bins24 = np.arange(-1 / 48, 1 + 1 / 48 + 1e-9, 1 / 24)
+    bins100 = np.linspace(0, 1, 101)
+    grid = np.linspace(0, 1, 101)
+    # panel, Table D1 model, moderator, its label, D2's y label (two lines), and
+    # the names in the panel titles
+    PANELS = [
+        ("a", "gov Model 1", "agency_str", AGENCY,
+         "Marginal effect of belief\nin economic agency", "Z_agency", "Y_gov_fix_gap"),
+        ("b", "gov Model 2", "justice_str", JUST,
+         "Marginal effect of belief that\neconomic desert is rewarded", "Z_justice", "Y_gov_fix_gap"),
+        ("c", "gov Model 3", "desert_rich_tot", RICH,
+         "Marginal effect of belief that rich\nAmericans deserve their wealth", "Z_rich_deserve",
+         "Y_gov_fix_gap"),
+        ("d", "tax Model 1", "agency_str", AGENCY,
+         "Marginal effect of belief\nin economic agency", "Z_agency", "Y_prog_tax"),
+    ]
+    fits = [d1_model(p[1]) for p in PANELS]
 
     fig, axes = plt.subplots(2, 2, figsize=(7, 6))
-    rows.append(me_panel(axes[0, 0], GOV, DEFS, "agency_str", plot_rhs(DEFS, "agency_str"),
-                         AGENCY, X_LAB, (-3, 1), "agency_str", bins24,
-                         "D1(a) X given Z_agency, on Y_gov_fix_gap"))
-    rows.append(me_panel(axes[0, 1], GOV, DEFS, "justice_str", plot_rhs(DEFS, "justice_str"),
-                         JUST, X_LAB, (-3, 1), "justice_str", bins24,
-                         "D1(b) X given Z_justice, on Y_gov_fix_gap"))
-    rows.append(me_panel(axes[1, 0], GOV, DEFS, "desert_rich_tot", plot_rhs(DEFS, "desert_rich_tot"),
-                         RICH, X_LAB, (-3, 1), "desert_rich_tot", bins24,
-                         "D1(c) X given Z_rich_deserve, on Y_gov_fix_gap"))
-    rows.append(me_panel(axes[1, 1], TAX, DEFS, "agency_str", plot_rhs(DEFS, "agency_str"),
-                         AGENCY, X_LAB, (-3, 1), "agency_str", bins24,
-                         "D1(d) X given Z_agency, on Y_prog_tax"))
+    for ax, (p, model, z, zlab, _, zname, yname), (r, sub, rhs) in zip(axes.flat, PANELS, fits):
+        main = rhs[0]
+        km = 0.5 if main == DEFS else 1.0
+        terms = [main, "x_" + z]
+        cols = [np.full_like(grid, km), grid / 2]
+        if z == "desert_rich_tot":
+            terms += ["x_desert_americans_tot", "x_desert_poor_tot"]
+            cols += [np.full_like(grid, sub["desert_americans_tot"].mean() / 2),
+                     np.full_like(grid, sub["desert_poor_tot"].mean() / 2)]
+        me, se = effect(r, terms, np.column_stack(cols))
+        title = f"D1({p}) X given {zname}, on {yname}"
+        panel(ax, grid, me, se, sub[z].values, bins24, zlab, X_LAB, title, rug=False)
+        rows.append(me_row(title, model, me, se, int(r.nobs)))
     save(fig, f"figure_D1{sfx}_python.png")
 
-    Z_LAB = "Importance of agency to definition of desert"
-    bins100 = np.linspace(0, 1, 101)
-
     fig, axes = plt.subplots(2, 2, figsize=(7, 6))
-    rows.append(me_panel(axes[0, 0], GOV, "agency_str", "agency_str",
-                         ["agency_str", DEFS, "x_agency_str"] + CTRL,
-                         Z_LAB, "Marginal effect of belief in economic agency",
-                         (-2, 7), DEFS, bins100,
-                         "D2(a) Z_agency given X, on Y_gov_fix_gap", rug=True))
-    rows.append(me_panel(axes[0, 1], GOV, "justice_str", "justice_str",
-                         ["justice_str", DEFS, "x_justice_str"] + CTRL,
-                         Z_LAB, "Marginal effect of belief that economic desert is rewarded",
-                         (-2, 7), DEFS, bins100,
-                         "D2(b) Z_justice given X, on Y_gov_fix_gap", rug=True))
-    rows.append(me_panel(axes[1, 0], GOV, "desert_rich_tot", "desert_rich_tot",
-                         ["desert_rich_tot", DEFS, "x_desert_rich_tot", "desert_americans_tot",
-                          "x_desert_americans_tot", "desert_poor_tot", "x_desert_poor_tot"] + CTRL,
-                         Z_LAB, "Marginal effect of belief that rich Americans deserve their wealth",
-                         (-2, 7), DEFS, bins100,
-                         "D2(c) Z_rich_deserve given X, on Y_gov_fix_gap", rug=True))
-    rows.append(me_panel(axes[1, 1], TAX, "agency_str", "agency_str",
-                         ["agency_str", DEFS, "x_agency_str"] + CTRL,
-                         Z_LAB, "Marginal effect of belief in economic agency",
-                         (-2, 7), DEFS, bins100,
-                         "D2(d) Z_agency given X, on Y_prog_tax", rug=True))
+    for ax, (p, model, z, _, ylab, zname, yname), (r, sub, rhs) in zip(axes.flat, PANELS, fits):
+        G = np.column_stack([np.ones_like(grid), (grid + 1) / 2])
+        me, se = effect(r, [z, "x_" + z], G)
+        title = f"D2({p}) {zname} given X, on {yname}"
+        panel(ax, grid, me, se, sub[DEF].values, bins100, Z_LAB, ylab, title, rug=True)
+        rows.append(me_row(title, model, me, se, int(r.nobs)))
     save(fig, f"figure_D2{sfx}_python.png")
     return rows
 
