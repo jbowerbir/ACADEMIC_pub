@@ -9,6 +9,8 @@ The tables in the article contain two kinds of error:
 
 The article's findings and interpretation stand. Two sentences in Section 6.1 misread the coefficient on Age², a control variable. It is so small that it prints as 0.000. The article calls it positive when it is negative, such that support for government action to reduce the income gap (Y_gov_fix_gap) rises with age up to about 34 and then falls, rather than accelerating. The turning point is from Table 1, Y_gov_fix_gap Model 1, the one model where Age² is significant.
 
+Figures D1 and D2 in Appendix D mix two scalings of the definition variable. Corrected figures, with an explanation, are in the replication package.
+
 The corrected Table 1, estimated on the 991 distinct respondents with the corrected weights, follows. Every table in the article is reproduced in the freely available replication package, deposited in IU DataCORE, Indiana University's data repository (DOI forthcoming), with each corrected cell shown beside its published value.
 
 ## Table 1 (corrected, 991 observations, corrected weights)
@@ -51,4 +53,4 @@ The corrected Table 1, estimated on the 991 distinct respondents with the correc
 | R² | 0.4998 | 0.5525 | 0.5937 | 0.4202 | 0.4454 | 0.4728 |
 | Adj. R² | 0.4671 | 0.5232 | 0.5661 | 0.3822 | 0.4091 | 0.4370 |
 
-Coefficients with robust standard errors in parentheses; \* p < 0.10, \*\* p < 0.05, \*\*\* p < 0.01. Coefficients that round to zero keep their sign. The constant is the grand-mean intercept, as Stata reports it; its standard error is an approximation.
+Coefficients with robust standard errors in parentheses; \* p < 0.10, \*\* p < 0.05, \*\*\* p < 0.01. Coefficients that round to zero keep their sign. N is 962 because 29 respondents have no Definition score. The constant is the grand-mean intercept, as Stata reports it; its standard error is an approximation.

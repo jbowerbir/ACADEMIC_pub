@@ -38,9 +38,9 @@
 # Takes under a minute.
 #
 # Two things carried over from the 2014 Stata code on purpose:
-#   - The Stata code recodes by exact comparison (`married == .8`). Here the
-#     values are rounded to the integer grid first, because 0.8 is stored as
-#     0.7999... and an exact test matches no rows.
+#   - The Stata code recodes by exact comparison (`progtaxes2_str == 4`). Here
+#     the values are rounded to the integer grid first, because they come out a
+#     hair off (4.0000000002) and an exact test matches no rows.
 #   - The interaction terms are built on (Definition + 1) / 2, a second rescaling
 #     of a column already on 0-1 (the Stata stored them under the unscaled
 #     names), and the Definition main effect is that rescaled variable in two of
@@ -394,20 +394,23 @@ draw_figures <- function(d, sfx) {
   sc <- function(v) 2 * v - 1          # a 0-1 score back to its -1 to 1 scale
 
   if (sfx == "_published-sample") {
-    # Figure 1: the General Social Survey percentages the article charts
-    # (not from this survey)
-    png_open("figure_1_R.png", 6.5, 2.4)
-    par(mar = c(3, 12, 2, 1), family = "serif")
+    # Figure 1: the percentages the article charts, not from this survey. The
+    # first two bars (income differences, conflicts) are from the 2010 General
+    # Social Survey (n = 1512), the third from a Gallup poll of 2011-11-28 to
+    # 2011-12-01 (n = 1012). As printed, agree is on the left.
+    png_open("figure_1_R.png", 6.5, 2.6)
+    par(mar = c(4, 12, 2, 1), family = "serif")
     agree    <- c(0.45, 0.5916, 0.6653)
     disagree <- c(0.52, 0.4084, 0.1647)
-    greys    <- c("grey85", "grey60", "grey30")
-    barplot(rbind(disagree, 1 - agree - disagree, agree), horiz = TRUE,
+    greys    <- c("grey30", "grey60", "grey85")
+    barplot(rbind(agree, 1 - agree - disagree, disagree), horiz = TRUE,
             col = greys, border = NA, las = 1, cex.names = 0.8, cex.axis = 0.8,
+            xlab = "percentage", cex.lab = 0.8,
             names.arg = c("the income gap is a\nproblem that needs fixing",
                           "there are strong conflicts\nbetween the rich and poor",
                           "differences in income\nare too large"))
     abline(v = 0.5, lty = 3)
-    legend("topright", c("disagree", "unsure", "agree"), fill = greys, border = NA,
+    legend("topright", c("agree", "unsure", "disagree"), fill = greys, border = NA,
            bty = "n", cex = 0.8, horiz = TRUE, inset = c(0, -0.22), xpd = TRUE)
     invisible(dev.off())
   }
@@ -460,54 +463,39 @@ draw_figures <- function(d, sfx) {
   box()
   invisible(dev.off())
 
-  # Figures D1 and D2: marginal-effect plots. Each panel: an ordinary weighted
-  # regression with the interaction, errors clustered by state (Stata:
-  # reg ... [pw=post_weight], cluster(state)); the marginal effect of X at each
-  # value of the moderator Z, b1 + b3*Z, with a 95% band, over a histogram of Z.
-  # D2 reverses the roles: the marginal effect of Z at each value of Definition.
+  # Figures D1 and D2: marginal-effect plots drawn from the Table D1 models
+  # (state fixed effects, robust errors), with Definition on one scale. Those
+  # models build the interactions from (Definition + 1) / 2. So the marginal
+  # effect of Definition as filed is km * b(main) + b(X x Z) * Z / 2, where km
+  # is 1/2 when the main term is itself (Definition + 1) / 2 and 1 otherwise.
+  # The moderator's effect at a value of Definition is
+  # b(Z) + b(X x Z) * (Definition + 1) / 2. In panel D1(c) the other two
+  # deserve scores are held at their means. Each line has a 95% band. The
+  # printed figures came from other regressions and mixed the two scalings.
+  # The README explains.
 
-  cluster_vcov <- function(fit, g) {
-    X <- model.matrix(fit)
-    w <- weights(fit)
-    e <- residuals(fit)
-    n <- nrow(X)
-    k <- ncol(X)
-    G <- length(unique(g))
-    bread <- solve(crossprod(X * sqrt(w)))
-    U     <- X * (w * e)
-    meat  <- Reduce(`+`, lapply(split(seq_len(n), g), function(i) {
-      s <- matrix(colSums(U[i, , drop = FALSE]), nrow = 1)
-      crossprod(s)
-    }))
-    bread %*% meat %*% bread * (G / (G - 1)) * ((n - 1) / (n - k))
+  d1_model <- function(model) {
+    m   <- Filter(function(m) startsWith(m[[1]], "Table D1") && m[[2]] == model, M)[[1]]
+    dv  <- m[[3]]
+    rhs <- m[[4]]
+    sub <- d[complete.cases(d[, unique(c(dv, rhs, DEF, "post_weight", "state"))]), ]
+    f   <- as.formula(paste(dv, "~", paste(c(rhs, "factor(state)"), collapse = " + ")))
+    fit <- lm(f, data = sub, weights = sub$post_weight)
+    list(fit = fit, V = hc1(fit), sub = sub, rhs = rhs)
   }
 
-  # the right-hand side of each plot regression: rescaled Definition, the
-  # moderator, their product, and the controls; for the rich-deserve panels
-  # all three deserve variables and their products enter together
-  plot_rhs <- function(zvar) {
-    block <- if (zvar == "desert_rich_tot") DES_X else c(zvar, paste0("x_", zvar))
-    c(DEFS, block, CTRL)
+  # the marginal effect G b at each grid point, and its standard error
+  effect <- function(f, terms, G) {
+    b <- coef(f$fit)[terms]
+    V <- f$V[terms, terms]
+    list(me = as.vector(G %*% b), se = sqrt(rowSums((G %*% V) * G)))
   }
 
-  me_panel <- function(dv, xvar, zvar, xlab, ylab, ylim, hist_var, breaks,
-                       main, rug = FALSE) {
-    rhs <- plot_rhs(zvar)
-    sub <- d[complete.cases(d[, c(dv, rhs, "post_weight", "state")]), ]
-    fit <- lm(as.formula(paste(dv, "~", paste(rhs, collapse = " + "))),
-              data = sub, weights = sub$post_weight)
-    V   <- cluster_vcov(fit, sub$state)
-    b   <- coef(fit)
-    ix  <- paste0("x_", zvar)
-    b1  <- b[[xvar]]
-    b3  <- b[[ix]]
-    v1  <- V[xvar, xvar]
-    v3  <- V[ix, ix]
-    c13 <- V[xvar, ix]
-    zz   <- seq(0, 1, by = 0.01)
-    me   <- b1 + b3 * zz
-    band <- 1.96 * sqrt(v1 + v3 * zz^2 + 2 * c13 * zz)
-    h    <- hist(sub[[hist_var]], breaks = breaks, plot = FALSE)
+  panel <- function(grid, e, hist_vals, breaks, xlab, ylab, main, rug) {
+    band <- 1.96 * e$se
+    lo   <- floor(min(e$me - band, 0))
+    hi   <- ceiling(max(e$me + band, 0))
+    h    <- hist(hist_vals, breaks = breaks, plot = FALSE)
     par(mar = c(4, 4, 2, 4), family = "serif")
     plot(h$mids, 100 * h$counts / sum(h$counts), type = "h", lend = 1,
          lwd = if (rug) 2 else 8, col = "grey80", axes = FALSE,
@@ -515,65 +503,88 @@ draw_figures <- function(d, sfx) {
     axis(4, cex.axis = 0.7)
     mtext("Percentage of observations", 4, line = 2.2, cex = 0.7)
     par(new = TRUE)
-    plot(zz, me, type = "l", lwd = 2, ylim = ylim, xlim = c(0, 1), bty = "n",
-         xlab = xlab, ylab = ylab, main = main,
+    plot(grid, e$me, type = "l", lwd = 2, ylim = c(lo, hi), xlim = c(0, 1),
+         bty = "n", xlab = xlab, ylab = ylab, main = main,
          cex.lab = 0.75, cex.axis = 0.7, cex.main = 0.8)
-    lines(zz, me + band, lty = 2)
-    lines(zz, me - band, lty = 2)
+    lines(grid, e$me + band, lty = 2)
+    lines(grid, e$me - band, lty = 2)
     abline(h = 0)
-    if (rug) rug(sub[[hist_var]], col = "grey40")
-    sprintf("| %s | %s | %s | %.3f | %.3f | %.3f | %.3f | %d |",
-            main, dv, zvar, b1, sqrt(v1), b3, sqrt(v3), nobs(fit))
+    if (rug) rug(hist_vals, col = "grey40")
   }
 
-  rows <- c(rows, "", "## Figure D1 and D2 regressions",
-          "| Panel | Outcome | Z | b(X) | SE | b(X x Z) | SE | N |",
-          "|---|---|---|---|---|---|---|---|")
+  me_row <- function(title, model, e, n) {
+    k <- length(e$me)
+    sprintf("| %s | %s | %.3f | %.3f | %.3f | %.3f | %d |",
+            title, model, e$me[1], e$se[1], e$me[k], e$se[k], n)
+  }
+
+  rows <- c(rows, "", "## The marginal effects in Figures D1 and D2", "",
+            paste0("Each line's value at the two ends of its horizontal axis, with its ",
+                   "standard error. In D1 that is the marginal effect of Definition at ",
+                   "Z = 0 and Z = 1. In D2 it is the marginal effect of Z at ",
+                   "Definition = 0 and Definition = 1."),
+            "",
+            "| Panel | Table D1 model | At 0 | SE | At 1 | SE | N |",
+            "|---|---|---|---|---|---|---|")
 
   X_LAB  <- "Marginal effect of definition"
+  Z_LAB  <- "Importance of agency to definition of desert"
   AGENCY <- "Belief that peoples' economic standing is within their control"
   JUST   <- "Belief that economic desert is rewarded"
   RICH   <- "Belief that rich Americans deserve their wealth"
   # 24 bins of width 1/24, offset half a bin so each answer level sits in the
   # middle of a bar
   br24   <- seq(-1 / 48, 1 + 1 / 48, by = 1 / 24)
+  br100  <- seq(0, 1, by = 0.01)
+  grid   <- seq(0, 1, by = 0.01)
+  # panel, Table D1 model, moderator, its label, D2's y label, and the names in
+  # the panel titles
+  PANELS <- list(
+    list("a", "gov Model 1", "agency_str", AGENCY,
+         "Marginal effect of belief in economic agency", "Z_agency", "Y_gov_fix_gap"),
+    list("b", "gov Model 2", "justice_str", JUST,
+         "Marginal effect of belief that economic desert is rewarded",
+         "Z_justice", "Y_gov_fix_gap"),
+    list("c", "gov Model 3", "desert_rich_tot", RICH,
+         "Marginal effect of belief that rich Americans deserve their wealth",
+         "Z_rich_deserve", "Y_gov_fix_gap"),
+    list("d", "tax Model 1", "agency_str", AGENCY,
+         "Marginal effect of belief in economic agency", "Z_agency", "Y_prog_tax"))
+  fits <- lapply(PANELS, function(p) d1_model(p[[2]]))
 
   png_open(sprintf("figure_D1%s_R.png", sfx), 7, 6)
   par(mfrow = c(2, 2))
-  rows <- c(rows,
-    me_panel(GOV, DEFS, "agency_str", AGENCY, X_LAB, c(-3, 1), "agency_str", br24,
-             "D1(a) X given Z_agency, on Y_gov_fix_gap"),
-    me_panel(GOV, DEFS, "justice_str", JUST, X_LAB, c(-3, 1), "justice_str", br24,
-             "D1(b) X given Z_justice, on Y_gov_fix_gap"),
-    me_panel(GOV, DEFS, "desert_rich_tot", RICH, X_LAB, c(-3, 1),
-             "desert_rich_tot", br24,
-             "D1(c) X given Z_rich_deserve, on Y_gov_fix_gap"),
-    me_panel(TAX, DEFS, "agency_str", AGENCY, X_LAB, c(-3, 1), "agency_str", br24,
-             "D1(d) X given Z_agency, on Y_prog_tax"))
+  for (i in seq_along(PANELS)) {
+    p     <- PANELS[[i]]
+    f     <- fits[[i]]
+    z     <- p[[3]]
+    main  <- f$rhs[1]
+    km    <- if (main == DEFS) 0.5 else 1
+    terms <- c(main, paste0("x_", z))
+    G     <- cbind(km, grid / 2)
+    if (z == "desert_rich_tot") {
+      terms <- c(terms, "x_desert_americans_tot", "x_desert_poor_tot")
+      G <- cbind(G, mean(f$sub$desert_americans_tot) / 2,
+                 mean(f$sub$desert_poor_tot) / 2)
+    }
+    e     <- effect(f, terms, G)
+    title <- sprintf("D1(%s) X given %s, on %s", p[[1]], p[[6]], p[[7]])
+    panel(grid, e, f$sub[[z]], br24, p[[4]], X_LAB, title, FALSE)
+    rows  <- c(rows, me_row(title, p[[2]], e, nobs(f$fit)))
+  }
   invisible(dev.off())
-
-  Z_LAB  <- "Importance of agency to definition of desert"
-  br100  <- seq(0, 1, by = 0.01)
 
   png_open(sprintf("figure_D2%s_R.png", sfx), 7, 6)
   par(mfrow = c(2, 2))
-  rows <- c(rows,
-    me_panel(GOV, "agency_str", "agency_str", Z_LAB,
-             "Marginal effect of belief in economic agency",
-             c(-2, 7), DEFS, br100,
-             "D2(a) Z_agency given X, on Y_gov_fix_gap", rug = TRUE),
-    me_panel(GOV, "justice_str", "justice_str", Z_LAB,
-             "Marginal effect of belief that economic desert is rewarded",
-             c(-2, 7), DEFS, br100,
-             "D2(b) Z_justice given X, on Y_gov_fix_gap", rug = TRUE),
-    me_panel(GOV, "desert_rich_tot", "desert_rich_tot", Z_LAB,
-             "Marginal effect of belief that rich Americans deserve their wealth",
-             c(-2, 7), DEFS, br100,
-             "D2(c) Z_rich_deserve given X, on Y_gov_fix_gap", rug = TRUE),
-    me_panel(TAX, "agency_str", "agency_str", Z_LAB,
-             "Marginal effect of belief in economic agency",
-             c(-2, 7), DEFS, br100,
-             "D2(d) Z_agency given X, on Y_prog_tax", rug = TRUE))
+  for (i in seq_along(PANELS)) {
+    p     <- PANELS[[i]]
+    f     <- fits[[i]]
+    z     <- p[[3]]
+    e     <- effect(f, c(z, paste0("x_", z)), cbind(1, (grid + 1) / 2))
+    title <- sprintf("D2(%s) %s given X, on %s", p[[1]], p[[6]], p[[7]])
+    panel(grid, e, f$sub[[DEF]], br100, Z_LAB, p[[5]], title, TRUE)
+    rows  <- c(rows, me_row(title, p[[2]], e, nobs(f$fit)))
+  }
   invisible(dev.off())
   rows
 }

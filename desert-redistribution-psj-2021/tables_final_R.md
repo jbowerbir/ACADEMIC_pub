@@ -333,17 +333,20 @@ The published tables re-estimated on the 991 distinct respondents, without the d
 | R2 | 0.4352 | 0.4454 | 0.4752 |
 | Adj-R2 | 0.3976 | 0.4085 | 0.4378 |
 
-## Figure D1 and D2 regressions
-| Panel | Outcome | Z | b(X) | SE | b(X x Z) | SE | N |
-|---|---|---|---|---|---|---|---|
-| D1(a) X given Z_agency, on Y_gov_fix_gap | gov_reducegap_str | agency_str | 0.691 | 0.604 | -2.372 | 0.743 | 962 |
-| D1(b) X given Z_justice, on Y_gov_fix_gap | gov_reducegap_str | justice_str | 0.587 | 0.412 | -3.134 | 0.893 | 962 |
-| D1(c) X given Z_rich_deserve, on Y_gov_fix_gap | gov_reducegap_str | desert_rich_tot | 1.401 | 0.567 | -4.804 | 1.784 | 962 |
-| D1(d) X given Z_agency, on Y_prog_tax | progtaxes2_str | agency_str | 1.614 | 0.517 | -2.275 | 0.624 | 962 |
-| D2(a) Z_agency given X, on Y_gov_fix_gap | gov_reducegap_str | agency_str | 1.896 | 0.700 | -2.372 | 0.743 | 962 |
-| D2(b) Z_justice given X, on Y_gov_fix_gap | gov_reducegap_str | justice_str | 2.484 | 0.807 | -3.134 | 0.893 | 962 |
-| D2(c) Z_rich_deserve given X, on Y_gov_fix_gap | gov_reducegap_str | desert_rich_tot | 4.034 | 1.635 | -4.804 | 1.784 | 962 |
-| D2(d) Z_agency given X, on Y_prog_tax | progtaxes2_str | agency_str | 1.912 | 0.576 | -2.275 | 0.624 | 962 |
+## The marginal effects in Figures D1 and D2
+
+Each line's value at the two ends of its horizontal axis, with its standard error. In D1 that is the marginal effect of Definition at Z = 0 and Z = 1. In D2 it is the marginal effect of Z at Definition = 0 and Definition = 1.
+
+| Panel | Table D1 model | At 0 | SE | At 1 | SE | N |
+|---|---|---|---|---|---|---|
+| D1(a) X given Z_agency, on Y_gov_fix_gap | gov Model 1 | 0.439 | 0.234 | -0.867 | 0.185 | 962 |
+| D1(b) X given Z_justice, on Y_gov_fix_gap | gov Model 2 | 0.244 | 0.185 | -1.200 | 0.242 | 962 |
+| D1(c) X given Z_rich_deserve, on Y_gov_fix_gap | gov Model 3 | 0.458 | 0.277 | -1.125 | 0.291 | 962 |
+| D1(d) X given Z_agency, on Y_prog_tax | tax Model 1 | 0.903 | 0.220 | -0.322 | 0.167 | 962 |
+| D2(a) Z_agency given X, on Y_gov_fix_gap | gov Model 1 | 0.848 | 0.277 | -0.459 | 0.075 | 962 |
+| D2(b) Z_justice given X, on Y_gov_fix_gap | gov Model 2 | 0.786 | 0.301 | -0.658 | 0.073 | 962 |
+| D2(c) Z_rich_deserve given X, on Y_gov_fix_gap | gov Model 3 | 0.959 | 0.440 | -0.623 | 0.102 | 962 |
+| D2(d) Z_agency given X, on Y_prog_tax | tax Model 1 | 0.864 | 0.250 | -0.361 | 0.077 | 962 |
 
 ## Cells that change with the two data fixes
 Typos fixed: 992 rows, the 2014 weight. Final: 991 rows, the duplicate removed, the weight corrected.
