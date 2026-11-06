@@ -52,4 +52,4 @@ With the data corrected, the main text's findings and interpretation stand. The 
 | R² | 0.4998 | 0.5525 | 0.5937 | 0.4202 | 0.4454 | 0.4728 |
 | Adj. R² | 0.4671 | 0.5232 | 0.5661 | 0.3822 | 0.4091 | 0.4370 |
 
-Coefficients with robust standard errors in parentheses; \* p < 0.10, \*\* p < 0.05, \*\*\* p < 0.01. Coefficients that round to zero keep their sign. N is 962 because 29 respondents have no Definition score. The constant is the grand-mean intercept, as Stata reports it; its standard error is an approximation.
+Coefficients with robust standard errors in parentheses; \* p < 0.10, \*\* p < 0.05, \*\*\* p < 0.01. Y_gov is Y_gov_fix_gap and Y_tax is Y_prog_tax. Coefficients that round to zero keep their sign. N is 962 because 29 respondents have no Definition score. The constant is the grand-mean intercept, as Stata reports it; its standard error is an approximation.
