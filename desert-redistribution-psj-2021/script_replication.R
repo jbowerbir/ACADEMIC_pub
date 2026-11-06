@@ -8,12 +8,12 @@
 # Reads, from this folder:
 #   data_survey_psj-subset.csv   992 records, the 27 survey variables the
 #                                tables and figures use
-#   tables_as-published.md       the tables as printed, for the comparison at
+#   tables/tables_as-published.md   the tables as printed, for the comparison at
 #                                the end (skipped if the file is absent)
 #
-# Writes, to this folder:
-#   tables_typos-fixed_R.md        Tables 1, A1, C1, C2, D1, and the eight
-#                                regressions behind Figures D1 and D2, on the
+# Writes, to tables/ and figures/ in this folder (created if missing):
+#   tables_typos-fixed_R.md        Tables 1, A1, C1, C2, D1, and the marginal
+#                                effects plotted in Figures D1 and D2, on the
 #                                published sample (992 rows, 2014 weight), with
 #                                a list of every printed cell that differs
 #                                appended at the end
@@ -52,7 +52,8 @@
 
 # ---- 1. The data and the two corrections it needs ----------------------------
 
-OUT <- "tables_typos-fixed_R.md"
+OUT <- "tables/tables_typos-fixed_R.md"
+for (f in c("tables", "figures")) dir.create(f, showWarnings = FALSE)
 d   <- read.csv("data_survey_psj-subset.csv")
 
 # One respondent's record is in the file twice (rows identical in every
@@ -382,14 +383,14 @@ dedup$md <- c("# Final tables", "",
 
 # ---- 5. Figures ------------------------------------------------------------------
 # Drawn twice: from the published sample (992 rows, 2014 weight), which
-# reproduces the printed figures, and from the final data (991 rows,
-# corrected weight) as figure_*_final-data_R.png. Returns the rows of the D1 and D2
-# regressions for the tables file.
+# reproduces the printed figures except D1 and D2 (drawn correctly here, see
+# the README), and from the final data (991 rows, corrected weight) as
+# figure_*_final-data_R.png. Returns the marginal-effect rows for the tables file.
 draw_figures <- function(d, sfx) {
   rows <- character(0)
 
   png_open <- function(f, w = 6.5, h = 4) {
-    png(f, width = w, height = h, units = "in", res = 200)
+    png(file.path("figures", f), width = w, height = h, units = "in", res = 200)
   }
   sc <- function(v) 2 * v - 1          # a 0-1 score back to its -1 to 1 scale
 
@@ -521,7 +522,8 @@ draw_figures <- function(d, sfx) {
   rows <- c(rows, "", "## The marginal effects in Figures D1 and D2", "",
             paste0("Each line's value at the two ends of its horizontal axis, with its ",
                    "standard error. In D1 that is the marginal effect of Definition at ",
-                   "Z = 0 and Z = 1. In D2 it is the marginal effect of Z at ",
+                   "Z = 0 and Z = 1 (in D1(c), with the other two deserve scores at ",
+                   "their means). In D2 it is the marginal effect of Z at ",
                    "Definition = 0 and Definition = 1."),
             "",
             "| Panel | Table D1 model | At 0 | SE | At 1 | SE | N |",
@@ -643,7 +645,7 @@ dd <- c(dedup$md, "",
         "Typos fixed: 992 rows, the 2014 weight. Final: 991 rows, the duplicate removed, the weight corrected.", "",
         "| Table | Outcome | Model | Row | Typos fixed | Final |",
         "|---|---|---|---|---|---|", changes)
-writeLines(dd, "tables_final_R.md")
+writeLines(dd, "tables/tables_final_R.md")
 ncells <- sum(sapply(res, function(r) length(r$est$cells)))
 cat(sprintf("wrote tables_final_R.md: %d of %d regression cells change",
             sum(!startsWith(changes, "| Table A1")), ncells), "at the printed precision\n")
@@ -656,7 +658,7 @@ cat(sprintf("wrote %s and the figures, figure_*_R.png\n", OUT))
 # printed decimals; the tolerances below are half a unit in the last printed
 # digit.
 
-PUB <- "tables_as-published.md"
+PUB <- "tables/tables_as-published.md"
 if (file.exists(PUB)) {
 
   # {section: {column: {row: coef, se}}} for a markdown file of tables; a

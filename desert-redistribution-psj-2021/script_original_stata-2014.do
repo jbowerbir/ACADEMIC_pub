@@ -4,8 +4,8 @@
 // The original Stata analysis for Bower-Bir (2022), "Desert and redistribution:
 // Justice as a remedy for, and cause of, economic inequality", Policy Studies
 // Journal 50(4): 757-795, as run in September 2014. Kept as a legacy record of
-// the original analysis. The commands are exactly as they were; the only 2026
-// additions are the comment lines that begin with "// [2026]", which name the
+// the original analysis. Commands as they were, minus the directory paths on
+// the log and use lines; the 2026 additions are the "// [2026]" comment lines, which name the
 // published table each model feeds and explain two things a reader would
 // otherwise have to discover.
 //
@@ -109,9 +109,10 @@ gen interact_poor_def_scale = .
 	replace interact_poor_def =  desert_poor_tot * corr_ideal_agency_scale
 
 	
-// [2026] Table C1 lives in this section. Of the models below, only the five
-// [2026] with ideology and a single Z (or no Z) were published, as Table C1
-// [2026] Models A, C, D, E; the rest were not printed.
+// [2026] Table C1 lives in this section. Of the models below, only those with
+// [2026] ideology were published, four per outcome, as Table C1 Models A, C,
+// [2026] D, and E (no Z, agency, justice, the three deserve scores); the rest
+// [2026] were not printed. Model B, Definition alone, is in the next section.
 //	BELIEF IN JUSTICE
 
 // + controls
@@ -1038,8 +1039,8 @@ graph twoway hist corr_ideal_agency, width(0.01) percent color(gs14) yaxis(2)
 	//	log close
 	
 
-// [2026] Console scratch from 2014: kernel densities, a command fragment,
-// [2026] and four models repeated from above. Kept because nothing in this
+// [2026] Console scratch from 2014: kernel densities, a command fragment, and
+// [2026] four unpublished models with extra controls. Kept because nothing in this
 // [2026] file has been removed; nothing here feeds a published table.
 kdens corr_ideal_agency if party > 0 [pweight = post_weight]
 kdens corr_ideal_agency if party < 0 [pweight = post_weight]
