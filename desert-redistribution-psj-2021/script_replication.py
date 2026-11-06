@@ -8,12 +8,12 @@ script_replication.R, in Python.
 Reads, from this folder:
   data_survey_psj-subset.csv   992 records, the 27 survey variables the
                                tables and figures use
-  tables_as-published.md       the tables as printed, for the comparison
+  tables/tables_as-published.md   the tables as printed, for the comparison
                                at the end (skipped if the file is absent)
 
-Writes, to this folder:
-  tables_typos-fixed_python.md        Tables 1, A1, C1, C2, D1, and the eight
-                                    regressions behind Figures D1 and D2, on
+Writes, to tables/ and figures/ in this folder (created if missing):
+  tables_typos-fixed_python.md        Tables 1, A1, C1, C2, D1, and the marginal
+                                    effects plotted in Figures D1 and D2, on
                                     the published sample (992 rows, 2014
                                     weight), with a list of every printed cell
                                     that differs appended at the end
@@ -63,7 +63,9 @@ import matplotlib.pyplot as plt
 
 # ---- 1. The data and the two corrections it needs ----------------------------
 
-OUT = "tables_typos-fixed_python.md"
+OUT = "tables/tables_typos-fixed_python.md"
+for _d in ("tables", "figures"):
+    os.makedirs(_d, exist_ok=True)
 d = pd.read_csv("data_survey_psj-subset.csv")
 
 # One respondent's record is in the file twice (rows identical in every
@@ -370,9 +372,9 @@ md_dedup = ["# Final tables", "", PREAMBLE_FINAL] + md_dedup
 
 # ---- 5. Figures ------------------------------------------------------------------
 # Drawn twice: from the published sample (992 rows, 2014 weight), which
-# reproduces the printed figures, and from the final data (991 rows, corrected
-# weight) as figure_*_final-data_python.png. Returns the rows of the D1 and D2
-# regressions for the tables file.
+# reproduces the printed figures except D1 and D2 (drawn correctly here, see
+# the README), and from the final data (991 rows, corrected weight) as
+# figure_*_final-data_python.png. Returns the marginal-effect rows for the tables file.
 
 plt.rcParams.update({"font.family": "serif", "font.size": 9})
 
@@ -404,7 +406,7 @@ def hide_spines(ax, sides):
 
 def save(fig, name):
     fig.tight_layout()
-    fig.savefig(name, dpi=200)
+    fig.savefig(os.path.join("figures", name), dpi=200)
     plt.close(fig)
 
 
@@ -544,8 +546,9 @@ def draw_figures(d, sfx):
 
     rows += ["", "## The marginal effects in Figures D1 and D2", "",
              "Each line's value at the two ends of its horizontal axis, with its standard "
-             "error. In D1 that is the marginal effect of Definition at Z = 0 and Z = 1. "
-             "In D2 it is the marginal effect of Z at Definition = 0 and Definition = 1.",
+             "error. In D1 that is the marginal effect of Definition at Z = 0 and Z = 1 (in "
+             "D1(c), with the other two deserve scores at their means). In D2 it is the "
+             "marginal effect of Z at Definition = 0 and Definition = 1.",
              "",
              "| Panel | Table D1 model | At 0 | SE | At 1 | SE | N |",
              "|---|---|---|---|---|---|---|"]
@@ -657,7 +660,7 @@ dd = md_dedup + [
     "| Table | Outcome | Model | Row | Typos fixed | Final |",
     "|---|---|---|---|---|---|",
 ] + changes
-open("tables_final_python.md", "w", encoding="utf-8", newline="\n").write("\n".join(dd) + "\n")
+open("tables/tables_final_python.md", "w", encoding="utf-8", newline="\n").write("\n".join(dd) + "\n")
 n_changed = sum(not ch.startswith("| Table A1") for ch in changes)
 n_cells = sum(len(e["cells"]) for _, _, e in res)
 print(f"wrote tables_final_python.md: {n_changed} of {n_cells} regression cells change "
@@ -671,7 +674,7 @@ print(f"wrote {OUT} and the figures, figure_*_python.png")
 # printed decimals; the tolerances below are half a unit in the last printed
 # digit.
 
-PUB = "tables_as-published.md"
+PUB = "tables/tables_as-published.md"
 if os.path.exists(PUB):
 
     def parse_md(path):

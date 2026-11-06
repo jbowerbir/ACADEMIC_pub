@@ -335,7 +335,7 @@ The published tables with their typos corrected, estimated on the published samp
 
 ## The marginal effects in Figures D1 and D2
 
-Each line's value at the two ends of its horizontal axis, with its standard error. In D1 that is the marginal effect of Definition at Z = 0 and Z = 1. In D2 it is the marginal effect of Z at Definition = 0 and Definition = 1.
+Each line's value at the two ends of its horizontal axis, with its standard error. In D1 that is the marginal effect of Definition at Z = 0 and Z = 1 (in D1(c), with the other two deserve scores at their means). In D2 it is the marginal effect of Z at Definition = 0 and Definition = 1.
 
 | Panel | Table D1 model | At 0 | SE | At 1 | SE | N |
 |---|---|---|---|---|---|---|
