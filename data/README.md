@@ -11,7 +11,7 @@ Each article's replication package holds the columns that article uses, cut unal
 
 ## The full survey
 
-The full survey is being deposited at IU DataCORE and is not in this repository; its DOI will be added here and to both packages when it is issued. The deposit holds the raw data as delivered (1,390 responses, de-identified), the cleaning programs in R and Python (the 2014 Stata chain written out statement by statement, with identical output), the cleaned data after each step (cleaned; weighted; scaled; scaled and weighted, the analysis file), the 2014 survey weight as published and a corrected one, the instrument as fielded with its Qualtrics source, the quota design, a codebook, and a provenance record.
+The full survey is being deposited at IU DataCORE and is not in this repository; its DOI will be added here and to both packages when it is issued. The deposit holds the raw data as delivered (1,390 responses, de-identified), the cleaning programs in R and Python (the 2014 Stata chain written out statement by statement, with identical output), the cleaned data after each step (cleaned; weighted; scaled; scaled and weighted, the analysis file), one record per respondent, the duplicate the 2014 cleaning missed dropped there while the two packages keep it, the 2014 survey weight as published and a corrected one, the instrument as fielded with its Qualtrics source, the quota design, a codebook, and a provenance record.
 
 ## De-identification
 
