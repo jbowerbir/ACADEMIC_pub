@@ -5,12 +5,12 @@
 # socioeconomic standing", Economia Politica 38(1): 131-170. Base R only.
 # script_replication.py is the same program in Python, without the figures.
 #
-# Reads, from this folder:
-#   data_survey_ep-subset.csv   992 respondents, the 54 survey variables the
-#                               tables and figures use
-#   tables_as-published.md      the tables as printed, for the comparison
+# Reads:
+#   data_survey_ep-subset.csv   992 records (991 respondents), the 54 survey
+#                               variables the tables and figures use
+#   tables/tables_as-published.md   the tables as printed, for the comparison
 #
-# Writes, to this folder:
+# Writes, to tables/ and figures/ (created if needed):
 #   tables_typos-fixed_R.md       Tables 1, 2, and 4, the numbers behind Figures
 #                               3 to 7, the survey-weight check, and a list of
 #                               every printed cell that differs from the re-run
@@ -49,8 +49,10 @@
 
 # ---- 1. The data and the duplicated record -----------------------------------
 
-OUT <- "tables_typos-fixed_R.md"
-PUB <- "tables_as-published.md"
+OUT <- "tables/tables_typos-fixed_R.md"
+PUB <- "tables/tables_as-published.md"
+dir.create("tables", showWarnings = FALSE)
+dir.create("figures", showWarnings = FALSE)
 d992 <- read.csv("data_survey_ep-subset.csv")
 
 # The duplicate: two rows identical in every answer (ids 1115 and 1157).
@@ -337,8 +339,8 @@ final <- c("# Final tables: Bower-Bir (2021), Economia Politica 38(1): 131-170",
            "", "## Cells that change",
            "Typos fixed: the 2014 weight; Table 2 on all 992 rows. Final: the corrected weight; Table 2 on the 991 distinct respondents.", "",
            "| Table | Model | Row | Typos fixed | Final |", "|---|---|---|---|---|", changes)
-writeLines(final, "tables_final_R.md", useBytes = TRUE)
-cat(sprintf("wrote tables_final_R.md: %d cells change at the printed precision\n", length(changes)))
+writeLines(final, "tables/tables_final_R.md", useBytes = TRUE)
+cat(sprintf("wrote tables/tables_final_R.md: %d cells change at the printed precision\n", length(changes)))
 
 
 # ---- 9. Comparison with the printed tables ---------------------------------------
@@ -401,7 +403,7 @@ ideal <- function(f) d[[paste0(f, "_ideal")]]    # ideal importance, 0-1
 by_imp <- names(FAC)[order(sapply(names(FAC), function(f) mean(ideal(f))))]
 
 # Figure 1: mean control and mean ideal importance, 95% intervals.
-png_open("figure_1_R.png", 1300, 1100)
+png_open("figures/figure_1_R.png", 1300, 1100)
 par(mar = c(6, 9, 1, 1))
 k <- length(by_imp)
 plot(NA, xlim = c(0, 1), ylim = c(0.5, k + 0.5), axes = FALSE, xlab = "", ylab = "")
@@ -424,7 +426,7 @@ legend("bottomright", c("control over", "ideal importance of"), pch = c(1, 19), 
 invisible(dev.off())
 
 # Figure 2: densities of control (dashed) and ideal importance (solid).
-png_open("figure_2_R.png", 1800, 1100)
+png_open("figures/figure_2_R.png", 1800, 1100)
 par(mfrow = c(3, 5), mar = c(2, 1, 2, 1), oma = c(2, 0, 0, 0))
 for (f in by_imp) {
   # a bandwidth wide enough to smooth over the 5 and 7 answer levels
@@ -461,8 +463,8 @@ heat <- function(file, truncate) {
           "ideal importance of (vu very un-important, vi very important)", side = 2, outer = TRUE, line = 0.5, cex = 0.8)
   invisible(dev.off())
 }
-heat("figure_3_R.png", FALSE)
-heat("figure_4_R.png", TRUE)
+heat("figures/figure_3_R.png", FALSE)
+heat("figures/figure_4_R.png", TRUE)
 
 # Figure 5: quadrants as the article assigns them (Sect. 3.3; the assignment is
 # the author's reading of Figures 1 and 2, not a computed quantity), distance
@@ -471,7 +473,7 @@ heat("figure_4_R.png", TRUE)
 QUAD <- list(c(1, 1), c(-1, 1), c(-1, -1), c(1, -1))
 INQ <- list(c("race", "wealth", "connections", "gender", "ambition", "hardwork", "attitude", "education"),
             c("creativity", "iq"), c("school", "health"), c("econstate", "stablefam", "parenteduc"))
-png_open("figure_5_R.png", 1200, 1200)
+png_open("figures/figure_5_R.png", 1200, 1200)
 par(mar = c(4, 4, 1, 1))
 plot(NA, xlim = c(-0.65, 0.65), ylim = c(-0.65, 0.65), asp = 1, axes = FALSE,
      xlab = "control over factor", ylab = "ideal importance of factor")
@@ -497,7 +499,7 @@ for (q in 1:4) {
 invisible(dev.off())
 
 # Figure 6: the by-respondent correlation.
-png_open("figure_6_R.png", 1300, 800)
+png_open("figures/figure_6_R.png", 1300, 800)
 par(mar = c(4.5, 4.5, 1, 1))
 plot(density(x), main = "", xlim = c(-1, 1), lwd = 1.5,
      xlab = "correlation b/w control over and ideal importance of factors", ylab = "density")
@@ -506,7 +508,7 @@ invisible(dev.off())
 # Figure 7, corrected: the index with its sign reversed, so that the right end is
 # neoliberal. The published figure plotted the index as stored and labeled its
 # right end neoliberal; see tables_typos-fixed_R.md, Figure 7.
-png_open("figure_7_R.png", 1300, 800)
+png_open("figures/figure_7_R.png", 1300, 800)
 par(mar = c(4.5, 4.5, 1, 1))
 nr <- -neo
 plot(density(nr, adjust = 1.5, from = -3, to = 3), main = "", lwd = 1.5,
@@ -518,4 +520,4 @@ text(mean(nr) - 0.05, par("usr")[4] * 0.95, sprintf("mean %.2f", mean(nr)), pos 
 text(-2.9, par("usr")[4] * 0.85, sprintf("lean anti-neoliberal %.1f%%", mean(nr < 0) * 100), pos = 4, cex = 0.8)
 text(2.9, par("usr")[4] * 0.85, sprintf("lean neoliberal %.1f%%", mean(nr > 0) * 100), pos = 2, cex = 0.8)
 invisible(dev.off())
-cat("wrote figure_1_R.png ... figure_7_R.png\n")
+cat("wrote figures/figure_1_R.png ... figures/figure_7_R.png\n")
