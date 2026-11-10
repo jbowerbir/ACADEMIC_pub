@@ -1,40 +1,22 @@
-# Economic Justice Survey (v7)
+# Economic Justice Survey (version 7)
 
-Survey data from the Economic Justice survey (v7), fielded by **SocialSci** between November 2013 and April 2014. N=992 respondents, nationally representative sample (weighted). This dataset supports multiple published papers:
+A national survey of American adults on economic desert, justice, and redistribution, fielded for me by SocialSci, an online survey panel company, between November 2013 and April 2014. The 2014 cleaning kept 992 records, which hold 991 respondents, weighted by raking to 2012 Census Bureau and Pew Research Center totals. The data behind two published articles and my dissertation:
 
-- Bower-Bir (2021) "Earning Our Place, More or Less" *Economia Politica* 38(1)
-- Bower-Bir (2022) "Desert and Redistribution" *Policy Studies Journal* 50(4)
+- Bower-Bir, J. S. (2021). Earning our place, more or less: Responsibility's flexible relationship with desert in socioeconomic standing. *Economia Politica* 38(1): 131–170. https://doi.org/10.1007/s40888-020-00201-9
+- Bower-Bir, J. S. (2022). Desert and redistribution: Justice as a remedy for, and cause of, economic inequality. *Policy Studies Journal* 50(4): 757–795. https://doi.org/10.1111/psj.12439
 
-> **Public now (2026-10):** the 27 columns the PSJ article's tables and figures use are in `../desert-redistribution-psj-2021/data_survey_psj-subset.csv`, with a codebook beside it.
->
-> **Note (2026):** The data files themselves are being finalized for public deposit at IU ScholarWorks and are not in this repository yet. This document describes the dataset and its schema; the CSVs and supporting materials will be posted with the complete, reviewed replication package. De-identification is under review before release.
+## What is public now
 
-## Files
+Each article's replication package holds the columns that article uses, cut unaltered from the survey's analysis file, with a codebook: 27 columns in [`desert-redistribution-psj-2021/`](../desert-redistribution-psj-2021/) and 54 in [`earning-our-place-ecopol-2020/`](../earning-our-place-ecopol-2020/). Row numbers (`row`) mean the same respondent in both.
 
-- `economic_justice_v7_nonstandardized.csv` — De-identified survey responses. 992 rows, 229 columns. Original (non-standardized) scale values. Good for descriptive work; **cannot reproduce the published regression tables** (no survey weights, unstandardized scales).
-- `economic_justice_v7_analysis-weighted.csv` — **The analysis file. Use this to replicate published tables.** De-identified. 992 rows, 241 columns. Variables standardized to [0,1] as the papers describe, and carries the six survey-weight columns — including `post_weight`, which every published regression uses (`[pw=post_weight]`). Derived from `Economic-Justice_v7_2014-04-08_E_WORKING.dta` by `build_analysis_csv.py`; added 2026-07-16 after it emerged that the tables could not be reproduced from the non-standardized release alone.
-- `build_analysis_csv.py` — Builds the above from the source Stata file. Documents exactly which columns are dropped for de-identification.
-- `Survey_v7_codebook_2014-04-08.xlsx` — Full codebook with variable names, question text, and response options.
+## The full survey
+
+The full survey is being deposited at IU DataCORE and is not in this repository; its DOI will be added here and to both packages when it is issued. The deposit holds the raw data as delivered (1,390 responses, de-identified), the cleaning programs in R and Python (the 2014 Stata chain written out statement by statement, with identical output), the cleaned data after each step (cleaned; weighted; scaled; scaled and weighted, the analysis file), one record per respondent, the duplicate the 2014 cleaning missed dropped there while the two packages keep it, the 2014 survey weight as published and a corrected one, the instrument as fielded with its Qualtrics source, the quota design, a codebook, and a provenance record.
 
 ## De-identification
 
-The following columns were removed from the public release: `participant_id` (SocialSci panel ID), `startdate`, `enddate`, `starttime`, `endtime` (survey timestamps), `pagesequence`, `visitedpages`, `pageprogression` (survey navigation metadata). The anonymous `id` column and `timetaken` (for data quality checks) are retained.
+Removed from the raw data and everything built from it: the vendor's panel ID, four timestamps, and three survey-navigation fields. Kept: the vendor's anonymous `id` (not a unique key; use `row`), the completion time used by the exclusion rule, `state`, and three open-text fields that hold descriptors only.
 
-## Citation
+## Citation and license
 
-If you use this data, please cite the relevant paper(s):
-
-> Bower-Bir, J.S. (2022). Desert and redistribution: Justice as a remedy for, and cause of, economic inequality. *Policy Studies Journal*, 50(4), 757-795. https://doi.org/10.1111/psj.12439
-
-> Bower-Bir, J.S. (2021). Earning our place, more or less: Responsibility's flexible relationship with desert in socioeconomic standing. *Economia Politica*, 38(1), 131-170. https://doi.org/10.1007/s40888-020-00201-9
-
-## Survey Design
-
-The survey contains experimental conditions for multiple research questions:
-- 15 factors rated for importance in determining wealth/poverty (the desert definitions battery)
-- Redistributive policy preferences (income differences, government responsibility, tax progressivity)
-- Perceptions of rich and poor deservingness
-- Demographics, political ideology, religiosity, economic assessments
-- "Amanda" vignette conditions (sympathetic/neutral/unsympathetic framing for rich/poor characters)
-
-See the codebook for full details on all variables and experimental conditions.
+Cite the article you use, and the deposit by the DOI on its record. The packages and the deposit are released under CC BY 4.0.

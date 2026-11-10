@@ -6,12 +6,12 @@ desert in socioeconomic standing", Economia Politica 38(1): 131-170. The same
 program as script_replication.R, in Python; the figures themselves are drawn
 by the R script only.
 
-Reads, from this folder:
-  data_survey_ep-subset.csv   992 respondents, the 54 survey variables the
-                              tables and figures use
-  tables_as-published.md      the tables as printed, for the comparison
+Reads:
+  data_survey_ep-subset.csv   992 records (991 respondents), the 54 survey
+                              variables the tables and figures use
+  tables/tables_as-published.md   the tables as printed, for the comparison
 
-Writes, to this folder:
+Writes, to tables/ (created if needed):
   tables_typos-fixed_python.md  Tables 1, 2, and 4, the numbers behind Figures
                               3 to 7, the survey-weight check, and a list of
                               every printed cell that differs from the re-run
@@ -44,6 +44,8 @@ Three things carried over from the 2014 Stata code on purpose:
   3. One respondent's record is in the file twice; every analysis except
      Table 2 drops the second copy, as the published regressions did.
 """
+import os
+
 import numpy as np
 import pandas as pd
 from scipy import stats
@@ -51,8 +53,9 @@ from scipy import stats
 
 # ---- 1. The data and the duplicated record -----------------------------------
 
-OUT = "tables_typos-fixed_python.md"
-PUB = "tables_as-published.md"
+OUT = "tables/tables_typos-fixed_python.md"
+PUB = "tables/tables_as-published.md"
+os.makedirs("tables", exist_ok=True)
 d992 = pd.read_csv("data_survey_ep-subset.csv")
 
 # The duplicate: two rows identical in every answer (ids 1115 and 1157).
@@ -340,8 +343,8 @@ final += ["", "## Cells that change",
           "Final: the corrected weight; Table 2 on the 991 distinct respondents.", "",
           "| Table | Model | Row | Typos fixed | Final |", "|---|---|---|---|---|"]
 final += changes
-open("tables_final_python.md", "w", encoding="utf-8", newline="\n").write("\n".join(final) + "\n")
-print(f"wrote tables_final_python.md: {len(changes)} cells change at the printed precision")
+open("tables/tables_final_python.md", "w", encoding="utf-8", newline="\n").write("\n".join(final) + "\n")
+print(f"wrote tables/tables_final_python.md: {len(changes)} cells change at the printed precision")
 
 
 # ---- 9. Comparison with the printed tables ---------------------------------------
