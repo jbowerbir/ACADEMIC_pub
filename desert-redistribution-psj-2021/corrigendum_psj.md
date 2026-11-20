@@ -2,7 +2,7 @@
 
 Bower-Bir, J. S. (2022). Desert and redistribution: Justice as a remedy for, and cause of, economic inequality. *Policy Studies Journal* 50(4): 757–795. https://doi.org/10.1111/psj.12439
 
-None of the corrections below changes the article’s findings or interpretation. The article as published contains three types of error:
+The article as published contains three types of error, none of which bears on the article’s findings or interpretation:
 
 - **Mistyped cells**, four in Table 1 and eighteen in the appendix tables. I mistyped them when entering the results into the manuscript. The most visible is in Table 1, Y_gov_fix_gap Model 3, where the coefficient on Definition is printed as positive when it is negative, as the prose in Section 6.3 correctly states. None of the typos bears on the article’s conclusions.
 - **A misread control variable.** Two sentences in Section 6.1 misread the coefficient on Age², a control. The coefficient is so small that it prints as 0.000. The article reads it as positive and says that support for government action to reduce the income gap (Y_gov_fix_gap) accelerates with age. The coefficient is negative: the estimated curve rises with age to about age 34 and then falls. The turning point comes from Y_gov_fix_gap Model 1 in Table 1, the one Table 1 model where Age² is significant.
